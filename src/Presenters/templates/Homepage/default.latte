@@ -1,0 +1,20 @@
+{block content}
+	Dashboard
+	<div class="d-flex justify-content-center my-5">
+		<b-spinner label="Loading..."></b-spinner>
+	</div>
+	{{ pokus }}
+{/block}
+
+{block scripts}
+	<script>
+		new Vue({
+			el: '#app',
+			data() {
+				return {
+					pokus: 'pokusná proměnná'
+				}
+			}
+		});
+	</script>
+{/block}

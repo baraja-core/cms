@@ -1,0 +1,12 @@
+parameters:
+	cmsMenu:
+		-
+			label: Dashboard
+			link: 'Homepage:default'
+
+extensions:
+	cms: Baraja\Cms\CmsExtension
+
+services:
+	cmsApiManager: Baraja\Cms\Api\CmsApiManager
+	- Baraja\Cms\Api\Endpoint\CmsEndpoint

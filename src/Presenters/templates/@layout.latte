@@ -1,0 +1,50 @@
+<html lang="en">
+<head>
+	<title>Baraja admin</title>
+	<meta charset="utf-8">
+	<meta content="width=device-width,initial-scale=1" name="viewport">
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css">
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css">
+	<link type="text/css" rel="stylesheet" href="{$basePath}/admin/api/cms/css">
+	<script>
+		let basePath = {$basePath};
+		let baseApiPath = {$basePath . '/admin/api'};
+	</script>
+</head>
+
+<body>
+<noscript>
+	<strong>
+		We're sorry but administration doesn't work properly without JavaScript enabled.
+		Please enable it to continue.
+	</strong>
+</noscript>
+
+<div id="app">
+	<ui-header></ui-header>
+	<b-container fluid>
+		<b-row>
+			<b-col cols="3" class="ui-left-menu py-3">
+				<ui-left-menu v-bind:items="{json_encode($menuContent)}"></ui-left-menu>
+			</b-col>
+			<b-col class="py-3" id="app">
+				{include content}
+			</b-col>
+		</b-row>
+	</b-container>
+	<ui-footer></ui-footer>
+</div>
+
+<script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="{$basePath}/admin/api/cms/js"></script>
+{block scripts}
+	<script>
+		new Vue({
+			el: '#app'
+		})
+	</script>
+{/block}
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+	"name": "baraja-core/cms",
+	"description": "Simple smart CMS for Nette and Vue.js",
+	"homepage": "https://github.com/baraja-core/cms",
+	"authors": [
+		{
+			"name": "Jan Barášek",
+			"homepage": "https://baraja.cz"
+		}
+	],
+	"require": {
+		"php": ">=7.1.0",
+		"ext-json": "*",
+		"ext-mbstring": "*",
+		"baraja-core/package-manager": "^3.0",
+		"nette/application": "^3.0"
+	},
+	"autoload": {
+		"classmap": [
+			"src/"
+		]
+	},
+	"minimum-stability": "stable"
+}
