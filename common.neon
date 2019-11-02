@@ -9,4 +9,7 @@ extensions:
 
 services:
 	cmsApiManager: Baraja\Cms\Api\CmsApiManager
+	userManager: Baraja\Cms\SimpleUserManager
+	userStorage: Baraja\Cms\UserFileStorage(%appDir%/../data/user)
 	- Baraja\Cms\Api\Endpoint\CmsEndpoint
+	- Baraja\Cms\InstallProcess

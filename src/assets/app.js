@@ -7,6 +7,10 @@ function post(url, parameters, app, callback) {
 			window.location.replace(response.data.redirectUrl);
 		}
 
+		if ('error' in response.data && response.data.error !== null) {
+			alert(response.data.error);
+		}
+
 		if (app !== undefined && callback !== undefined) {
 			callback(app, response.data);
 		}

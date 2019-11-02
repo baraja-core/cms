@@ -5,10 +5,17 @@ declare(strict_types=1);
 namespace App\AdminModule\Presenters;
 
 
+use Baraja\Cms\UserManager;
 use Nette\Application\UI\InvalidLinkException;
 
 class BasePresenter extends \App\Presenters\BasePresenter
 {
+
+	/**
+	 * @var UserManager
+	 * @inject
+	 */
+	public $userManager;
 
 	public function startup(): void
 	{
