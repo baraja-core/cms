@@ -49,7 +49,7 @@ final class CmsApiManager
 			throw new ApiEndpointException('Service "' . $service . '" does not exist');
 		}
 
-		if (method_exists($endpoint, $method = 'action' . str_replace('.', '', Helpers::firstUpper($signal)))) {
+		if (method_exists($endpoint, $method = Helpers::formatApiMethod($signal))) {
 			try {
 				return $this->call($endpoint, $method, array_merge($_GET, $_POST));
 			} catch (\Exception $e) {
@@ -68,7 +68,11 @@ final class CmsApiManager
 		if (\count($_POST) === 1 && preg_match('/^\{.*\}$/', $post = array_keys($_POST)[0]) && ($json = json_decode($post)) instanceof \stdClass) {
 			foreach ($json as $key => $value) {
 				$_POST[$key] = $value;
-				unset($_POST[$post]);
+			}
+			unset($_POST[$post]);
+		} elseif (($input = (string) file_get_contents('php://input')) !== '' && $json = json_decode($input, true)) {
+			foreach ($json as $key => $value) {
+				$_POST[$key] = $value;
 			}
 		}
 	}
@@ -87,15 +91,17 @@ final class CmsApiManager
 		$paramValues = [];
 
 		foreach ($ref->getParameters() as $parameter) {
-			$paramName = $parameter->getName();
-
-			if (isset($args[$paramName])) {
+			if (isset($args[$paramName = $parameter->getName()])) {
 				$type = $parameter->getType();
 				$paramValues[$paramName] = $type === null
 					? (string) $args[$paramName]
 					: $this->resolveType($type->getName(), $type->allowsNull(), $args[$paramName]);
 			} elseif ($parameter->isOptional() === false) {
-				throw new ApiEndpointException('Parameter "' . $paramName . '" for method "' . $method . '" is required.');
+				if (($type = $parameter->getType()) !== null && $type->allowsNull() === true) {
+					$paramValues[$paramName] = null;
+				} else {
+					throw new ApiEndpointException('Parameter "' . $paramName . '" for method "' . $method . '" is required.');
+				}
 			} else {
 				$paramValues[$paramName] = $parameter->getDefaultValue();
 			}

@@ -60,7 +60,16 @@ class CmsExtension extends CompilerExtension
 		$initialize->addBody(
 			'$this->getService(\'routing.router\')[] = \Baraja\Cms\CmsExtension::createAdminRouter();'
 			. "\n" . '\Baraja\Cms\CmsExtension::fixRouter($this->getService(\'routing.router\'));'
+			. ($this->isProjectInstalled() ? '' : '$this->getByType(\'' . InstallProcess::class . '\')->run();')
 		);
+	}
+
+	/**
+	 * @return bool
+	 */
+	private function isProjectInstalled(): bool
+	{
+		return is_file(__DIR__ . '/../../../../data/config.json');
 	}
 
 }
