@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Instalace projektu | Baraja admin</title>
+	<meta charset="utf-8">
+	<meta name="description" content="Baraja administration">
+	<meta name="author" content="Baraja.cz">
+	<meta name="robots" content="noindex, nofollow">
+	<meta content="width=device-width,initial-scale=.5" name="viewport">
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css">
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css">
+	<script>
+		let basePath = {$basePath};
+		let baseApiPath = {$basePath . '/api/v1'};
+	</script>
+</head>
+
+<body>
+<noscript>
+	<div class="container">
+		<div class="row my-5">
+			<div class="col">
+				<h1>Javascript is not allowed</h1>
+				<p class="mt-5"><b>We're sorry but administration doesn't work properly without JavaScript enabled.</b></p>
+				<p>Please enable it to continue.</p>
+			</div>
+		</div>
+	</div>
+</noscript>
+
+<div id="app">
+	<template v-if="installForm === false">
+		{include content}
+	</template>
+	<template v-if="installForm === true">
+		{include contentInstalled}
+	</template>
+</div>
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@2.7.0/dist/bootstrap-vue.min.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+{include scripts}
+</body>
+</html>
+
+{define content}
+	<b-container>
+		<b-row align-h="center">
+			<b-col class="py-5" cols="8">
+				<b-card :title="isBusy ? '' : 'Vítá Vás instalace nového projektu'">
+					<div v-if="isBusy" class="text-center text-primary my-5">
+						<b-spinner class="align-middle mr-3"></b-spinner>
+						<strong>Vytvářím projekt...</strong>
+					</div>
+					<template v-else>
+						<p>
+							Vítejte v&nbsp;instalačním procesu pro založení nového webu nebo e-shopu.
+							Než se budeme moci naplno pustit do správy webu, potřebujeme vyplnit základní informace.
+						</p>
+						<b-alert n:if="$isLocalhost" show variant="warning">
+							<b>Upozornění:</b>
+							Pokoušíte se projekt nainstalovat na lokální server ve Vašem počítači.
+							Po nahrání souborů na webový server bude potřeba upřesnit konfiguraci URL adres,
+							e&#8209;mailového serveru a&nbsp;další nastavení v&nbsp;závislosti na vaší konfiguraci.
+						</b-alert>
+						{include form}
+					</template>
+				</b-card>
+				<div v-if="isBusy === false" class="text-right">
+					<b-link class="btn-sm" v-b-modal.security-info>Informace o&nbsp;zabezpečení</b-link>
+					<b-link class="btn-sm" v-b-modal.not-admin>Nejsem správce webu</b-link>
+				</div>
+			</b-col>
+		</b-row>
+	</b-container>
+
+	<b-modal id="not-admin" size="lg" title="Nejsem správce tohoto webu">
+		<p>
+			Tato stránka slouží <b>pouze pro majitele a&nbsp;správce tohoto webového projektu</b>
+			a&nbsp;zobrazí se jen v&nbsp;případě, když web čeká na dokončení konfigurace.
+		</p>
+		<p>
+			Pokud můžete, kontaktujte správce webu, aby dokončil celý proces registrace, což způsobí spuštění webu.
+		</p>
+		<p n:if="$isBarajaCz">
+			Správcem tohoto webu je společnost Baraja.cz.
+		</p>
+		<p n:if="$isLocalhost">
+			Projekt je nainstalován lokálně, proto je správce majitel tohoto zařízení.
+		</p>
+	</b-modal>
+
+	<b-modal id="security-info" size="lg" title="Informace o zabezpečení a ochraně osobních údajů">
+		<p>
+			Vítejte v&nbsp;nápovědě o&nbsp;zabezpečení a&nbsp;ochraně osobních údajů.
+		</p>
+		<p>
+			Bezpečnost je&nbsp;pro nás <b>na&nbsp;prvním místě</b>, proto jsme rádi, že se&nbsp;můžeme podělit o&nbsp;způsob,
+			jak s&nbsp;daty nakládáme.
+		</p>
+		<p>
+			Všechna vložená data jsou <b>maximálně důvěrná</b> a&nbsp;slouží pro správný běh Vašeho webu.
+			Data budou fyzicky uložena na stejném webovém serveru, jako tento web, pokud vysloveně nepožádáte jinak.
+			Pro uložení základní konfigurace používáme specializované databázové tabulky, které transparentním
+			způsobem zobrazují všechna data, která systém zná a&nbsp;používá.
+		</p>
+		<p>
+			Hesla a&nbsp;další extrémně citlivá data před uložením
+			<a href="https://php.baraja.cz/hashovani" target="_blank">hashujeme</a> algoritmem BCRYPT.
+		</p>
+		<p>
+			Pokud během používání aplikace propojíte Váš web s&nbsp;některou ze služeb společnosti Baraja.cz,
+			budeme s&nbsp;daty nakládat podle
+			<a href="https://baraja.cz/vseobecne-obchodni-podminky" target="_blank">Všeobecných obchodních podmínek</a>.
+			Informace o&nbsp;zabezpečení a&nbsp;způsobu použití dat naleznete na stránce
+			<a href="https://baraja.cz/gdpr-ochrana-a-zpracovani-osobnich-udaju" target="_blank"
+			>Ochrana a&nbsp;zpracování osobních údajů v&nbsp;souladu s&nbsp;GDPR</a>.
+		</p>
+		<p>
+			Za bezpečnost zpracování dat na serverech baraja.cz ručí Jan Barášek.
+			Uvedené zabezpečení platí pouze v&nbsp;případě, když pro hosting webu používáte oficiální servery Baraja.cz,
+			nebo našich certifikovaných partnerů. V&nbsp;ostatních případech mohou na zabezpečení existovat další vlivy,
+			které nemůžeme ohlídat.
+		</p>
+		<p>
+			Pokud potřebujete více informací, neváhejte
+			<a href="https://baraja.cz/kontakt" target="_blank">kontaktovat zákaznickou podporu</a>.
+		</p>
+	</b-modal>
+{/define}
+
+{define contentInstalled}
+	<b-container>
+		<b-row align-h="center">
+			<b-col class="py-5" cols="8">
+				<b-card title="Vítejte!">
+					<p>Instalace projektu byla úspěšně dokončena.</p>
+					<p>
+						Podrobné pokyny, jak administraci používat a&nbsp;kde se příště přihlásit,
+						vám byly odeslány na uvedený e-mail.
+					</p>
+					<b-button variant="primary" href="{$basePath}/admin">
+						Přejít do administrace
+					</b-button>
+				</b-card>
+			</b-col>
+		</b-row>
+	</b-container>
+{/define}
+
+{define form}
+	<b-alert v-if="errorSamePassword" show variant="danger" class="mb-3">
+		Hesla se musí shodovat!
+	</b-alert>
+
+	<b-alert v-if="serverErrors.length > 0" show variant="danger" class="mb-3">
+		<p>Prosím, nejprve vyřešte tyto chyby:</p>
+		<ul>
+			<li v-for="serverError in serverErrors">{{ serverError }}</li>
+		</ul>
+	</b-alert>
+
+	<b-form @submit="onSubmit" @input="checkValidForm()">
+		<b-form-group>
+			<b-icon
+					icon="question-circle-fill"
+					variant="info"
+					v-b-tooltip.hover
+					title="Název webu slouží pro vaši lepší orientaci v projektech a bude se zobrazovat jako výchozí název ve vyhledávačích, titulku stránek a předmětech e-mailů. Název můžete později změnit v nastavení systému. Název nemusí být stejný jako doména, kde bude web dostupný.">
+			</b-icon>
+			<label for="name">Název webu:</label>
+			<b-form-input id="name" v-model="form.name" type="text" placeholder="Například název firmy, blogu, e-shopu, společnosti, ..." required></b-form-input>
+		</b-form-group>
+
+		<b-row>
+			<b-col>
+				<b-form-group label="Jméno správce:" label-for="firstName">
+					<b-form-input id="firstName" v-model="form.firstName" type="text" required></b-form-input>
+				</b-form-group>
+			</b-col>
+			<b-col>
+				<b-form-group label="Příjmení správce:" label-for="lastName">
+					<b-form-input id="lastName" v-model="form.lastName" type="text" required></b-form-input>
+				</b-form-group>
+			</b-col>
+		</b-row>
+
+		<b-form-group>
+			<b-icon
+					icon="question-circle-fill"
+					variant="info"
+					v-b-tooltip.hover
+					title="Tento e-mail musí existovat a musí ho číst odpovědná osoba vzhledem k tomuto projektu. Na e-mail budeme pravidelně zasílat všechna důležitá oznámení, informace o technickém stavu a report chyb. Z tohoto e-mailu můžete také zasílat autorizované požadavky na placenou technickou podporu.">
+			</b-icon>
+			<label for="mail">E-mail správce:</label>
+			<b-form-input id="mail" v-model="form.mail" type="email" required></b-form-input>
+		</b-form-group>
+
+		<b-form-group>
+			<b-icon
+					icon="question-circle-fill"
+					variant="info"
+					v-b-tooltip.hover
+					title="Po dokončení instalace vám bude vytvořen uživatelský účet s tímto přihlašovacím jménem. Tento účet bude označen jako systémový a bude mít nastaveno nejvyšší možné oprávnění.">
+			</b-icon>
+			<label for="username">Uživatelské jméno správce:</label>
+			<b-form-input id="username" v-model="form.username" type="text" required></b-form-input>
+		</b-form-group>
+
+		<b-form-group>
+			<b-icon
+					icon="question-circle-fill"
+					variant="info"
+					v-b-tooltip.hover
+					title="Heslo bude uloženo pouze v hashované podobě (bezpečným algoritmem Bcrypt) v lokální databázi tohoto projektu. Heslo nikdy nepřenášíme na vzdálené servery a znáte ho pouze vy. Heslo nikdy neposíláme e-mailem a nikde neexistuje jeho člověkem čitelná verze.">
+			</b-icon>
+			<label for="password">Heslo:</label>
+			<b-form-input id="password" v-model="form.password" type="password" required @input="validatePassword()"></b-form-input>
+			<b-progress :value="passwordStrength" max="5" class="mb-3" show-value v-b-tooltip
+						title="Vyjadřuje bezpečnost hesla. Hlavní administrátor musí mít bezpečnost aspoň na úrovni 4. Body získáváte za použití malých a velkých písmen, číslic a speciálních znaků."></b-progress>
+		</b-form-group>
+
+		<b-form-group label="Heslo znovu:" label-for="passwordVerify">
+			<b-form-input id="passwordVerify" v-model="form.passwordVerify" type="password" required @input="onInputPassword()"></b-form-input>
+		</b-form-group>
+
+		<b-form-group label-for="vop">
+			<b-form-checkbox id="vop" v-model="form.vop" :value="true" :unchecked-value="false">
+				<span v-b-tooltip title="Veškerá zadaná data do tohoto formuláře i získaná později v administraci zpracováváme v souladu s GDPR. Pokud potřebujete více informací, klikněte na odkaz 'Informace o zabezpečení' na konci této stránky.">
+					Souhlasím se <a href="https://baraja.cz/vseobecne-obchodni-podminky" target="_blank">Všeobecnými podmínkami služby</a> a&nbsp;<a href="https://baraja.cz/gdpr-ochrana-a-zpracovani-osobnich-udaju" target="_blank">zpracováním osobních údajů</a>.
+				</span>
+			</b-form-checkbox>
+		</b-form-group>
+
+		<b-button type="submit" variant="primary">Pokračovat</b-button>
+	</b-form>
+{/define}
+
+{define scripts}
+	<script>
+		new Vue({
+			el: '#app',
+			data() {
+				return {
+					form: {
+			 			name: '',
+						username: 'admin',
+						firstName: '',
+						lastName: '',
+						mail: '',
+						password: '',
+						passwordVerify: '',
+						vop: false
+					},
+					passwordStrength: 0,
+					isBusy: false,
+					errorSamePassword: false,
+					serverErrors: {},
+					isFormOk: false,
+					installForm: false
+				}
+			},
+			methods: {
+				onSubmit(evt) {
+					evt.preventDefault();
+					this.checkValidForm();
+
+					if (this.isFormOk === false) {
+						if (this.passwordStrength < 4) {
+							alert('Pro zajištění maximální bezpečnosti musí administrátorské heslo získat aspoň 4 body.');
+						} else if (this.form.vop === false) {
+							alert('Musíte souhlasit s podmínkami služby.');
+						} else {
+							alert('Opravte formulářová pole. Všechna pole jsou povinná, hesla se musí shodovat a musíte souhlasit s podmínkami služby.');
+						}
+					} else {
+						this.isBusy = true;
+
+						fetch(baseApiPath + '/cms-install/basic', {
+							method: 'POST',
+							body: JSON.stringify(this.form)
+						})
+							.then(json => json.json())
+							.then(json => {
+								if ('state' in json && json.state === 'error') {
+									this.serverErrors = json.errors;
+								} else {
+									this.installForm = true;
+								}
+							}).finally(json => this.isBusy = false);
+					}
+				},
+				validatePassword() {
+					if (this.form.password === '') {
+						this.passwordStrength = 0;
+						return;
+					}
+
+					let matchedCase = ['[$@$!%*#?&]', '[A-Z]', '[0-9]', '[a-z]'];
+					let strength = 0;
+					for (let i = 0; i < matchedCase.length; i++) {
+						if (new RegExp(matchedCase[i]).test(this.form.password)) {
+							strength++;
+						}
+					}
+
+					this.passwordStrength = strength + 1;
+					this.onInputPassword();
+				},
+				onInputPassword() {
+					this.errorSamePassword = this.form.password !== ''
+						&& this.form.passwordVerify !== ''
+						&& this.form.password !== this.form.passwordVerify;
+				},
+				checkValidForm() {
+					this.isFormOk = this.passwordStrength >= 4
+						&& this.form.password !== ''
+						&& this.errorSamePassword === false
+						&& this.form.vop === true;
+				}
+			}
+		})
+	</script>
+{/define}

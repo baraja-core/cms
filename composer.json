@@ -1,6 +1,6 @@
 {
 	"name": "baraja-core/cms",
-	"description": "Simple smart CMS for Nette and Vue.js",
+	"description": "Simple smart CMS for Nette and Vue.js.",
 	"homepage": "https://github.com/baraja-core/cms",
 	"authors": [
 		{
@@ -10,15 +10,33 @@
 	],
 	"require": {
 		"php": ">=7.1.0",
-		"ext-json": "*",
-		"ext-mbstring": "*",
-		"baraja-core/package-manager": "~1.0",
+		"baraja-core/dynamic-configuration": "^1.0",
+		"baraja-core/doctrine": "^2.0",
+		"baraja-core/structured-api": "^2.0",
+		"baraja-core/admin-bar": "^1.0",
+		"baraja-core/plugin-system": "^1.0",
+		"baraja-core/localization": "^1.0",
 		"nette/di": "^3.0",
-		"nette/application": "^3.0"
+		"latte/latte": "^2.5",
+		"nette/security": "^3.0",
+		"nette/utils": "^3.0",
+		"nette/http": "^3.0",
+		"nette/caching": "^3.0"
+	},
+	"require-dev": {
+		"phpstan/phpstan": "^0.12.18",
+		"tracy/tracy": "^2.7",
+		"phpstan/phpstan-nette": "^0.12.6",
+		"symplify/easy-coding-standard": "^7.2"
 	},
 	"autoload": {
 		"classmap": [
 			"src/"
+		]
+	},
+	"scripts": {
+		"phpstan": [
+			"vendor/bin/phpstan analyse src -c phpstan.neon --level 6 --no-progress"
 		]
 	},
 	"minimum-stability": "stable"
