@@ -13,6 +13,7 @@ use Baraja\Cms\Proxy\Proxy;
 use Baraja\Cms\User\Authorizator;
 use Baraja\Cms\User\UserManager;
 use Baraja\Plugin\Component\VueComponent;
+use Baraja\Plugin\PluginComponentExtension;
 use Baraja\Plugin\PluginLinkGenerator;
 use Baraja\Plugin\PluginManager;
 use Nette\Application\Application;
@@ -43,7 +44,7 @@ final class CmsExtension extends CompilerExtension
 
 	public function beforeCompile(): void
 	{
-		$builder = $this->getContainerBuilder();
+		PluginComponentExtension::defineBasicServices($builder = $this->getContainerBuilder());
 
 		// linkGenerator
 		$builder->addDefinition(self::SERVICE_PREFIX . 'linkGenerator')
