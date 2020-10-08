@@ -42,26 +42,22 @@ final class Support
 	 */
 	public function getIssues(): array
 	{
-		return json_decode(file_get_contents(self::BASE_URL . '/cms-issue?domain=' . urlencode($this->getDomain())), true);
+		return $this->cloudManager->callRequest('cms-issue', [
+			'domain' => $this->getDomain(),
+		]);
 	}
 
 
 	public function createIssue(string $subject, string $message, string $priority, ?\DateTime $dueDate = null, ?string $url = null): void
 	{
-		file_get_contents(self::BASE_URL . '/cms-issue', false, stream_context_create([
-			'http' => [
-				'method' => 'POST',
-				'header' => 'Content-Type: application/x-www-form-urlencoded',
-				'content' => http_build_query([
-					'domain' => $this->getDomain(),
-					'subject' => $subject,
-					'message' => $message,
-					'priority' => $priority,
-					'dueDate' => $dueDate === null ? null : $dueDate->format(\DateTime::ATOM),
-					'url' => $url,
-				]),
-			],
-		]));
+		$this->cloudManager->callRequest('cms-issue', [
+			'domain' => $this->getDomain(),
+			'subject' => $subject,
+			'message' => $message,
+			'priority' => $priority,
+			'dueDate' => $dueDate === null ? null : $dueDate->format(\DateTime::ATOM),
+			'url' => $url,
+		], 'POST');
 	}
 
 
@@ -71,7 +67,10 @@ final class Support
 	 */
 	public function getIssue(string $id): array
 	{
-		return json_decode(file_get_contents(self::BASE_URL . '/cms-issue/detail?id=' . urlencode($id) . '&domain=' . urlencode($this->getDomain())), true);
+		return $this->cloudManager->callRequest('cms-issue/detail', [
+			'id' => $id,
+			'domain' => $this->getDomain(),
+		]);
 	}
 
 

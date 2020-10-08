@@ -85,12 +85,7 @@ final class Admin
 				$this->terminate($this->renderSetUserPasswordTemplate($_GET['userId'] ?? ''));
 			}
 			if (($assetType = ($path === 'assets/core.js') ? 'js' : null) || ($assetType = ($path === 'assets/core.css') ? 'css' : null)) { // route static assets from template directory
-				if (isset(Proxy::CONTENT_TYPES[$assetType]) === true) {
-					header('Content-Type: ' . Proxy::CONTENT_TYPES[$assetType]);
-				} else {
-					throw new \InvalidArgumentException('Unsupported file extension, "' . $assetType . '" given.');
-				}
-
+				header('Content-Type: ' . Proxy::CONTENT_TYPES[$assetType]);
 				echo '/*' . "\n"
 					. ' * This file is part of Baraja CMS.' . "\n"
 					. ' */' . "\n\n"

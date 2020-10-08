@@ -239,6 +239,8 @@ final class CmsEndpoint extends BaseEndpoint
 				->getSingleResult();
 		} catch (NoResultException | NonUniqueResultException | \InvalidArgumentException $e) {
 			$this->sendError('User "' . $userId . '" does not exist.');
+
+			return;
 		}
 
 		$user->setPassword($password);

@@ -8,9 +8,9 @@ namespace Baraja\Cms\Api;
 use Baraja\BarajaCloud\CloudManager;
 use Baraja\Cms\Helpers;
 use Baraja\Cms\Settings;
-use Baraja\Cms\Settings\Constant;
 use Baraja\Cms\User\Entity\User;
 use Baraja\Doctrine\EntityManager;
+use Baraja\DynamicConfiguration\Configuration;
 use Baraja\StructuredApi\BaseEndpoint;
 use Nette\Http\Url;
 use Nette\Utils\Strings;
@@ -29,10 +29,10 @@ final class CmsInstallEndpoint extends BaseEndpoint
 	public $entityManager;
 
 	/**
-	 * @var Constant
+	 * @var Configuration
 	 * @inject
 	 */
-	public $constant;
+	public $configuration;
 
 	/**
 	 * @var CloudManager
@@ -71,7 +71,7 @@ final class CmsInstallEndpoint extends BaseEndpoint
 		}
 		if (($mail = trim($mail)) === '') {
 			$errors[] = 'Zadejte e-mail.';
-		} elseif (Validators::isEmail($mail) === '') {
+		} elseif (Validators::isEmail($mail) === false) {
 			$errors[] = 'Zadaný e-mail neexistuje.';
 		}
 		if (($password = trim($password)) === '') {
@@ -98,8 +98,8 @@ final class CmsInstallEndpoint extends BaseEndpoint
 			]);
 		}
 
-		$this->constant->save('name', $name, 'core');
-		$this->constant->save('admin-email', $mail, 'core');
+		$this->configuration->save('name', $name, 'core');
+		$this->configuration->save('admin-email', $mail, 'core');
 
 		$user = new User($username, $password, $mail, 'admin');
 		$user->setFirstName($firstName);
