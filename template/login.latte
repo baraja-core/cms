@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="Baraja administration">
+	<meta name="author" content="Baraja.cz">
+	<meta name="robots" content="noindex, nofollow">
+	<title>Baraja CMS</title>
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+	<script>
+	  window.onerror = function (message, file, line, col, error) {
+		  if (error !== null) {
+			  document.getElementById('unsupportedErrorMessage').innerHTML += message + '<br><code>' + file + '</code>:' + line + '<hr>';
+			  document.getElementById('unsupportedErrorDiv').style.display = 'block';
+			  document.getElementById('loginFormContainer').style.display = 'none';
+		  }
+
+		  return false;
+	  };
+	</script>
+
+	<style>
+		body {
+			background: #f3f3f3;
+		}
+
+		.modal-backdrop {
+			background: rgba(0, 0, 0, .5);
+		}
+
+		a {
+			color: #007bff;
+			text-decoration: none;
+		}
+
+		a:hover, a:focus {
+			color: #004386;
+		}
+
+		.page-wrapper {
+			height: 75vh;
+		}
+
+		@media (min-width: 769px) {
+			.card-wrapper {
+				width: 400px;
+			}
+		}
+
+		.card {
+			border: 0;
+			border-radius: 0.25rem;
+			-webkit-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+			box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+		}
+
+		.card-header, .card-footer {
+			border-bottom-color: #e9ecef;
+		}
+
+		.card-header {
+			background-color: #00000008;
+		}
+
+		.card-footer {
+			background-color: #fff;
+		}
+
+		.btn-primary, .btn-primary:disabled {
+			background-color: #007bff;
+			border-color: #007bff;
+		}
+
+		.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+			background-color: #007bff !important;
+			border-color: #007bff !important;
+			-webkit-box-shadow: 0 0 0 0.2rem rgba(17, 27, 185, 0.5) !important;
+			box-shadow: 0 0 0 0.2rem rgba(55, 42, 179, 0.5) !important;
+		}
+
+		.custom-control-input:checked ~ .custom-control-label::before {
+			background-color: #007bff;
+			border-color: #007bff;
+		}
+
+		.form-control {
+			display: block;
+			width: 100%;
+			height: calc(1.5em + 0.876rem + 2px);
+			padding: 0.438rem 1rem;
+			font-size: 1rem;
+			font-weight: 400;
+			line-height: 1.5;
+			color: #495057;
+			background-color: #fff;
+			background-clip: padding-box;
+			border: 1px solid #ced4da;
+			border-radius: 0.25rem;
+			-webkit-transition: border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+			transition: border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+			-o-transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+			transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+			transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+		}
+
+		.form-control:focus {
+			color: #495057;
+			background-color: #fff;
+			border-color: #8dc9ff;
+			outline: 0;
+			-webkit-box-shadow: 0 0 0 0.2rem rgba(50, 100, 165, 0.25);
+			box-shadow: 0 0 0 0.2rem rgba(63, 106, 165, 0.25);
+		}
+
+		.text-muted {
+			color: #6c757d !important;
+		}
+	</style>
+</head>
+<body>
+<div id="app">
+	<div class="page-wrapper d-flex flex-column align-items-center justify-content-center pt-5">
+		<noscript>
+			<div class="card-wrapper">
+				<div class="card">
+					<div class="card-header d-flex justify-content-between">
+						<a href="https://baraja.cz" class="corner-logo" target="_blank">
+							Baraja&nbsp;CMS
+						</a>
+					</div>
+					<div class="card-body py-4">
+						<table class="w-100 mb-3">
+							<tr>
+								<td class="p-2">❌</td>
+								<td class="text-center text-danger">Your browser does not support javascript.</td>
+							</tr>
+						</table>
+						<p>
+							You must have javascript active in&nbsp;your browser for the correct
+							functionality of&nbsp;the administration interface.
+						</p>
+						<p>
+							If&nbsp;you are unsure, please contact your administrator
+							or&nbsp;<a href="https://baraja.cz/kontakt" target="_blank">Official Support</a>.
+						</p>
+					</div>
+				</div>
+			</div>
+		</noscript>
+		<div style="display:none" id="unsupportedErrorDiv">
+			<div class="card-wrapper">
+				<div class="card">
+					<div class="card-header d-flex justify-content-between">
+						<a href="https://baraja.cz" class="corner-logo" target="_blank">
+							Baraja&nbsp;CMS
+						</a>
+					</div>
+					<div class="card-body py-4">
+						<p>
+							Your browser is not supported yet. We are compatible with browsers:<br>
+							<b>Chrome&nbsp;55+, Firefox&nbsp;53+, MS&nbsp;Edge&nbsp;16+, Safari&nbsp;11+ and iOS&nbsp;Safari&nbsp;11+</b>
+						</p>
+						<p>
+							If&nbsp;you are unsure, please contact your administrator
+							or&nbsp;<a href="https://baraja.cz/kontakt" target="_blank">Official Support</a>.
+						</p>
+						<p>List of errors:</p>
+						<i id="unsupportedErrorMessage" class="text-secondary"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="loginFormContainer">
+			<login :locales="{$availableLocales|escapeJs}" init-locale="{$locale}"></login>
+		</div>
+	</div>
+</div>
+<script src="https://unpkg.com/vue@latest/dist/vue.min.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
+<script>
+	Vue.component('login', {
+		props: ['locales', 'initLocale'],
+		template: `
+		<div class="card-wrapper">
+			<div v-if="errorMessage" class="alert alert-danger text-center mb-2">
+				{{ errorMessage }}
+			</div>
+			<div class="card">
+				<div class="card-header d-flex justify-content-between">
+					<a :href="'https://baraja.cz/cms?locale=' + locale" class="corner-logo" target="_blank">
+						{{ projectName }}
+					</a>
+					<div>
+						<template v-for="(localeItem, offset) in locales">
+							<b-link class="card-link mx-1" @click="locale=localeItem">{{ localeItem }}</b-link>
+							<span v-if="offset < locales.length-1" class="small text-muted" style="position:relative;top:-1px">|</span>
+						</template>
+					</div>
+				</div>
+				<div class="card-body py-4">
+					<div v-if="form.username === 'baraja'" class="text-center mb-3">
+						<a href="https://baraja.cz/janbarasek" target="_blank">
+							<img src="https://baraja.cz/content/jan-barasek.jpg" class="rounded-circle" style="max-height:8em" alt="Baraja">
+						</a>
+					</div>
+					<form v-if="!isOAuth" @submit.prevent id="loginForm" role="form">
+						<b-form-group :label="translator[locale].form.username + ':'" label-for="username">
+							<b-form-input type="text" v-model="form.username" id="username" tabindex="1" required></b-form-input>
+						</b-form-group>
+						<b-form-group :label="translator[locale].form.password + ':'" label-for="password">
+							<b-form-input type="password" v-model="form.password" id="password" tabindex="2" required></b-form-input>
+						</b-form-group>
+						<button type="submit" @click.prevent="loginProcess()" :disabled="!form.username || !form.password" tabindex="3" class="btn btn-block btn-primary">
+							<template v-if="isLoading">
+								<b-spinner small></b-spinner>
+							</template>
+							<template v-else>
+								{{ translator[locale].form.submit }}
+							</template>
+						</button>
+					</form>
+					<div v-else>
+						<form ref="oauth" id="oauthForm">
+							<b-form-group label="Authentication code:" label-for="oauth">
+								<b-form-input ref="otpInput" type="string" maxlength="7" minlength="6" v-model="form.oauth" id="oauth" autocomplete="one-time-code" required></b-form-input>
+								<div class="invalid-feedback">
+									{{ translator[locale].otp.invalidCode }}
+								</div>
+								<small>{{ translator[locale].otp.info }}</small>
+							</b-form-group>
+
+							<button type="submit" @click.prevent="verifyOAuth()" :disabled="form.oauth.length < 6" class="btn btn-block btn-primary">
+								<template v-if="isLoading">
+									<b-spinner small></b-spinner>
+								</template>
+								<template v-else>
+									{{ translator[locale].form.submit }}
+								</template>
+							</button>
+						</form>
+					</div>
+				</div>
+				<div class="card-footer">
+					<b-row>
+						<b-col>
+							<b-form-group label-for="remember" v-if="!isOAuth" class="mb-0">
+								<b-form-checkbox id="remember" v-model="form.remember" value="yes" unchecked-value="no">
+									<span v-b-tooltip :title="translator[locale].form.rememberAlt">{{ translator[locale].form.rememberText }}</span>
+								</b-form-checkbox>
+							</b-form-group>
+						</b-col>
+						<b-col class="text-right">
+							<b-link class="card-link" v-b-modal.need-help-modal>{{ translator[locale].form.help }}</b-link>
+						</b-col>
+					</b-row>
+				</div>
+			</div>
+			<b-modal id="need-help-modal" :title="translator[locale].needHelp.title" centered hide-footer>
+				<b-overlay :show="reportProblem.isBusy" rounded="lg">
+					<b-alert v-if="reportProblem.state === 'ok'" show variant="success">
+						<p>{{ translator[locale].needHelp.success }}</p>
+						<b-button variant="success" @click="reportProblem.state=null">Ok</b-button>
+					</b-alert>
+					<template v-else>
+						<div v-if="needHelpPage == null">
+							<p>{{ translator[locale].needHelp.description }}</p>
+							<b-list-group>
+								<b-list-group-item @click="needHelpPage='forgotPassword'" href="#">{{ translator[locale].needHelp.forgotPassword }}</b-list-group-item>
+								<b-list-group-item @click="needHelpPage='forgotUsername'" href="#">{{ translator[locale].needHelp.forgotUsername }}</b-list-group-item>
+								<b-list-group-item @click="needHelpPage='other'" href="#">{{ translator[locale].needHelp.otherProblem }}</b-list-group-item>
+							</b-list-group>
+						</div>
+						<div v-if="needHelpPage != null" class="mb-3">
+							<b-button variant="secondary" @click="resetReportProblem()" class="btn-sm">
+								<b-icon icon="chevron-left" aria-hidden="true"></b-icon>
+								{{ translator[locale].needHelp.backButton }}
+							</b-button>
+						</div>
+						<b-alert v-if="reportProblem.state === 'error'" show variant="danger">
+							{{ reportProblem.serverMessage }}
+						</b-alert>
+						<template v-if="needHelpPage == 'forgotPassword'">
+							<p>{{ translator[locale].needHelp.forgotPasswordDescription }}</p>
+							<b-form @submit="onReportProblem">
+								<b-form-group>
+									<b-form-input id="username" v-model="reportProblem.username" type="text" required></b-form-input>
+								</b-form-group>
+								<b-button type="submit" variant="primary">
+									{{ translator[locale].needHelp.sendButton }}
+								</b-button>
+							</b-form>
+						</template>
+						<template v-if="needHelpPage == 'forgotUsername'">
+							<p>{{ translator[locale].needHelp.forgotUsernameDescription }}</p>
+							<b-form @submit="onReportProblem">
+								<b-form-group>
+									<b-form-input id="realName" v-model="reportProblem.realName" type="text" required></b-form-input>
+								</b-form-group>
+								<b-button type="submit" variant="primary">
+									{{ translator[locale].needHelp.sendButton }}
+								</b-button>
+							</b-form>
+						</template>
+						<template v-if="needHelpPage == 'other'">
+							<p>{{ translator[locale].needHelp.otherProblemDescription }}</p>
+							<b-form @submit="onReportProblem">
+								<b-form-group>
+									<b-form-textarea id="problemDescription" v-model="reportProblem.problemDescription" rows="6" required></b-form-textarea>
+								</b-form-group>
+								<b-form-group label="E-mail:" label-for="username">
+									<b-form-input id="username" v-model="reportProblem.username" type="email" required></b-form-input>
+								</b-form-group>
+								<b-button type="submit" variant="primary">
+									{{ translator[locale].needHelp.sendButton }}
+								</b-button>
+							</b-form>
+						</template>
+					</template>
+				</b-overlay>
+			</b-modal>
+		</div>`,
+		data: function () {
+			return {
+				locale: 'en',
+				projectName: {$projectName},
+				redirect: '',
+				isLoading: false,
+				isOAuth: false,
+				errorMessage: '',
+				needHelpPage: null,
+				form: {
+					username: '',
+					password: '',
+					oauth: '',
+					remember: 'yes'
+				},
+		  	reportProblem: {
+					realName: '',
+					username: '',
+					problemDescription: '',
+					isBusy: false,
+					state: null,
+					serverMessage: ''
+				},
+				translator: {
+					en: {
+						form: {
+							username: 'Username or e-mail address',
+							password: 'Password',
+							submit: 'Sign in',
+							rememberText: 'Stay signed in',
+							rememberAlt: 'Permanent login creates 14-day cookies.',
+							help: 'Need help?'
+						},
+						otp: {
+							invalidCode: 'Invalid authentication code',
+							info: 'Code from your Two-Factor Verfication App'
+						},
+						needHelp: {
+							title: 'Potřebuji pomoct',
+							description: 'S čím vám můžeme pomoct?',
+							forgotPassword: 'Zapomenuté heslo',
+							forgotPasswordDescription: 'Zadejte vaše uživatelské jméno nebo e-mail:',
+							forgotUsername: 'Zapomenuté uživatelské jméno',
+							forgotUsernameDescription: 'Zadejte vaše reálné jméno a příjmení. Pokud bude uživatel s tímto jménem existovat, pošleme na jeho e-mailovou adresu další instrukce.',
+							otherProblem: 'Jiný problém',
+							otherProblemDescription: 'Popište, prosím, váš problém co nejvíc podrobně a nezapomeňte zmínit všechny důležité detaily. Vaše zpráva bude doručena přímo správci tohoto projektu, který vás bude kontaktovat.',
+							backButton: 'Zpět',
+							sendButton: 'Odeslat',
+							success: 'Děkujeme za vyplnění formuláře. Až budeme vědět více informací, pošleme vám e-mail na adresu uvedenou ve vašem uživatelském profilu. Pokud budeme potřebovat více informací, pošleme vám odkaz na formulář pro další doplnění.'
+					  }
+					},
+					cs: {
+						form: {
+							username: 'Uživatelské jméno nebo e-mail',
+							password: 'Heslo',
+							submit: 'Přihlásit se',
+							rememberText: 'Trvalé přihlášení',
+							rememberAlt: 'Trvalé přihlášení vytvoří cookies s platností na 14 dnů.',
+							help: 'Potřebujete pomoct?'
+						},
+						otp: {
+							invalidCode: 'Zadaný kód neodpovídá reálnému.',
+							info: 'Zadejte kód z vaší aplikace pro dvoufázové ověřování.'
+						},
+						needHelp: {
+							title: 'Centrum technické podpory',
+							description: 'S čím vám můžeme pomoci?',
+							forgotPassword: 'Zapomenuté heslo',
+							forgotPasswordDescription: 'Zadejte vaše uživatelské jméno nebo e-mail:',
+							forgotUsername: 'Zapomenuté uživatelské jméno',
+							forgotUsernameDescription: 'Zadejte vaše reálné jméno a příjmení. Pokud bude uživatel s tímto jménem existovat, pošleme na jeho e-mailovou adresu další instrukce.',
+							otherProblem: 'Jiný problém',
+							otherProblemDescription: 'Popište, prosím, váš problém co nejvíc podrobně a nezapomeňte zmínit všechny důležité detaily. Vaše zpráva bude doručena přímo správci tohoto projektu, který vás bude kontaktovat.',
+							backButton: 'Zpět',
+							sendButton: 'Odeslat',
+							success: 'Děkujeme za vyplnění formuláře. Až budeme vědět více informací, pošleme vám e-mail na adresu uvedenou ve vašem uživatelském profilu. Pokud budeme potřebovat více informací, pošleme vám odkaz na formulář pro další doplnění.'
+						}
+					}
+				}
+			}
+		},
+		created() {
+			let nLang = navigator.language;
+			if (nLang === 'cs' || nLang === 'cs-cz' || nLang === 'cz') {
+				nLang = 'cs';
+			}
+			else {
+				nLang = 'en';
+			}
+			this.locale = nLang;
+		},
+		methods: {
+			verifyOAuth() {
+				this.isLoading = true;
+				fetch({$basePath . '/api/v1'} + '/cms/check-oauth-code', {
+					method: 'POST',
+					body: JSON.stringify({
+						locale: this.locale,
+						code: this.form.oauth.replace(/\s+/, '')
+					})
+				})
+					.then(json => json.json())
+					.then(json => {
+						if ('state' in json && json.state === 'error') {
+							this.form.oauth = '';
+							this.$refs.oauth.classList.add('was-validated')
+						} else {
+							window.location.href = this.redirect;
+						}
+					}).finally(json => this.isLoading = false)
+
+			},
+			loginProcess: function (e) {
+				this.isLoading = true;
+				fetch({$basePath . '/api/v1'} + '/cms/sign', {
+					method: 'POST',
+					body: JSON.stringify({
+						locale: this.locale,
+						username: this.form.username,
+						password: this.form.password,
+						remember: this.form.remember === 'yes'
+					})
+				})
+					.then(data => data.json())
+					.then(data => {
+						this.isLoading = false;
+						this.errorMessage = '';
+
+						if ('state' in data && data.state === 'error') {
+							this.errorMessage = data.message;
+						} else {
+							if (data.data.needOauth === true) {
+								this.isOAuth = true;
+								setTimeout(() => this.$refs.otpInput.focus(), 150)
+							} else {
+								window.location.href = this.redirect;
+							}
+						}
+					});
+			},
+			resetReportProblem() {
+		  	this.needHelpPage = null;
+				this.reportProblem.serverMessage = null;
+				this.reportProblem.isBusy = false;
+			 	this.reportProblem.state = null;
+			},
+			onReportProblem(evt) {
+				evt.preventDefault();
+				this.reportProblem.isBusy = true;
+		  	this.reportProblem.state = null;
+		  	let queryUrl = '';
+		  	let queryParameters = {};
+
+		  	if (this.needHelpPage === 'forgotPassword') {
+					queryUrl = 'forgot-password';
+		  		queryParameters = {
+						locale: this.locale,
+						username: this.reportProblem.username
+					};
+				} else if (this.needHelpPage === 'forgotUsername') {
+					queryUrl = 'forgot-username';
+					queryParameters = {
+						locale: this.locale,
+			  		realName: this.reportProblem.realName
+					};
+				} else {
+					queryUrl = 'report-problem';
+					queryParameters = {
+						locale: this.locale,
+					  description: this.reportProblem.problemDescription,
+						username: this.reportProblem.username
+					};
+				}
+
+				fetch({$basePath . '/api/v1'} + '/cms/' + queryUrl, {
+					method: 'POST',
+					body: JSON.stringify(queryParameters)
+				})
+					.then(data => data.json())
+					.then(data => {
+						this.reportProblem.isBusy = false;
+						this.reportProblem.serverMessage = data.message;
+			  		this.reportProblem.state = data.state;
+					});
+			},
+		}
+	});
+
+	new Vue({
+		el: '#app',
+	})
+</script>
+</body>
+</html>

@@ -1,15 +1,8 @@
-parameters:
-	cmsMenu:
-		-
-			label: Dashboard
-			link: 'Homepage:default'
-
 extensions:
 	cms: Baraja\Cms\CmsExtension
+	permission: Baraja\Cms\User\PermissionExtension
 
-services:
-	cmsApiManager: Baraja\Cms\Api\CmsApiManager
-	userManager: Baraja\Cms\SimpleUserManager
-	userStorage: Baraja\Cms\UserFileStorage(%appDir%/../data/user)
-	- Baraja\Cms\Api\Endpoint\CmsEndpoint
-	- Baraja\Cms\InstallProcess
+orm.annotations:
+	paths:
+		Baraja\Cms\User\Entity: %rootDir%/vendor/baraja-core/cms/src/User/Entity
+		Baraja\DoctrineConfiguration: %rootDir%/vendor/baraja-core/cms/Settings/Entity

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Spojení s Baraja Cloud | Baraja admin</title>
+	<meta charset="utf-8">
+	<meta name="description" content="Baraja administration">
+	<meta name="author" content="Baraja.cz">
+	<meta name="robots" content="noindex, nofollow">
+	<meta content="width=device-width,initial-scale=.5" name="viewport">
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css">
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css">
+	<script>
+	  let basePath = {$basePath};
+	  let baseApiPath = {$basePath . '/api/v1'};
+	</script>
+</head>
+
+<body>
+<noscript>
+	<div class="container">
+		<div class="row my-5">
+			<div class="col">
+				<h1>Javascript is not allowed</h1>
+				<p class="mt-5"><b>We're sorry but administration doesn't work properly without JavaScript enabled.</b></p>
+				<p>Please enable it to continue.</p>
+			</div>
+		</div>
+	</div>
+</noscript>
+
+<div id="app">
+	{include content}
+</div>
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@2.7.0/dist/bootstrap-vue.min.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+{include scripts}
+</body>
+</html>
+
+{define content}
+<b-container>
+	<b-row align-h="center">
+		<b-col class="py-5" cols="8">
+			<b-card :title="connectionOk ? 'Cloud funguje!' : '☁️ Spojení s Baraja Cloud'">
+				<template v-if="connectionOk">
+					<p>Spojení s Cloudem bylo úspěšně navázáno.</p>
+					<b-button variant="primary" href="{$basePath}/admin">
+						Pokračovat
+					</b-button>
+				</template>
+				<template v-else>
+					<p>
+						Abyste mohli využít všechny výhody redakčního systému naplno,
+						je potřeba váš systém propojit do&nbsp;<a href="https://baraja.cz/cloud" target="_blank">Cloudu</a>.
+						Tento průvodce vám pomůže celé propojení provést automaticky.
+					</p>
+					<div class="row">
+						<div class="col">
+							<template v-if="showFeatures">
+								<p><b>Co propojením s&nbsp;Cloudem získáte?</b></p>
+							</template>
+						</div>
+						<div class="col-3 text-right">
+							<b-button variant="outline-secondary" class="btn-sm mb-2" @click="showFeatures=!showFeatures">
+								{{ showFeatures ? 'Skrýt' : 'Zobrazit více' }}
+							</b-button>
+						</div>
+					</div>
+					<template v-if="showFeatures">
+						<ul>
+							<li>Kompletní automatizaci rutinních procesů</li>
+							<li>Kontrolu stavu projektu a&nbsp;automatický report chyb</li>
+							<li>Napojení na systém pro odesílání automatických e-mailů</li>
+							<li>
+								Oficiální <a href="https://baraja.cz/kontakt">technickou podporu</a> přes chat
+								a&nbsp;ticketovací systém
+							</li>
+							<li>Možnost nastavit automatické zálohování na externí webový server</li>
+							<li>
+								Řadu dalších výhod,
+								jejichž <a href="https://baraja.cz/cloud" target="_blank">seznam</a> se neustále rozrůstá
+							</li>
+						</ul>
+						<p><b>Kolik použití Cloudu stojí?</b></p>
+						<p>
+							Základní použití Cloudu vždy bylo, je, a&nbsp;bude zdarma.
+							Drobné poplatky budeme účtovat za využití oficiální technické podpory,
+							zálohování dat nad určitý limit a&nbsp;konkrétní zakoupené balíčky služeb.
+							<b>Kompletní funkce Cloudu lze využívat zdarma bez nutnosti platit jakékoli skryté poplatky.</b>
+						</p>
+					</template>
+					<b-overlay :show="isBusy" rounded="sm">
+						<b-row>
+							<b-col>
+								<h2 class="h5">Registrace nového účtu</h2>
+
+								<b-form @submit="onSubmit">
+									<b-form-group>
+										<b-icon
+												icon="question-circle-fill"
+												variant="info"
+												v-b-tooltip.hover
+												title="Tímto e-mailem se budete do Cloudu přihlašovat. Zároveň vám na tento e-mail budeme automaticky zasílat důležité informace týkající se vašeho projektu, jako jsou například výpadky, technické chyby na webu, hlášení chyb od uživatelů a podobně. Tento e-mail budeme používat pro ověření, v případě obnovy hesla k vašemu účtu.">
+										</b-icon>
+										<label for="email">E-mail:</label>
+										<b-form-input id="email" v-model="form.email" type="email" required></b-form-input>
+									</b-form-group>
+
+									<b-form-group label="Bezpečné heslo:" label-for="password">
+										<b-form-input id="password" v-model="form.password" type="password" required></b-form-input>
+									</b-form-group>
+
+									<b-row>
+										<b-col>
+											<b-form-group label="Jméno:" label-for="firstName">
+												<b-form-input id="firstName" v-model="form.firstName" type="text" required></b-form-input>
+											</b-form-group>
+										</b-col>
+										<b-col>
+											<b-form-group label="Příjmení:" label-for="lastName">
+												<b-form-input id="lastName" v-model="form.lastName" type="text" required></b-form-input>
+											</b-form-group>
+										</b-col>
+									</b-row>
+
+									<b-form-group>
+										<b-icon
+												icon="question-circle-fill"
+												variant="info"
+												v-b-tooltip.hover
+												title="Toto telefonní číslo uvidí pracovníci technické podpory v případě, když pošlete urgentní požadavek. Na toto telefonní číslo může zavolat některý z našich operátorů v případě, když bude váš web ohrožen nebo nefunkční. Telefonní čísla používáme pouze pro krizovou komunikaci živým člověkem a dále je nezpracováváme. Podpora po telefonu je poskytována pouze v češtině a angličtině.">
+										</b-icon>
+										<label for="phone">Telefonní číslo (nepovinné):</label>
+										<b-form-input id="phone" v-model="form.phone" type="phone"></b-form-input>
+									</b-form-group>
+
+									<b-form-group label-for="vop">
+										<b-form-checkbox id="vop" v-model="form.vop" :value="true" :unchecked-value="false">
+											<span v-b-tooltip title="Veškerá zadaná data do tohoto formuláře i získaná později v administraci zpracováváme v souladu s GDPR.">
+												Souhlasím se <a href="https://baraja.cz/vseobecne-obchodni-podminky" target="_blank">Všeobecnými podmínkami služby</a> a&nbsp;<a href="https://baraja.cz/gdpr-ochrana-a-zpracovani-osobnich-udaju" target="_blank">zpracováním osobních údajů</a>.
+											</span>
+										</b-form-checkbox>
+									</b-form-group>
+
+									<b-button type="submit" variant="primary">Založit účet a propojit</b-button>
+								</b-form>
+							</b-col>
+							<b-col cols="5">
+								<h2 class="h5">Přihlášení existujícím účtem</h2>
+
+								<b-form @submit="onSubmitLogin">
+									<b-form-group>
+										<label for="loginEmail">E-mail:</label>
+										<b-form-input id="loginEmail" v-model="loginForm.email" type="email" required></b-form-input>
+									</b-form-group>
+
+									<b-form-group label="Heslo:" label-for="loginPassword">
+										<b-form-input id="loginPassword" v-model="loginForm.password" type="password" required></b-form-input>
+									</b-form-group>
+
+									<b-form-group label-for="loginVop">
+										<b-form-checkbox id="loginVop" v-model="loginForm.vop" :value="true" :unchecked-value="false">
+											<span v-b-tooltip title="Veškerá zadaná data do tohoto formuláře i získaná později v administraci zpracováváme v souladu s GDPR.">
+												Souhlasím se <a href="https://baraja.cz/vseobecne-obchodni-podminky" target="_blank">Všeobecnými podmínkami služby</a> a&nbsp;<a href="https://baraja.cz/gdpr-ochrana-a-zpracovani-osobnich-udaju" target="_blank">zpracováním osobních údajů</a>.
+											</span>
+										</b-form-checkbox>
+									</b-form-group>
+
+									<b-button type="submit" variant="primary">Přihlásit se a propojit</b-button>
+								</b-form>
+							</b-col>
+						</b-row>
+						<p class="mt-2">
+							<i>
+								Tento uživatelský účet slouží pouze pro komunikaci s&nbsp;Cloudem.
+								V&nbsp;rámci redakčního systému získáte vlastní nezávislý účet.
+							</i>
+						</p>
+					</b-overlay>
+					<div class="mt-3">
+						<p><b>Jaké údaje Cloud zpracovává?</b></p>
+						<p>
+							Použití Cloudu je bezpečné, protože zpracovává jen minimum osobních údajů.
+							Jak konkrétně a&nbsp;jaká data společnost Baraja.cz zpracovává si můžete přečíst
+							na <a href="https://baraja.cz/gdpr-ochrana-a-zpracovani-osobnich-udaju" target="_blank">samostatné
+							stránce</a>.
+						</p>
+					</div>
+				</template>
+			</b-card>
+		</b-col>
+	</b-row>
+</b-container>
+{/define}
+
+{define scripts}
+<script>
+	new Vue({
+		el: '#app',
+		data() {
+			return {
+				showFeatures: true,
+				isBusy: false,
+				connectionOk: false,
+				form: {
+					email: '',
+					password: '',
+					firstName: '',
+					lastName: '',
+					phone: '',
+					vop: false
+				},
+				loginForm:{
+					email: '',
+					password: '',
+					vop: false
+				}
+			}
+		},
+	  methods: {
+			onSubmit(evt) {
+				evt.preventDefault();
+				if (this.form.vop === false) {
+					alert('Musíte souhlasit s podmínkami služby.');
+					return;
+				}
+				this.isBusy = true;
+				fetch(baseApiPath + '/cms-install/cloud-create-account', {
+					method: 'POST',
+					body: JSON.stringify(this.form)
+				})
+					.then(json => json.json())
+					.then(json => {
+						if ('state' in json && json.state === 'error') {
+							alert(json.message);
+						} else {
+							this.connectionOk = true;
+						}
+					}).finally(json => this.isBusy = false);
+			},
+			onSubmitLogin(evt) {
+				evt.preventDefault();
+				if (this.loginForm.vop === false) {
+					alert('Musíte souhlasit s podmínkami služby.');
+					return;
+				}
+				this.isBusy = true;
+				fetch(baseApiPath + '/cms-install/cloud-login', {
+					method: 'POST',
+					body: JSON.stringify(this.loginForm)
+				})
+					.then(json => json.json())
+					.then(json => {
+						if ('state' in json && json.state === 'error') {
+							alert(json.message);
+						} else {
+							this.connectionOk = true;
+						}
+					}).finally(json => this.isBusy = false);
+	  	}
+		}
+	})
+</script>
+{/define}

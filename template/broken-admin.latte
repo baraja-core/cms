@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Instalace je poškozena | Baraja admin</title>
+	<meta charset="utf-8">
+	<meta name="description" content="Baraja administration">
+	<meta name="author" content="Baraja.cz">
+	<meta name="robots" content="noindex, nofollow">
+	<meta content="width=device-width,initial-scale=.5" name="viewport">
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css">
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css">
+	<script>
+	  let basePath = {$basePath};
+	  let baseApiPath = {$basePath . '/api/v1'};
+	</script>
+</head>
+
+<body>
+<noscript>
+	<div class="container">
+		<div class="row my-5">
+			<div class="col">
+				<h1>Javascript is not allowed</h1>
+				<p class="mt-5"><b>We're sorry but administration doesn't work properly without JavaScript enabled.</b></p>
+				<p>Please enable it to continue.</p>
+			</div>
+		</div>
+	</div>
+</noscript>
+
+<div id="app">
+	{include content}
+</div>
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@2.7.0/dist/bootstrap-vue.min.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+{include scripts}
+</body>
+</html>
+
+{define content}
+<b-container>
+	<b-row align-h="center">
+		<b-col class="py-5" cols="8">
+			<b-card title="Administrace je poškozena">
+				<b-alert show variant="danger">
+					<b>Závažný problém:</b><br>
+					Při startování administrace došlo k&nbsp;závažnému problému, který způsobil její nefunkčnost.
+				</b-alert>
+				<p>
+					Problém se spouštěním administrace často bývá způsoben poškozenou konfigurací
+					nebo nefunkčním připojením k&nbsp;databázi.
+					Než budete pokračovat, zkuste prověřit, že připojení k&nbsp;databázi funguje,
+					a&nbsp;že byly synchronizovány všechny tabulky.
+				</p>
+				<div n:if="$isDebug === true && $exception !== null">
+					<h2 class="h5">Zachycená výjimka</h2>
+					<p>Tato chyba je pro Vašeho technického správce:</p>
+					<b-alert show variant="danger">
+						{$exception->getMessage()}
+					</b-alert>
+					<p>Chyba v souboru: <b>{$exception->getFile()}</b> (řádek <b>{$exception->getLine()}</b>).</p>
+				</div>
+			</b-card>
+		</b-col>
+	</b-row>
+</b-container>
+{/define}
+
+{define scripts}
+<script>
+	new Vue({
+		el: '#app',
+		data() {
+			return {}
+		}
+	})
+</script>
+{/define}

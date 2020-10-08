@@ -5,24 +5,37 @@ declare(strict_types=1);
 namespace Baraja\Cms;
 
 
+use Latte\Engine;
+use Nette\Http\Request;
+use Nette\Utils\Strings;
+use Tracy\Debugger;
+
 final class Helpers
 {
 
-	/**
-	 * @throws \Error
-	 */
+	/** @throws \Error */
 	public function __construct()
 	{
 		throw new \Error('Class ' . get_class($this) . ' is static and cannot be instantiated.');
 	}
 
+
 	/**
-	 * @param string $signal
+	 * Return current API path by current HTTP URL.
+	 * In case of CLI return empty string.
+	 *
+	 * @param Request $httpRequest
 	 * @return string
 	 */
+	public static function processPath(Request $httpRequest): string
+	{
+		return trim(str_replace(rtrim($httpRequest->getUrl()->withoutUserInfo()->getBaseUrl(), '/'), '', (string) self::getCurrentUrl()), '/');
+	}
+
+
 	public static function formatApiMethod(string $signal): string
 	{
-		$return = 'action' . str_replace('.', '', self::firstUpper($signal));
+		$return = 'action' . str_replace('.', '', Strings::firstUpper($signal));
 
 		$return = (string) preg_replace_callback('/-([a-z])/', static function (array $match): string {
 			return mb_strtoupper($match[1], 'UTF-8');
@@ -31,74 +44,159 @@ final class Helpers
 		return $return;
 	}
 
-	/**
-	 * Converts first character to upper case.
-	 */
-	public static function firstUpper(string $s): string
-	{
-		return mb_strtoupper(self::substring($s, 0, 1), 'UTF-8') . self::substring($s, 1);
-	}
 
-	/**
-	 * Returns a part of UTF-8 string.
-	 */
-	public static function substring(string $s, int $start, int $length = null): string
+	public static function userIp(): string
 	{
-		if (function_exists('mb_substr')) {
-			return mb_substr($s, $start, $length, 'UTF-8'); // MB is much faster
+		static $ip = null;
+
+		if ($ip === null) {
+			if (isset($_SERVER['REMOTE_ADDR']) === true) {
+				if (\in_array($_SERVER['REMOTE_ADDR'], ['::1', '0.0.0.0', 'localhost'], true)) {
+					$ip = '127.0.0.1';
+				} elseif (($ip = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) === false) {
+					$ip = '127.0.0.1';
+				}
+			} else {
+				$ip = '127.0.0.1';
+			}
 		}
 
-		if ($length === null) {
-			$length = self::length($s);
-		} elseif ($start < 0 && $length < 0) {
-			$start += self::length($s); // unifies iconv_substr behavior with mb_substr
+		return $ip;
+	}
+
+
+	/**
+	 * @param string $data -> a string of length divisible by five
+	 * @return string
+	 * @copyright Jakub Vrána, https://php.vrana.cz/
+	 */
+	public static function otpBase32Encode(string $data): string
+	{
+		static $codes = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+		$bits = '';
+		foreach (str_split($data) as $c) {
+			$bits .= sprintf('%08b', \ord($c));
+		}
+		$return = '';
+		foreach (str_split($bits, 5) as $c) {
+			$return .= $codes[bindec($c)];
 		}
 
-		return iconv_substr($s, $start, $length, 'UTF-8');
+		return $return;
 	}
 
-	/**
-	 * Returns number of characters (not bytes) in UTF-8 string.
-	 * That is the number of Unicode code points which may differ from the number of graphemes.
-	 */
-	public static function length(string $s): int
-	{
-		return function_exists('mb_strlen') ? mb_strlen($s, 'UTF-8') : strlen(utf8_decode($s));
-	}
 
 	/**
-	 * Return random UUID version 4
+	 * Generate URL for OTP QR code
 	 *
+	 * @param string $issuer -> service (or project) name
+	 * @param string $user -> username (displayed in Authenticator app)
+	 * @param string $secret -> in binary format
+	 * @return string URL
+	 * @copyright Jakub Vrána, https://php.vrana.cz/
+	 */
+	public static function getOtpQrUrl(string $issuer, string $user, string $secret): string
+	{
+		return 'https://chart.googleapis.com/chart?chs=500x500&chld=M|0&cht=qr&chl='
+			. urlencode(
+				'otpauth://totp/' . rawurlencode($issuer)
+				. ':' . $user . '?secret=' . self::otpBase32Encode($secret)
+				. '&issuer=' . rawurlencode($issuer)
+			);
+	}
+
+
+	/**
+	 * Generate one-time password
+	 *
+	 * @param string $secret -> in binary format
+	 * @param string $timeSlot -> example: floor(time() / 30)
+	 * @return int
+	 * @copyright Jakub Vrána, https://php.vrana.cz/
+	 */
+	public static function getOtp(string $secret, string $timeSlot): int
+	{
+		$data = str_pad(pack('N', $timeSlot), 8, "\0", STR_PAD_LEFT);
+		$hash = hash_hmac('sha1', $data, $secret, true);
+		$offset = \ord(\substr($hash, -1)) & 0xF;
+		$unpacked = unpack('N', substr($hash, $offset, 4));
+
+		return ($unpacked[1] & 0x7FFFFFFF) % 1e6;
+	}
+
+
+	public static function checkAuthenticatorOtpCodeManually(string $otpCode, int $code): bool
+	{
+		$checker = static function (int $timeSlot) use ($otpCode, $code): bool {
+			return self::getOtp($otpCode, (string) $timeSlot) === $code;
+		};
+
+		return $checker($slot = (int) floor(time() / 30)) || $checker($slot - 1) || $checker($slot + 1);
+	}
+
+
+	/**
+	 * Normalize phone to basic format if pattern match.
+	 *
+	 * @param string $phone user input
+	 * @param int $region use this prefix when number prefix does not exist
 	 * @return string
 	 */
-	public static function uuid(): string
+	public static function fixPhone(string $phone, int $region = 420): string
 	{
-		return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-			// 32 bits for "time_low"
-			mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+		$phone = (string) preg_replace('/\s+/', '', $phone); // remove spaces
 
-			// 16 bits for "time_mid"
-			mt_rand(0, 0xffff),
+		if (preg_match('/^([\+0-9]+)/', $phone, $trimUnexpected)) { // remove user notice and unexpected characters
+			$phone = (string) $trimUnexpected[1];
+		}
+		if (preg_match('/^\+(4\d{2})(\d{3})(\d{3})(\d{3})$/', $phone, $prefixParser)) { // +420 xxx xxx xxx
+			$phone = '+' . $prefixParser[1] . ' ' . $prefixParser[2] . ' ' . $prefixParser[3] . ' ' . $prefixParser[4];
+		} elseif (preg_match('/^\+(4\d{2})(\d+)$/', $phone, $prefixSimpleParser)) { // +420 xxx
+			$phone = '+' . $prefixSimpleParser[1] . ' ' . $prefixSimpleParser[2];
+		} elseif (preg_match('/^(\d{3})(\d{3})(\d{3})$/', $phone, $regularParser)) { // numbers only
+			$phone = '+' . $region . ' ' . $regularParser[1] . ' ' . $regularParser[2] . ' ' . $regularParser[3];
+		} else {
+			throw new \InvalidArgumentException('Phone number "' . $phone . '" for region "' . $region . '" does not exist.');
+		}
 
-			// 16 bits for "time_hi_and_version",
-			// four most significant bits holds version number 4
-			mt_rand(0, 0x0fff) | 0x4000,
-
-			// 16 bits, 8 bits for "clk_seq_hi_res",
-			// 8 bits for "clk_seq_low",
-			// two most significant bits holds zero and one for variant DCE1.1
-			mt_rand(0, 0x3fff) | 0x8000,
-
-			// 48 bits for "node"
-			mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-		);
+		return $phone;
 	}
+
+
+	/**
+	 * Advance function for parsing real user full name.
+	 * Accept name in format "Doc. Ing. Jan Barášek, PhD."
+	 *
+	 * @param string $name
+	 * @return string[]|null[]
+	 */
+	public static function nameParser(string $name): array
+	{
+		static $degreePattern = '((?:(?:\s*(?:[A-Za-z]{2,8})\.\s*)+))?';
+		$normalized = str_replace(',', '', trim(str_replace('/\s+/', ' ', $name)));
+		$degreeBefore = null;
+		$degreeAfter = null;
+
+		if (preg_match('/^' . $degreePattern . '\s*([^.]+?)?\s*' . $degreePattern . '$/', $normalized, $degreeParser)) {
+			$normalized = trim($degreeParser[2] ?? '');
+			$degreeBefore = trim($degreeParser[1] ?? '') ?: null;
+			$degreeAfter = trim($degreeParser[3] ?? '') ?: null;
+		}
+
+		$parts = explode(' ', $normalized, 2);
+
+		return [
+			'firstName' => Strings::firstUpper($parts[0] ?? '') ?: null,
+			'lastName' => Strings::firstUpper($parts[1] ?? '') ?: null,
+			'degreeBefore' => $degreeBefore,
+			'degreeAfter' => $degreeAfter,
+		];
+	}
+
 
 	/**
 	 * Return current absolute URL.
 	 * Return null, if current URL does not exist (for example in CLI mode).
-	 *
-	 * @return string|null
 	 */
 	public static function getCurrentUrl(): ?string
 	{
@@ -110,9 +208,7 @@ final class Helpers
 			. '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 	}
 
-	/**
-	 * @return string|null
-	 */
+
 	public static function getBaseUrl(): ?string
 	{
 		static $return;
@@ -120,17 +216,13 @@ final class Helpers
 		if ($return !== null) {
 			return $return;
 		}
-
-		$currentUrl = self::getCurrentUrl();
-
-		if ($currentUrl !== null) {
+		if (($currentUrl = self::getCurrentUrl()) !== null) {
 			if (preg_match('/^(https?:\/\/.+)\/www\//', $currentUrl, $localUrlParser)) {
 				$return = $localUrlParser[0];
 			} elseif (preg_match('/^(https?:\/\/[^\/]+)/', $currentUrl, $publicUrlParser)) {
 				$return = $publicUrlParser[1];
 			}
 		}
-
 		if ($return !== null) {
 			$return = rtrim($return, '/');
 		}
@@ -138,4 +230,90 @@ final class Helpers
 		return $return;
 	}
 
+
+	public static function formatPresenterNameToUri(string $name): string
+	{
+		return trim((string) preg_replace_callback('/([A-Z])/', static function (array $match): string {
+			return '-' . mb_strtolower($match[1], 'UTF-8');
+		}, $name), '-');
+	}
+
+
+	public static function formatPresenterNameByUri(string $name): string
+	{
+		return Strings::firstUpper(self::formatPresenter(mb_strtolower($name, 'UTF-8')));
+	}
+
+
+	public static function formatActionNameByUri(string $name): string
+	{
+		return trim(self::formatPresenter($name), '/');
+	}
+
+
+	/**
+	 * Convert URI case to Presenter name case. The first character will not be enlarged automatically.
+	 *
+	 * For example: "article-manager" => "articleManager".
+	 */
+	public static function formatPresenter(string $haystack): string
+	{
+		return (string) preg_replace_callback('/-([a-z])/', static function (array $match): string {
+			return mb_strtoupper($match[1], 'UTF-8');
+		}, $haystack);
+	}
+
+
+	/**
+	 * Escapes string for use inside HTML attribute value.
+	 */
+	public static function escapeHtmlAttr(string $s, bool $double = true): string
+	{
+		if (strpos($s, '`') !== false && strpbrk($s, ' <>"\'') === false) {
+			$s .= ' '; // protection against innerHTML mXSS vulnerability nette/nette#1496
+		}
+
+		return htmlspecialchars($s, ENT_QUOTES, 'UTF-8', $double);
+	}
+
+
+	/**
+	 * Escapes string for use inside HTML comments.
+	 */
+	public static function escapeHtmlComment(string $s): string
+	{
+		if ($s && (strpos($s, '-') === 0 || strpos($s, '>') === 0 || strpos($s, '!') === 0)) {
+			$s = ' ' . $s;
+		}
+
+		$s = str_replace('--', '- - ', $s);
+		if (substr($s, -1) === '-') {
+			$s .= ' ';
+		}
+
+		return $s;
+	}
+
+
+	public static function minifyHtml(string $haystack): string
+	{
+		return preg_replace_callback(
+			'#[ \t\r\n]+|<(/)?(textarea|pre)(?=\W)#i',
+			static function (array $match) {
+				return empty($match[2]) ? ' ' : $match[0];
+			},
+			$haystack
+		);
+	}
+
+
+	public static function brokenAdmin(\Throwable $e): void
+	{
+		echo self::minifyHtml((new Engine)
+			->renderToString(__DIR__ . '/../template/broken-admin.latte', [
+				'basePath' => self::getBaseUrl(),
+				'exception' => $e,
+				'isDebug' => Debugger::isEnabled(),
+			]));
+	}
 }
