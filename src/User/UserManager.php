@@ -270,11 +270,11 @@ final class UserManager implements IAuthenticator
 		try {
 			$user = $this->getUserByUsername($username);
 		} catch (NoResultException | NonUniqueResultException $e) {
-			if (($externalEmail = $this->authenticateByCloudAccount($username, $password)) !== null) {
-				$user = $this->entityManager->persist($user = new User($username, $password, $externalEmail))->flush($user);
-			} else {
-				throw new AuthenticationException('The username is incorrect. Username "' . $username . '" given.');
-			}
+			// TODO: Reserved for future use
+			// TODO: if (($externalEmail = $this->authenticateByCloudAccount($username, $password)) !== null) {
+			// TODO: $user = $this->entityManager->persist($user = new User($username, $password, $externalEmail))->flush($user);
+			// TODO: } else {
+			throw new AuthenticationException('The username is incorrect. Username "' . $username . '" given.');
 		}
 
 		$attempt->setUser($user);
