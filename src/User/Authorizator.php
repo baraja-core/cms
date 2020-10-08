@@ -90,7 +90,6 @@ final class Authorizator implements IAuthorizator
 	{
 		$user = $this->userStorage->getIdentity();
 
-		bdump($user); // TODO: fix caching user permissions by user ID
 		if (!$user instanceof User) {
 			return false;
 		}
