@@ -5,4 +5,4 @@ extensions:
 orm.annotations:
 	paths:
 		Baraja\Cms\User\Entity: %rootDir%/vendor/baraja-core/cms/src/User/Entity
-		Baraja\DoctrineConfiguration: %rootDir%/vendor/baraja-core/cms/Settings/Entity
+		Baraja\DoctrineConfiguration: %rootDir%/vendor/baraja-core/cms/src/Settings/Entity
