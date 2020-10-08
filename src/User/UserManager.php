@@ -298,9 +298,13 @@ final class UserManager implements IAuthenticator
 
 	/**
 	 * Return user e-mail in case of this account exist and credentials match.
+	 *
+	 * @return null
 	 */
-	private function authenticateByCloudAccount(string $username, string $password): ?string
+	private function authenticateByCloudAccount(string $username, string $password)
 	{
+		// TODO: Implement me in future version.
+
 		return null;
 	}
 }
