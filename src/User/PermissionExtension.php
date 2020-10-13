@@ -5,12 +5,22 @@ declare(strict_types=1);
 namespace Baraja\Cms\User;
 
 
+use Baraja\Cms\CmsExtension;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Definitions\ServiceDefinition;
 
 final class PermissionExtension extends CompilerExtension
 {
 	private const ALLOWED_CONFIG_KEYS = ['role' => 1, 'roles' => 1, 'privileges' => 1];
+
+
+	/**
+	 * @return string[]
+	 */
+	public static function mustBeDefinedAfter(): array
+	{
+		return [CmsExtension::class];
+	}
 
 
 	public function beforeCompile(): void
