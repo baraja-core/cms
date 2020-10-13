@@ -12,6 +12,7 @@ use Baraja\Cms\Plugin\UserPlugin;
 use Baraja\Cms\Proxy\Proxy;
 use Baraja\Cms\User\Authorizator;
 use Baraja\Cms\User\UserManager;
+use Baraja\Doctrine\ORM\DI\OrmAnnotationsExtension;
 use Baraja\Plugin\Component\VueComponent;
 use Baraja\Plugin\PluginComponentExtension;
 use Baraja\Plugin\PluginLinkGenerator;
@@ -34,6 +35,15 @@ final class CmsExtension extends CompilerExtension
 	private const SERVICE_PREFIX = 'baraja.cms.';
 
 
+	/**
+	 * @return string[]
+	 */
+	public static function mustBeDefinedBefore(): array
+	{
+		return [OrmAnnotationsExtension::class];
+	}
+
+
 	public function getConfigSchema(): Schema
 	{
 		return Expect::structure([
@@ -44,6 +54,8 @@ final class CmsExtension extends CompilerExtension
 
 	public function beforeCompile(): void
 	{
+		OrmAnnotationsExtension::addAnnotationPath('Baraja\Cms\User\Entity', __DIR__ . '/User/Entity');
+		OrmAnnotationsExtension::addAnnotationPath('Baraja\DoctrineConfiguration', __DIR__ . '/Settings/Entity');
 		PluginComponentExtension::defineBasicServices($builder = $this->getContainerBuilder());
 
 		// linkGenerator
