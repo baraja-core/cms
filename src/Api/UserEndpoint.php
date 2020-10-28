@@ -25,33 +25,24 @@ use Nette\Utils\Validators;
 
 final class UserEndpoint extends BaseEndpoint
 {
+	private UserManager $userManager;
 
-	/**
-	 * @var UserManager
-	 * @inject
-	 */
-	public $userManager;
+	private EntityManager $entityManager;
 
-	/**
-	 * @var EntityManager
-	 * @inject
-	 */
-	public $entityManager;
+	private CloudManager $cloudManager;
 
-	/**
-	 * @var CloudManager
-	 * @inject
-	 */
-	public $cloudManager;
+
+	public function __construct(UserManager $userManager, EntityManager $entityManager, CloudManager $cloudManager)
+	{
+		$this->userManager = $userManager;
+		$this->entityManager = $entityManager;
+		$this->cloudManager = $cloudManager;
+	}
 
 
 	/**
 	 * Returns all users
 	 *
-	 * @param int $page
-	 * @param int $limit
-	 * @param string|null $role
-	 * @param string|null $query
 	 * @param string|null $active String 'active' => show only active users, 'deleted' => show only deleted users, null => all users
 	 */
 	public function actionDefault(int $page = 1, int $limit = 32, ?string $role = null, ?string $query = null, ?string $active = null): void

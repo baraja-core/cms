@@ -10,9 +10,7 @@ use Baraja\Plugin\BasePlugin;
 
 final class CmsPlugin extends BasePlugin
 {
-
-	/** @var UserManager */
-	private $userManager;
+	private UserManager $userManager;
 
 
 	public function __construct(UserManager $userManager)

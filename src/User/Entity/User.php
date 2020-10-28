@@ -45,56 +45,40 @@ class User implements IIdentity
 
 	public const ROLE_USER = 'user';
 
-	/**
-	 * @var string
-	 * @ORM\Column(type="string", length=64, unique=true)
-	 */
-	private $username;
+	/** @ORM\Column(type="string", length=64, unique=true) */
+	private string $username;
 
 	/**
 	 * User real password stored as BCrypt hash.
 	 * More info on https://php.baraja.cz/hashovani
 	 *
-	 * @var string
 	 * @ORM\Column(type="string", length=60)
 	 */
-	private $password;
+	private string $password;
 
-	/**
-	 * @var string|null
-	 * @ORM\Column(type="string", length=32, nullable=true)
-	 */
-	private $firstName;
+	/** @ORM\Column(type="string", length=32, nullable=true) */
+	private ?string $firstName;
 
-	/**
-	 * @var string|null
-	 * @ORM\Column(type="string", length=32, nullable=true)
-	 */
-	private $lastName;
+	/** @ORM\Column(type="string", length=32, nullable=true) */
+	private ?string $lastName;
 
-	/**
-	 * @var string|null
-	 * @ORM\Column(type="string", nullable=true, length=50, unique=true)
-	 */
-	private $nick;
+	/** @ORM\Column(type="string", nullable=true, length=50, unique=true) */
+	private ?string $nick;
 
-	/**
-	 * @var string
-	 * @ORM\Column(type="string", length=128, unique=true)
-	 */
-	private $email;
+	/** @ORM\Column(type="string", length=128, unique=true) */
+	private string $email;
 
 	/**
 	 * @var string[]
 	 * @ORM\Column(type="json_array")
 	 */
-	private $emails = [];
+	private array $emails = [];
 
 	/**
 	 * @var string[]|null
 	 * @ORM\Column(type="json_array")
 	 */
-	private $roles = [];
+	private ?array $roles = [];
 
 	/**
 	 * Super fast storage of given permissions.
@@ -103,37 +87,22 @@ class User implements IIdentity
 	 * @var string[]|null
 	 * @ORM\Column(type="json_array")
 	 */
-	private $privileges = [];
+	private ?array $privileges = [];
 
-	/**
-	 * @var string|null
-	 * @ORM\Column(type="string", length=16, nullable=true)
-	 */
-	private $phone;
+	/** @ORM\Column(type="string", length=16, nullable=true) */
+	private ?string $phone;
 
-	/**
-	 * @var string
-	 * @ORM\Column(type="string", length=39)
-	 */
-	private $registerIp;
+	/** @ORM\Column(type="string", length=39) */
+	private string $registerIp;
 
-	/**
-	 * @var \DateTime
-	 * @ORM\Column(type="datetime")
-	 */
-	private $registerDate;
+	/** @ORM\Column(type="datetime") */
+	private \DateTime $registerDate;
 
-	/**
-	 * @var \DateTime
-	 * @ORM\Column(type="datetime")
-	 */
-	private $createDate;
+	/** @ORM\Column(type="datetime") */
+	private \DateTime $createDate;
 
-	/**
-	 * @var bool
-	 * @ORM\Column(type="boolean")
-	 */
-	private $active = true;
+	/** @ORM\Column(type="boolean") */
+	private bool $active = true;
 
 	/**
 	 * @var UserMeta[]|Collection
@@ -141,11 +110,8 @@ class User implements IIdentity
 	 */
 	private $metas;
 
-	/**
-	 * @var string|null
-	 * @ORM\Column(type="string", nullable=true)
-	 */
-	private $avatarUrl;
+	/** @ORM\Column(type="string", nullable=true) */
+	private ?string $avatarUrl;
 
 	/**
 	 * @var UserLogin[]|Collection
@@ -269,8 +235,8 @@ class User implements IIdentity
 	 * Set password as legacy MD5/SHA1 or other crypt.
 	 * Never store passwords in a readable form!
 	 *
-	 * @internal never use it for new users! Back compatibility only!
 	 * @param string $password
+	 * @internal never use it for new users! Back compatibility only!
 	 */
 	public function setLegacyRawPassword(string $password): void
 	{

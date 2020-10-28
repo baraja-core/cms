@@ -20,35 +20,20 @@ class UserLogin
 	use UuidIdentifier;
 	use SmartObject;
 
-	/**
-	 * @var User
-	 * @ORM\ManyToOne(targetEntity="User", inversedBy="logins")
-	 */
-	private $user;
+	/** @ORM\ManyToOne(targetEntity="User", inversedBy="logins") */
+	private User $user;
 
-	/**
-	 * @var string
-	 * @ORM\Column(type="string", length=39, nullable=true)
-	 */
-	private $ip;
+	/** @ORM\Column(type="string", length=39, nullable=true) */
+	private string $ip;
 
-	/**
-	 * @var string|null
-	 * @ORM\Column(type="string", length=128, nullable=true)
-	 */
-	private $hostname;
+	/** @ORM\Column(type="string", length=128, nullable=true) */
+	private ?string $hostname;
 
-	/**
-	 * @var string|null
-	 * @ORM\Column(type="string", nullable=true)
-	 */
-	private $userAgent;
+	/** @ORM\Column(type="string", nullable=true) */
+	private ?string $userAgent;
 
-	/**
-	 * @var \DateTime
-	 * @ORM\Column(type="datetime")
-	 */
-	private $loginDatetime;
+	/** @ORM\Column(type="datetime") */
+	private \DateTime $loginDatetime;
 
 
 	public function __construct(User $user)

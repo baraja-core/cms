@@ -13,12 +13,13 @@ use Nette\Utils\Validators;
 
 final class InternalSupportEndpoint extends BaseEndpoint
 {
+	private Support $support;
 
-	/**
-	 * @var Support
-	 * @inject
-	 */
-	public $support;
+
+	public function __construct(Support $support)
+	{
+		$this->support = $support;
+	}
 
 
 	public function actionDefault(): void

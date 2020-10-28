@@ -10,9 +10,7 @@ use Baraja\DynamicConfiguration\Configuration;
 
 final class CmsConstantTokenStorage implements TokenStorage
 {
-
-	/** @var Configuration */
-	private $configuration;
+	private Configuration $configuration;
 
 
 	public function __construct(Configuration $configuration)

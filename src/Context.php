@@ -18,39 +18,28 @@ use Nette\Security\User;
 
 final class Context
 {
+	private Request $request;
 
-	/** @var Request */
-	private $request;
+	private Response $response;
 
-	/** @var Response */
-	private $response;
+	private Localization $localization;
 
-	/** @var Localization */
-	private $localization;
+	private EntityManager $entityManager;
 
-	/** @var EntityManager */
-	private $entityManager;
+	private Configuration $configuration;
 
-	/** @var Configuration */
-	private $configuration;
+	private Settings $settings;
 
-	/** @var Settings */
-	private $settings;
+	private User $user;
 
-	/** @var User */
-	private $user;
+	private TranslatorFilter $translatorFilter;
 
-	/** @var TranslatorFilter */
-	private $translatorFilter;
+	private BasicPanel $basicInformation;
 
-	/** @var BasicPanel */
-	private $basicInformation;
-
-	/** @var PluginManager */
-	private $pluginManager;
+	private PluginManager $pluginManager;
 
 	/** @var string[] (type => path) */
-	private $customAssets = [];
+	private array $customAssets = [];
 
 
 	public function __construct(Request $request, Response $response, Localization $localization, EntityManager $entityManager, Configuration $configuration, Settings $settings, User $user, TranslatorFilter $translatorFilter, BasicPanel $basicInformation, PluginManager $pluginManager)

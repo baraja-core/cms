@@ -23,18 +23,13 @@ use Nette\Security\Passwords;
 
 final class UserManager implements IAuthenticator
 {
+	private EntityManager $entityManager;
 
-	/** @var EntityManager */
-	private $entityManager;
+	private IUserStorage $userStorage;
 
-	/** @var IUserStorage */
-	private $userStorage;
+	private CloudManager $cloudManager;
 
-	/** @var CloudManager */
-	private $cloudManager;
-
-	/** @var AuthenticationService|null */
-	private $authenticationService;
+	private ?AuthenticationService $authenticationService;
 
 
 	public function __construct(EntityManager $entityManager, IUserStorage $userStorage, CloudManager $cloudManager)

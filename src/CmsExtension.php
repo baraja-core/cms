@@ -10,6 +10,7 @@ use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Plugin\HomepagePlugin;
 use Baraja\Cms\Plugin\UserPlugin;
 use Baraja\Cms\Proxy\Proxy;
+use Baraja\Cms\Support\Support;
 use Baraja\Cms\User\Authorizator;
 use Baraja\Cms\User\UserManager;
 use Baraja\Doctrine\ORM\DI\OrmAnnotationsExtension;
@@ -95,6 +96,9 @@ final class CmsExtension extends CompilerExtension
 				$context->addSetup('?->setCustomAssetPath(?, ?)', ['@self', $assetFormat, $assetPath]);
 			}
 		}
+
+		$builder->addDefinition($this->prefix('support'))
+			->setFactory(Support::class);
 
 		// translator
 		$builder->addDefinition(self::SERVICE_PREFIX . 'translatorFilter')

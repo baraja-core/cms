@@ -20,35 +20,20 @@ class UserResetPasswordRequest
 	use UuidIdentifier;
 	use SmartObject;
 
-	/**
-	 * @var User
-	 * @ORM\ManyToOne(targetEntity="User", inversedBy="passwordResets")
-	 */
-	private $user;
+	/** @ORM\ManyToOne(targetEntity="User", inversedBy="passwordResets") */
+	private User $user;
 
-	/**
-	 * @var string
-	 * @ORM\Column(type="string", length=40, unique=true)
-	 */
-	private $token;
+	/** @ORM\Column(type="string", length=40, unique=true) */
+	private string $token;
 
-	/**
-	 * @var \DateTime
-	 * @ORM\Column(type="datetime")
-	 */
-	private $insertedDate;
+	/** @ORM\Column(type="datetime") */
+	private \DateTime $insertedDate;
 
-	/**
-	 * @var \DateTime
-	 * @ORM\Column(type="datetime")
-	 */
-	private $expireDate;
+	/** @ORM\Column(type="datetime") */
+	private \DateTime $expireDate;
 
-	/**
-	 * @var bool
-	 * @ORM\Column(type="boolean")
-	 */
-	private $expired = false;
+	/** @ORM\Column(type="boolean") */
+	private bool $expired = false;
 
 
 	public function __construct(User $user, string $expireTime = '30 minutes')

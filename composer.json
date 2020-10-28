@@ -9,7 +9,7 @@
 		}
 	],
 	"require": {
-		"php": ">=7.1.0",
+		"php": ">=7.4.0",
 		"baraja-core/dynamic-configuration": "^1.0",
 		"baraja-core/doctrine": "^2.0",
 		"baraja-core/structured-api": "^2.0",

@@ -13,11 +13,10 @@ final class Authorizator implements IAuthorizator
 {
 	public const ALIASES = ['default' => 'list', 'detail' => 'overview'];
 
-	/** @var IUserStorage */
-	private $userStorage;
+	private IUserStorage $userStorage;
 
 	/** @var mixed[][] */
-	private $map;
+	private array $map;
 
 
 	public function __construct(IUserStorage $userStorage)

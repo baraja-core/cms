@@ -27,17 +27,11 @@ class Option
 	use Identifier;
 	use SmartObject;
 
-	/**
-	 * @var string
-	 * @ORM\Column(type="string", name="`key`", length=128, unique=true)
-	 */
-	private $key;
+	/** @ORM\Column(type="string", name="`key`", length=128, unique=true) */
+	private string $key;
 
-	/**
-	 * @var string
-	 * @ORM\Column(type="string", length=512)
-	 */
-	private $value;
+	/** @ORM\Column(type="string", length=512) */
+	private string $value;
 
 	/**
 	 * Last non empty values.
@@ -45,19 +39,13 @@ class Option
 	 * @var string[]
 	 * @ORM\Column(type="json_array")
 	 */
-	private $oldValues = [];
+	private array $oldValues = [];
 
-	/**
-	 * @var \DateTime
-	 * @ORM\Column(type="datetime")
-	 */
-	private $insertedDate;
+	/** @ORM\Column(type="datetime") */
+	private \DateTime $insertedDate;
 
-	/**
-	 * @var \DateTime|null
-	 * @ORM\Column(type="datetime", nullable=true)
-	 */
-	private $updatedDate;
+	/** @ORM\Column(type="datetime", nullable=true) */
+	private ?\DateTime $updatedDate;
 
 
 	public function __construct(string $key, string $value)
