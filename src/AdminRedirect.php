@@ -9,9 +9,7 @@ use Nette\Utils\Validators;
 
 final class AdminRedirect extends \RuntimeException
 {
-
-	/** @var string */
-	private $url;
+	private string $url;
 
 
 	public function __construct(string $url)

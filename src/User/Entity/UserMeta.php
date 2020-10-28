@@ -18,23 +18,14 @@ class UserMeta
 	use UuidIdentifier;
 	use SmartObject;
 
-	/**
-	 * @var User
-	 * @ORM\ManyToOne(targetEntity="User", inversedBy="metas")
-	 */
-	private $user;
+	/** @ORM\ManyToOne(targetEntity="User", inversedBy="metas") */
+	private User $user;
 
-	/**
-	 * @var string
-	 * @ORM\Column(type="string", name="`key`", length=64)
-	 */
-	private $key;
+	/** @ORM\Column(type="string", name="`key`", length=64) */
+	private string $key;
 
-	/**
-	 * @var string|null
-	 * @ORM\Column(type="text", name="`value`", nullable=true)
-	 */
-	private $value;
+	/** @ORM\Column(type="text", name="`value`", nullable=true) */
+	private ?string $value;
 
 
 	public function __construct(User $user, string $key, ?string $value)

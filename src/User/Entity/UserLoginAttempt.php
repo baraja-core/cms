@@ -21,47 +21,26 @@ class UserLoginAttempt
 	use UuidIdentifier;
 	use SmartObject;
 
-	/**
-	 * @var User|null
-	 * @ORM\ManyToOne(targetEntity="User", inversedBy="loginAttempts")
-	 */
-	private $user;
+	/** @ORM\ManyToOne(targetEntity="User", inversedBy="loginAttempts") */
+	private ?User $user;
 
-	/**
-	 * @var string
-	 * @ORM\Column(type="string", length=64)
-	 */
-	private $username;
+	/** @ORM\Column(type="string", length=64) */
+	private string $username;
 
-	/**
-	 * @var bool
-	 * @ORM\Column(type="boolean")
-	 */
-	private $password = false;
+	/** @ORM\Column(type="boolean") */
+	private bool $password = false;
 
-	/**
-	 * @var string|null
-	 * @ORM\Column(type="string", length=2048, nullable=true)
-	 */
-	private $loginUrl;
+	/** @ORM\Column(type="string", length=2048, nullable=true) */
+	private ?string $loginUrl;
 
-	/**
-	 * @var string|null
-	 * @ORM\Column(type="string", length=39, nullable=true)
-	 */
-	private $ip;
+	/** @ORM\Column(type="string", length=39, nullable=true) */
+	private ?string $ip;
 
-	/**
-	 * @var \DateTime
-	 * @ORM\Column(type="datetime")
-	 */
-	private $insertedDateTime;
+	/** @ORM\Column(type="datetime") */
+	private \DateTime $insertedDateTime;
 
-	/**
-	 * @var string|null
-	 * @ORM\Column(type="text", nullable=true)
-	 */
-	private $notice;
+	/** @ORM\Column(type="text", nullable=true) */
+	private ?string $notice;
 
 
 	public function __construct(?User $user, string $username)

@@ -13,15 +13,12 @@ use Nette\Security\User;
 
 final class MenuManager
 {
+	private PluginManager $pluginManager;
 
-	/** @var PluginManager */
-	private $pluginManager;
-
-	/** @var User */
-	private $user;
+	private User $user;
 
 	/** @var true[] */
-	private $ignorePlugins = [
+	private array $ignorePlugins = [
 		CmsPlugin::class => true,
 		ErrorPlugin::class => true,
 		HomepagePlugin::class => true,

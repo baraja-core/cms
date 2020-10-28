@@ -33,29 +33,21 @@ final class Admin
 {
 	public const SUPPORTED_LOCALES = ['cs', 'en'];
 
-	/** @var string */
-	private $cacheDir;
+	private string $cacheDir;
 
-	/** @var Context */
-	private $context;
+	private Context $context;
 
-	/** @var LinkGenerator */
-	private $linkGenerator;
+	private LinkGenerator $linkGenerator;
 
-	/** @var MenuManager */
-	private $menuManager;
+	private MenuManager $menuManager;
 
-	/** @var CmsPluginPanel */
-	private $panel;
+	private CmsPluginPanel $panel;
 
-	/** @var string|null */
-	private $plugin;
+	private ?string $plugin;
 
-	/** @var string|null */
-	private $view;
+	private ?string $view;
 
-	/** @var string|null */
-	private $locale;
+	private ?string $locale;
 
 
 	public function __construct(string $cacheDir, Context $context, LinkGenerator $linkGenerator, MenuManager $menuManager, CmsPluginPanel $panel)

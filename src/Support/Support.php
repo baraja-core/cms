@@ -23,11 +23,9 @@ final class Support
 		self::PRIORITY_URGENT => 'Urgent (24 hours)',
 	];
 
-	/** @var UrlScript */
-	private $url;
+	private UrlScript $url;
 
-	/** @var CloudManager */
-	private $cloudManager;
+	private CloudManager $cloudManager;
 
 
 	public function __construct(Request $request, CloudManager $cloudManager)

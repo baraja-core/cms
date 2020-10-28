@@ -21,30 +21,22 @@ use Nette\Utils\Validators;
  */
 final class CmsInstallEndpoint extends BaseEndpoint
 {
+	private EntityManager $entityManager;
 
-	/**
-	 * @var EntityManager
-	 * @inject
-	 */
-	public $entityManager;
+	private Configuration $configuration;
 
-	/**
-	 * @var Configuration
-	 * @inject
-	 */
-	public $configuration;
+	private CloudManager $cloudManager;
 
-	/**
-	 * @var CloudManager
-	 * @inject
-	 */
-	public $cloudManager;
+	private Settings $settings;
 
-	/**
-	 * @var Settings
-	 * @inject
-	 */
-	public $settings;
+
+	public function __construct(EntityManager $entityManager, Configuration $configuration, CloudManager $cloudManager, Settings $settings)
+	{
+		$this->entityManager = $entityManager;
+		$this->configuration = $configuration;
+		$this->cloudManager = $cloudManager;
+		$this->settings = $settings;
+	}
 
 
 	public function postBasic(string $name, string $username, string $firstName, string $lastName, string $mail, string $password, string $passwordVerify, bool $vop = false): void

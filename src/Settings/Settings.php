@@ -17,21 +17,15 @@ use Nette\Utils\Validators;
 
 final class Settings
 {
+	private Cache $cache;
 
-	/** @var Cache */
-	private $cache;
+	private EntityManager $entityManager;
 
-	/** @var EntityManager */
-	private $entityManager;
+	private Localization $localization;
 
-	/** @var Localization */
-	private $localization;
+	private Configuration $configuration;
 
-	/** @var Configuration */
-	private $configuration;
-
-	/** @var CloudManager */
-	private $cloudManager;
+	private CloudManager $cloudManager;
 
 
 	public function __construct(IStorage $storage, EntityManager $entityManager, Localization $localization, Configuration $configuration, CloudManager $cloudManager)

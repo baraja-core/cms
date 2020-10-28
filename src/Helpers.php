@@ -23,9 +23,6 @@ final class Helpers
 	/**
 	 * Return current API path by current HTTP URL.
 	 * In case of CLI return empty string.
-	 *
-	 * @param Request $httpRequest
-	 * @return string
 	 */
 	public static function processPath(Request $httpRequest): string
 	{

@@ -18,8 +18,7 @@ final class Proxy
 		'css' => 'text/css',
 	];
 
-	/** @var PluginManager */
-	private $pluginManager;
+	private PluginManager $pluginManager;
 
 
 	public function __construct(PluginManager $pluginManager)

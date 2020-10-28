@@ -16,9 +16,7 @@ use Doctrine\ORM\NoResultException;
  */
 final class DoctrineStorage implements Storage
 {
-
-	/** @var EntityManager */
-	private $entityManager;
+	private EntityManager $entityManager;
 
 
 	public function __construct(EntityManager $entityManager)

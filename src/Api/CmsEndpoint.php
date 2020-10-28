@@ -25,30 +25,22 @@ use Tracy\ILogger;
  */
 final class CmsEndpoint extends BaseEndpoint
 {
+	private UserManager $userManager;
 
-	/**
-	 * @var UserManager
-	 * @inject
-	 */
-	public $userManager;
+	private CloudManager $cloudManager;
 
-	/**
-	 * @var CloudManager
-	 * @inject
-	 */
-	public $cloudManager;
+	private Settings $settings;
 
-	/**
-	 * @var Settings
-	 * @inject
-	 */
-	public $settings;
+	private EntityManager $entityManager;
 
-	/**
-	 * @var EntityManager
-	 * @inject
-	 */
-	public $entityManager;
+
+	public function __construct(UserManager $userManager, CloudManager $cloudManager, Settings $settings, EntityManager $entityManager)
+	{
+		$this->userManager = $userManager;
+		$this->cloudManager = $cloudManager;
+		$this->settings = $settings;
+		$this->entityManager = $entityManager;
+	}
 
 
 	public function postSign(string $locale, string $username, string $password, bool $remember = false): void
