@@ -29,7 +29,7 @@ final class UserManager implements IAuthenticator
 
 	private CloudManager $cloudManager;
 
-	private ?AuthenticationService $authenticationService;
+	private ?AuthenticationService $authenticationService = null;
 
 
 	public function __construct(EntityManager $entityManager, IUserStorage $userStorage, CloudManager $cloudManager)
