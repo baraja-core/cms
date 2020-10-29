@@ -33,8 +33,6 @@ use Tracy\ILogger;
 
 final class CmsExtension extends CompilerExtension
 {
-	private const SERVICE_PREFIX = 'baraja.cms.';
-
 
 	/**
 	 * @return string[]
@@ -60,7 +58,7 @@ final class CmsExtension extends CompilerExtension
 		PluginComponentExtension::defineBasicServices($builder = $this->getContainerBuilder());
 
 		// linkGenerator
-		$builder->addDefinition(self::SERVICE_PREFIX . 'linkGenerator')
+		$builder->addDefinition($this->prefix('linkGenerator'))
 			->setFactory(LinkGenerator::class);
 
 		try {
@@ -72,17 +70,17 @@ final class CmsExtension extends CompilerExtension
 		}
 
 		// proxy
-		$builder->addDefinition(self::SERVICE_PREFIX . 'proxy')
+		$builder->addDefinition($this->prefix('proxy'))
 			->setFactory(Proxy::class);
 
 		// admin
-		$builder->addDefinition(self::SERVICE_PREFIX . 'admin')
+		$builder->addDefinition($this->prefix('admin'))
 			->setFactory(Admin::class)
 			->setArgument('cacheDir', $cacheDir = $builder->parameters['tempDir'] . '/cache/baraja.cms');
 		FileSystem::createDir($cacheDir);
 
 		// context
-		$context = $builder->addDefinition(self::SERVICE_PREFIX . 'context')
+		$context = $builder->addDefinition($this->prefix('context'))
 			->setFactory(Context::class);
 
 		if (isset($this->config->assets) === true) {
@@ -101,25 +99,25 @@ final class CmsExtension extends CompilerExtension
 			->setFactory(Support::class);
 
 		// translator
-		$builder->addDefinition(self::SERVICE_PREFIX . 'translatorFilter')
+		$builder->addDefinition($this->prefix('translatorFilter'))
 			->setFactory(TranslatorFilter::class);
 
 		// settings
-		$builder->addDefinition(self::SERVICE_PREFIX . 'settings')
+		$builder->addDefinition($this->prefix('settings'))
 			->setFactory(Settings::class);
 
-		$builder->addDefinition(self::SERVICE_PREFIX . 'tokenStorage')
+		$builder->addDefinition($this->prefix('tokenStorage'))
 			->setFactory(CmsConstantTokenStorage::class);
 
 		// menuManager
-		$builder->addDefinition(self::SERVICE_PREFIX . 'menuManager')
+		$builder->addDefinition($this->prefix('menuManager'))
 			->setFactory(MenuManager::class);
 
 		// user
-		$builder->addDefinition(self::SERVICE_PREFIX . 'userManager')
+		$builder->addDefinition($this->prefix('userManager'))
 			->setFactory(UserManager::class);
 
-		$builder->addDefinition(self::SERVICE_PREFIX . 'authorizator')
+		$builder->addDefinition($this->prefix('authorizator'))
 			->setFactory(Authorizator::class);
 
 		/** @var ServiceDefinition $pluginManager */
