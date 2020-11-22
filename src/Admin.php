@@ -349,8 +349,9 @@ final class Admin
 
 	private function renderNeedOtpAuth(): string
 	{
-		return '<div style="margin-top:6em">
-	<h1>Permission denied</h1>
+		return '<div style="margin:6em auto;max-width:32em;padding:0 1em">
+	<img src="https://cdn.baraja.cz/icon/warning-triangle.png" alt="Warning">
+	<h1 style="display:inline-block">Permission denied</h1>
 	<p>To visit this page, you must first verify through 2-step verification.</p>
 	<p><a href="' . Helpers::getBaseUrl() . '/admin/cms/sign-out">Sign out</a></p>
 </div>';
@@ -359,8 +360,9 @@ final class Admin
 
 	private function renderPermissionDenied(): string
 	{
-		return '<div style="margin-top:6em">
-	<h1>Permission denied</h1>
+		return '<div style="margin:6em auto;max-width:32em;padding:0 1em">
+	<img src="https://cdn.baraja.cz/icon/warning-triangle.png" alt="Warning">
+	<h1 style="display:inline-block">Permission denied</h1>
 	<p>Open this page is not permitted for your account.</p>
 	<p><a href="' . Helpers::getBaseUrl() . '/admin/cms/sign-out">Sign out</a></p>
 </div>';
