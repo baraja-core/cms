@@ -113,7 +113,7 @@ final class Helpers
 		$data = str_pad(pack('N', $timeSlot), 8, "\0", STR_PAD_LEFT);
 		$hash = hash_hmac('sha1', $data, $secret, true);
 		$offset = \ord(\substr($hash, -1)) & 0xF;
-		$unpacked = unpack('N', substr($hash, $offset, 4));
+		$unpacked = (array) unpack('N', substr($hash, $offset, 4));
 
 		return ($unpacked[1] & 0x7FFFFFFF) % 1e6;
 	}

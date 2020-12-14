@@ -423,11 +423,14 @@ class User implements IIdentity
 
 	public function getOtpCode(): ?string
 	{
-		if (is_resource($otpCode = $this->otpCode) === true) {
-			$otpCode = (string) stream_get_contents($otpCode);
+		if ($this->otpCode === null) {
+			return null;
+		}
+		if (is_resource($this->otpCode) === true) {
+			return (string) stream_get_contents($this->otpCode);
 		}
 
-		return $otpCode;
+		return (string) $this->otpCode;
 	}
 
 
