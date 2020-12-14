@@ -21,7 +21,6 @@ final class TranslatorFilter
 
 	/**
 	 * @param string|object $haystack
-	 * @return string
 	 */
 	public function __invoke(FilterInfo $info, $haystack): string
 	{

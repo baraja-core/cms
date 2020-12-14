@@ -70,13 +70,13 @@ class User implements IIdentity
 
 	/**
 	 * @var string[]
-	 * @ORM\Column(type="json_array")
+	 * @ORM\Column(type="json")
 	 */
 	private array $emails = [];
 
 	/**
 	 * @var string[]|null
-	 * @ORM\Column(type="json_array")
+	 * @ORM\Column(type="json")
 	 */
 	private ?array $roles = [];
 
@@ -85,7 +85,7 @@ class User implements IIdentity
 	 * When we assign a specific role to a user, we automatically insert all his rights as a simple array.
 	 *
 	 * @var string[]|null
-	 * @ORM\Column(type="json_array")
+	 * @ORM\Column(type="json")
 	 */
 	private ?array $privileges = [];
 
@@ -278,11 +278,9 @@ class User implements IIdentity
 	/**
 	 * @return string[]
 	 */
-	public function getPrivileges(): ?array
+	public function getPrivileges(): array
 	{
-		return array_filter($this->privileges ?? [], static function (string $item): bool {
-			return trim($item) !== '';
-		});
+		return array_filter($this->privileges ?? [], fn (string $item): bool => trim($item) !== '');
 	}
 
 
@@ -425,11 +423,11 @@ class User implements IIdentity
 
 	public function getOtpCode(): ?string
 	{
-		if (is_resource($this->otpCode) === true) {
-			$this->otpCode = stream_get_contents($this->otpCode);
+		if (is_resource($otpCode = $this->otpCode) === true) {
+			$otpCode = (string) stream_get_contents($otpCode);
 		}
 
-		return $this->otpCode;
+		return $otpCode;
 	}
 
 

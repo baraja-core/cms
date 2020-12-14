@@ -97,8 +97,8 @@ final class DoctrineStorage implements Storage
 		} catch (NoResultException | NonUniqueResultException $e) {
 			$this->entityManager->persist($option = new Option($key, $value));
 		}
-
-		$this->entityManager->flush($option->setValue($value));
+		$option->setValue($value);
+		$this->entityManager->flush();
 	}
 
 
@@ -111,7 +111,9 @@ final class DoctrineStorage implements Storage
 		}
 
 		try {
-			$this->entityManager->remove($option)->flush($option)->clear($option);
+			$this->entityManager->remove($option);
+			$this->entityManager->flush();
+			$this->entityManager->clear($option);
 		} catch (MappingException $e) {
 			throw new \RuntimeException($e->getMessage(), $e->getCode(), $e);
 		}

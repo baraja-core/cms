@@ -83,7 +83,7 @@ final class UserEndpoint extends BaseEndpoint
 		foreach ($users as $user) {
 			$return[] = [
 				'id' => $user['id'],
-				'name' => (function () use ($user): ?string {
+				'name' => (static function () use ($user): ?string {
 					if (($return = trim($user['firstName'] . ' ' . $user['lastName']) ?: null) === null) {
 						$return = explode('@', $user['emails'][0] ?? '')[0] ?? null;
 					}
@@ -127,7 +127,7 @@ final class UserEndpoint extends BaseEndpoint
 			$this->entityManager->persist($user = new User($email, $password ?? '', $email, User::ROLE_USER));
 			$user->setPhone($phone);
 			$user->addRole($role);
-			$this->entityManager->flush($user);
+			$this->entityManager->flush();
 		} catch (\InvalidArgumentException $e) {
 			$this->sendError($e->getMessage());
 
@@ -135,7 +135,7 @@ final class UserEndpoint extends BaseEndpoint
 		}
 
 		$this->setRealUserName($user, $fullName);
-		$this->entityManager->flush($user);
+		$this->entityManager->flush();
 
 		$this->cloudManager->callRequest('cloud/confirm-user-registration', [
 			'domain' => (new Url(Helpers::getCurrentUrl()))->getDomain(3),
@@ -162,7 +162,7 @@ final class UserEndpoint extends BaseEndpoint
 		}
 
 		$user->setActive(false);
-		$this->entityManager->flush($user);
+		$this->entityManager->flush();
 		$this->flashMessage('User was marked as deleted.', 'success');
 		$this->sendOk();
 	}
@@ -179,7 +179,7 @@ final class UserEndpoint extends BaseEndpoint
 		}
 
 		$user->setActive(true);
-		$this->entityManager->flush($user);
+		$this->entityManager->flush();
 		$this->flashMessage('User was reverted to active state.', 'success');
 		$this->sendOk();
 	}
@@ -302,8 +302,7 @@ final class UserEndpoint extends BaseEndpoint
 		// TODO: }
 
 		$user->setPassword($password);
-		$this->entityManager->flush($user);
-
+		$this->entityManager->flush();
 		$this->sendOk();
 	}
 
@@ -337,11 +336,11 @@ final class UserEndpoint extends BaseEndpoint
 
 		} catch (NoResultException | NonUniqueResultException $e) {
 			$meta = new UserMeta($user, 'password-last-changed-date', $user->getRegisterDate()->format('Y-m-d'));
-			$this->entityManager->persist($meta)->flush($meta);
+			$this->entityManager->persist($meta)->flush();
 		}
 
 		$this->sendJson([
-			'lastChangedPassword' => DateTime::from($meta->getValue())->format('F j, Y'),
+			'lastChangedPassword' => DateTime::from($meta->getValue() ?? 'now')->format('F j, Y'),
 			'twoFactorAuth' => $user->getOtpCode() !== null,
 		]);
 	}
@@ -358,8 +357,7 @@ final class UserEndpoint extends BaseEndpoint
 		}
 
 		$user->setOtpCode(null);
-		$this->entityManager->flush($user);
-
+		$this->entityManager->flush();
 		$this->sendOk();
 	}
 
@@ -373,7 +371,6 @@ final class UserEndpoint extends BaseEndpoint
 
 			return;
 		}
-
 		if ($user->getOtpCode() !== null) {
 			$this->sendError('OTP code already exist.');
 		}
@@ -407,8 +404,9 @@ final class UserEndpoint extends BaseEndpoint
 
 		if ($otpCode === null) {
 			$this->sendError('Hash is invalid or already expired.');
-		}
 
+			return;
+		}
 		if (Helpers::checkAuthenticatorOtpCodeManually($otpCode, (int) $code) === true) {
 			try {
 				$user = $this->userManager->getUserById($id);
@@ -419,7 +417,7 @@ final class UserEndpoint extends BaseEndpoint
 			}
 
 			$user->setOtpCode($otpCode);
-			$this->entityManager->flush($user);
+			$this->entityManager->flush();
 			$this->sendOk();
 		}
 
@@ -445,7 +443,7 @@ final class UserEndpoint extends BaseEndpoint
 		}
 
 		$user->addRole('admin');
-		$this->entityManager->flush($user);
+		$this->entityManager->flush();
 		$this->sendOk();
 	}
 
@@ -551,7 +549,7 @@ final class UserEndpoint extends BaseEndpoint
 		if (!($imageHeaders = @get_headers($url)) || ($imageHeaders[0] ?? '') === 'HTTP/1.1 404 Not Found') {
 			$this->sendError('URL does not exist.');
 		}
-		foreach ($imageHeaders as $imageHeader) {
+		foreach ((array) $imageHeaders as $imageHeader) {
 			if (preg_match('/^Content-Type:\s(.+)$/', $imageHeader, $headerParser)
 				&& !\in_array($headerParser[1], ['image/jpeg', 'image/png', 'image/gif'], true)) {
 				$this->sendError('Image type is not valid, because "' . $headerParser[1] . '" given.');
@@ -566,9 +564,8 @@ final class UserEndpoint extends BaseEndpoint
 		}
 
 		$user->setAvatarUrl($url);
-		$this->entityManager->flush($user);
+		$this->entityManager->flush();
 		$this->flashMessage('User photo has been changed.', 'success');
-
 		$this->sendOk();
 	}
 
@@ -588,9 +585,8 @@ final class UserEndpoint extends BaseEndpoint
 			$this->sendError($e->getMessage());
 		}
 
-		$this->entityManager->flush($user);
+		$this->entityManager->flush();
 		$this->flashMessage('User phone has been changed.', 'success');
-
 		$this->sendOk();
 	}
 
@@ -616,8 +612,8 @@ final class UserEndpoint extends BaseEndpoint
 		}
 
 		$user->setPassword($password);
-		$this->entityManager->flush($user);
-		$this->userManager->setMeta($user->getId(), 'password-last-changed-date', date('Y-m-d'));
+		$this->userManager->setMeta((string) $user->getId(), 'password-last-changed-date', date('Y-m-d'));
+		$this->entityManager->flush();
 		$this->flashMessage('User password has been changed.', 'success');
 
 		$this->sendOk();
@@ -653,7 +649,7 @@ final class UserEndpoint extends BaseEndpoint
 		$countTypes = [];
 		foreach ($this->getAllUsers() as $user) {
 			foreach ($user['roles'] ?? [] as $role) {
-				$roles[$role] = true;
+				$roles[$role = (string) $role] = true;
 				if (isset($countTypes[$role]) === false) {
 					$countTypes[$role] = 1;
 				} else {
@@ -667,6 +663,7 @@ final class UserEndpoint extends BaseEndpoint
 
 		$return = [];
 		foreach ($roles as $role) {
+			$role = (string) $role;
 			$return[$role] = Strings::firstUpper($role) . ' (' . $countTypes[$role] . ')';
 		}
 
@@ -679,8 +676,9 @@ final class UserEndpoint extends BaseEndpoint
 		$nameParser = Helpers::nameParser($name);
 		$user->setFirstName($nameParser['firstName']);
 		$user->setLastName($nameParser['lastName']);
-		$this->userManager->setMeta($user->getId(), 'name--degree-before', $nameParser['degreeBefore']);
-		$this->userManager->setMeta($user->getId(), 'name--degree-after', $nameParser['degreeAfter']);
+		$this->userManager->setMeta((string) $user->getId(), 'name--degree-before', $nameParser['degreeBefore']);
+		$this->userManager->setMeta((string) $user->getId(), 'name--degree-after', $nameParser['degreeAfter']);
+		$this->entityManager->flush();
 	}
 
 

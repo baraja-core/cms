@@ -62,9 +62,7 @@ final class MenuManager
 			}
 		}
 
-		usort($return, static function (array $a, array $b): int {
-			return $a['priority'] < $b['priority'] ? 1 : -1;
-		});
+		usort($return, fn (array $a, array $b): int => $a['priority'] < $b['priority'] ? 1 : -1);
 
 		return $return;
 	}
@@ -79,8 +77,6 @@ final class MenuManager
 	 * - Is superuser? If yes, allow always
 	 *
 	 * @param mixed[] $plugin
-	 * @param string $route
-	 * @return bool
 	 */
 	private function checkPermission(array $plugin, string $route): bool
 	{
@@ -93,7 +89,6 @@ final class MenuManager
 				return true;
 			}
 		}
-
 		foreach ($plugin['privileges'] ?? [] as $privilege) {
 			if ($this->user->isAllowed((string) $privilege) === true) {
 				return true;

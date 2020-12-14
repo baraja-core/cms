@@ -64,7 +64,6 @@ final class Helpers
 
 	/**
 	 * @param string $data -> a string of length divisible by five
-	 * @return string
 	 * @copyright Jakub Vrána, https://php.vrana.cz/
 	 */
 	public static function otpBase32Encode(string $data): string
@@ -89,7 +88,6 @@ final class Helpers
 	 * @param string $issuer -> service (or project) name
 	 * @param string $user -> username (displayed in Authenticator app)
 	 * @param string $secret -> in binary format
-	 * @return string URL
 	 * @copyright Jakub Vrána, https://php.vrana.cz/
 	 */
 	public static function getOtpQrUrl(string $issuer, string $user, string $secret): string
@@ -108,7 +106,6 @@ final class Helpers
 	 *
 	 * @param string $secret -> in binary format
 	 * @param string $timeSlot -> example: floor(time() / 30)
-	 * @return int
 	 * @copyright Jakub Vrána, https://php.vrana.cz/
 	 */
 	public static function getOtp(string $secret, string $timeSlot): int
@@ -135,9 +132,7 @@ final class Helpers
 	/**
 	 * Normalize phone to basic format if pattern match.
 	 *
-	 * @param string $phone user input
 	 * @param int $region use this prefix when number prefix does not exist
-	 * @return string
 	 */
 	public static function fixPhone(string $phone, int $region = 420): string
 	{
@@ -164,7 +159,6 @@ final class Helpers
 	 * Advance function for parsing real user full name.
 	 * Accept name in format "Doc. Ing. Jan Barášek, PhD."
 	 *
-	 * @param string $name
 	 * @return string[]|null[]
 	 */
 	public static function nameParser(string $name): array
@@ -294,7 +288,7 @@ final class Helpers
 
 	public static function minifyHtml(string $haystack): string
 	{
-		return preg_replace_callback(
+		return (string) preg_replace_callback(
 			'#[ \t\r\n]+|<(/)?(textarea|pre)(?=\W)#i',
 			static function (array $match) {
 				return empty($match[2]) ? ' ' : $match[0];
