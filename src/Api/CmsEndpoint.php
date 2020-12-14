@@ -79,6 +79,8 @@ final class CmsEndpoint extends BaseEndpoint
 	{
 		if (($userEntity = $this->getUserEntity()) === null) {
 			$this->sendError('User is not logged in.');
+
+			return;
 		}
 		try {
 			$user = $this->userManager->getUserById($userEntity->getId());
@@ -87,7 +89,12 @@ final class CmsEndpoint extends BaseEndpoint
 
 			return;
 		}
-		if (Helpers::checkAuthenticatorOtpCodeManually($user->getOtpCode(), (int) $code) === true) {
+		if (($otpCode = $user->getOtpCode()) === null) {
+			$this->sendError('OTP code for user "' . $userEntity->getId() . '" does not exist.');
+
+			return;
+		}
+		if (Helpers::checkAuthenticatorOtpCodeManually($otpCode, (int) $code) === true) {
 			$this->getUser()->getStorage()->setAuthenticated(true);
 			$this->sendOk();
 		} else {
@@ -112,7 +119,8 @@ final class CmsEndpoint extends BaseEndpoint
 				->getQuery()
 				->getSingleResult();
 
-			$this->entityManager->persist($request = new UserResetPasswordRequest($user, '3 hours'))->flush($request);
+			$this->entityManager->persist($request = new UserResetPasswordRequest($user, '3 hours'));
+			$this->entityManager->flush();
 
 			$this->cloudManager->callRequest('cloud/forgot-password', [
 				'domain' => (new Url(Helpers::getCurrentUrl()))->getDomain(3),
@@ -236,8 +244,7 @@ final class CmsEndpoint extends BaseEndpoint
 		}
 
 		$user->setPassword($password);
-		$this->entityManager->flush($user);
-
+		$this->entityManager->flush();
 		$this->sendOk();
 	}
 }

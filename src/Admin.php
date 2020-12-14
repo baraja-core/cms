@@ -269,7 +269,7 @@ final class Admin
 		try {
 			require __DIR__ . '/../template/@layout.phtml';
 
-			return ob_get_clean();
+			return (string) ob_get_clean();
 		} catch (\Throwable $e) {
 			ob_end_clean();
 			throw new \RuntimeException($e->getMessage(), $e->getCode(), $e);
@@ -279,7 +279,6 @@ final class Admin
 
 	/**
 	 * @param PluginComponent[] $components
-	 * @return string
 	 */
 	private function renderContentCode(Plugin $plugin, array $components): string
 	{
@@ -310,7 +309,7 @@ final class Admin
 					. ($plugin->isSaveAll() === true ? ' :save-all="true"' : '')
 					. (($smartComponent = $plugin->getSmartControlComponentName()) !== null
 						? ' smart-component="' . Helpers::escapeHtmlAttr($smartComponent) . '"'
-						. ' :smart-component-params="' . Helpers::escapeHtmlAttr(json_encode($plugin->getSmartControlComponentParams())) . '"' : '');
+						. ' :smart-component-params="' . Helpers::escapeHtmlAttr((string) json_encode($plugin->getSmartControlComponentParams())) . '"' : '');
 			}
 
 			$return = '<div class="px-4 py-2">' . "\n"
@@ -386,7 +385,6 @@ final class Admin
 
 	/**
 	 * @param SimpleComponent[] $simpleComponents
-	 * @return string
 	 */
 	private function renderSimpleComponents(array $simpleComponents): string
 	{
@@ -395,7 +393,7 @@ final class Admin
 			$return[] = $component->toArray();
 		}
 
-		return json_encode($return);
+		return (string) json_encode($return);
 	}
 
 

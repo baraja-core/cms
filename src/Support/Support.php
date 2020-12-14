@@ -60,7 +60,6 @@ final class Support
 
 
 	/**
-	 * @param string $id
 	 * @return mixed[]
 	 */
 	public function getIssue(string $id): array

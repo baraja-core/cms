@@ -12,7 +12,6 @@ final class LinkGenerator implements PluginLinkGenerator
 
 	/**
 	 * @param mixed[] $params
-	 * @return string
 	 */
 	public static function generateInternalLink(string $route, array $params = []): string
 	{
@@ -49,7 +48,6 @@ final class LinkGenerator implements PluginLinkGenerator
 
 	/**
 	 * @param mixed[] $params
-	 * @return string
 	 */
 	public function link(string $route, array $params = []): string
 	{

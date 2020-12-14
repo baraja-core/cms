@@ -49,7 +49,7 @@ final class PermissionExtension extends CompilerExtension
 	{
 		$return = [];
 
-		foreach ($this->config as $resource => $config) {
+		foreach ((array) $this->config as $resource => $config) {
 			foreach (array_keys($config) as $configKey) {
 				if (isset(self::ALLOWED_CONFIG_KEYS[$configKey]) === false) {
 					throw new \RuntimeException('Permissions: Unexpected config key "' . $configKey . '". Did you mean "' . implode('", "', self::ALLOWED_CONFIG_KEYS) . '"?');

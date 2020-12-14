@@ -89,7 +89,7 @@ final class UserManager implements IAuthenticator
 
 		$attempt = new UserLoginAttempt(null, $username);
 		$attempt->setLoginUrl(Helpers::getCurrentUrl());
-		$this->entityManager->persist($attempt)->flush($attempt);
+		$this->entityManager->persist($attempt)->flush();
 
 		if ($this->authenticationService !== null) {
 			try {
@@ -236,8 +236,7 @@ final class UserManager implements IAuthenticator
 		} else {
 			$meta->setValue($value);
 		}
-
-		$this->entityManager->flush($meta);
+		$this->entityManager->flush();
 
 		return $this;
 	}
@@ -267,7 +266,7 @@ final class UserManager implements IAuthenticator
 		} catch (NoResultException | NonUniqueResultException $e) {
 			// TODO: Reserved for future use
 			// TODO: if (($externalEmail = $this->authenticateByCloudAccount($username, $password)) !== null) {
-			// TODO: $user = $this->entityManager->persist($user = new User($username, $password, $externalEmail))->flush($user);
+			// TODO: $user = $this->entityManager->persist($user = new User($username, $password, $externalEmail))->flush();
 			// TODO: } else {
 			throw new AuthenticationException('The username is incorrect. Username "' . $username . '" given.');
 		}
