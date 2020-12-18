@@ -401,7 +401,7 @@ final class Admin
 	{
 		AdminBar::enable(true);
 		AdminBar::addPanel($this->context->getBasicInformation());
-		AdminBar::setUser(new AdminBarUser);
+		AdminBar::setUser(new AdminBarUser($this->context->getUser()->getIdentity()));
 
 		if ($this->context->getUser()->isAllowed('user', 'detail') === true) { // Show link only in case of user can edit profile
 			AdminBar::addLink('My Profile', $this->linkGenerator->link('User:detail', ['id' => $this->context->getUser()->getId()]));
