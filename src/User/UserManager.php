@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Baraja\Cms\User;
 
 
+use Baraja\AdminBar\AdminIdentity;
 use Baraja\BarajaCloud\CloudManager;
 use Baraja\Cms\Helpers;
 use Baraja\Cms\User\Entity\User;
@@ -16,7 +17,6 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Nette\Security\AuthenticationException;
 use Nette\Security\IAuthenticator;
-use Nette\Security\Identity;
 use Nette\Security\IIdentity;
 use Nette\Security\IUserStorage;
 use Nette\Security\Passwords;
@@ -57,8 +57,15 @@ final class UserManager implements IAuthenticator
 
 	public function createIdentity(IIdentity $user, string $expiration = '2 hours'): IIdentity
 	{
+		$name = null;
+		$avatarUrl = null;
+		if ($user instanceof User) {
+			$name = $user->getName();
+			$avatarUrl = $user->getAvatarUrl();
+		}
+
 		$this->userStorage
-			->setIdentity($identity = new Identity($user->getId(), $user->getRoles()))
+			->setIdentity($identity = new AdminIdentity($user->getId(), $user->getRoles(), [], $name, $avatarUrl))
 			->setAuthenticated(true)
 			->setExpiration($expiration);
 
@@ -74,7 +81,6 @@ final class UserManager implements IAuthenticator
 
 	/**
 	 * @param mixed[] $credentials
-	 * @return IIdentity|User
 	 * @throws AuthenticationException
 	 */
 	public function authenticate(array $credentials): IIdentity
