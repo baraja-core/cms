@@ -521,9 +521,8 @@ final class UserEndpoint extends BaseEndpoint
 
 			return;
 		}
-
 		try {
-			$this->userManager->getUserStorage()->setIdentity($user)->setAuthenticated(true);
+			$this->userManager->createIdentity($user);
 		} catch (\Throwable $e) {
 			$this->sendError($e->getMessage());
 		}
