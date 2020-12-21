@@ -150,6 +150,10 @@ h1 {
 	float: left
 }
 
+.cms-table-no-border-top tr th {
+	border-top: hidden;
+}
+
 .flag__red {
 	background: #f44336
 }
