@@ -9,7 +9,7 @@ Vue.component('user-login-history', {
 					<p><i>History is empty.</i></p>
 				</div>
 				<template v-else>
-					<table class="table table-sm">
+					<table class="table table-sm cms-table-no-border-top">
 						<tr>
 							<th>IP address</th>
 							<th>Hostname</th>

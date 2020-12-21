@@ -93,21 +93,18 @@ Vue.component('user-default', {
 				<span class="text-muted small">Items found: <b>{{ paginator.itemCount }}</b></span>
 			</b-col>
 		</b-row>
-
 		<cms-filter>
 			<b-form inline class="w-100">
 				<div class="w-100">
 					<div class="d-flex flex-column flex-sm-row align-items-sm-center pr-lg-0">
-						<label for="search" class="small text-muted mb-0 mr-3">Search: </label>
-						<b-form-input size="sm" id="search" v-model="search.name" @input="sync" class="mr-3" placeholder="Enter name"></b-form-input>
-						<label for="role" class="small text-muted mb-0 mr-3">Role: </label>
-						<b-form-select size="sm" id="role" :options="roles" v-model="search.role" @change="sync"></b-form-select>
+						<b-form-input size="sm" v-model="search.name" @input="sync" class="mr-3" placeholder="Search users..."></b-form-input>
+						<b-form-select size="sm" :options="roles" v-model="search.role" @change="sync"></b-form-select>
 					</div>
 				</div>
 			</b-form>
 		</cms-filter>
 		<b-card>
-			<table class="table table-sm">
+			<table class="table table-sm cms-table-no-border-top">
 				<tr>
 					<th>Full name</th>
 					<th>E-mail</th>
@@ -117,27 +114,29 @@ Vue.component('user-default', {
 				</tr>
 				<tr v-for="(item, offset) of user.items">
 					<td>
-						<img v-if="item.avatarUrl" :src="item.avatarUrl" :alt="item.name" style="max-height: 32px">
-						<a :href="link('User:detail', {id: item.id})">{{ item.name }}</a>
+						<a :href="link('User:detail', {id: item.id})">
+							<img v-if="item.avatarUrl" :src="item.avatarUrl" :alt="item.name" style="max-height:32px">
+							{{ item.name }}
+						</a>
 					</td>
 					<td>{{ item.email }}</td>
 					<td>
-						<div v-for="role in item.roles" :class="['badge', 'badge-pill', 'mx-1', role === 'admin' ? 'badge-success' : 'badge-secondary']"> {{ role }}</div>
+						<div v-for="role in item.roles" :class="['badge', 'badge-pill', 'mx-1', role === 'admin' ? 'badge-success' : 'badge-secondary']">{{ role }}</div>
 					</td>
 					<td>
 						<div v-if="item.isActive" class="badge badge-pill badge-success">active</div>
 						<div v-else class="badge badge-pill badge-danger">inactive</div>
 					</td>
 					<td class="text-right">
-						<b-btn href="#" @click="loginAs(item.id)" variant="primary" size="sm" title="Sign in as this user">
-							<b-icon icon="box-arrow-in-right"></b-icon>
-						</b-btn>
-						<b-btn :href="link('User:detail', {id: item.id})" variant="warning" size="sm" title="Edit">
+						<b-button :href="link('User:detail', {id: item.id})" variant="warning" size="sm" title="Edit">
 							<b-icon icon="pencil"></b-icon>
-						</b-btn>
-						<b-btn variant="danger" size="sm" title="Remove" @click="deleteUser(item.id)">
+						</b-button>
+						<b-button @click="loginAs(item.id)" variant="primary" size="sm" v-b-tooltip.hover title="Log in as this user.">
+							<b-icon icon="box-arrow-in-right"></b-icon>
+						</b-button>
+						<b-button @click="deleteUser(item.id)" variant="danger" size="sm" v-b-tooltip.hover title="Hide this user.">
 							<b-icon icon="trash"></b-icon>
-						</b-btn>
+						</b-button>
 					</td>
 				</tr>
 			</table>
@@ -244,7 +243,7 @@ Vue.component('user-default', {
 				axiosApi.get('user?' + httpBuildQuery(query)).then(req => {
 					let data = req.data;
 					this.user.items = data.list;
-					this.roles = {null: 'All', ...data.roles};
+					this.roles = {null: 'All roles', ...data.roles};
 					this.user.statusCount = data.statusCount;
 					this.rolesSimple = data.roles;
 					this.paginator = data.paginator;

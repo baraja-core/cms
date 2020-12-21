@@ -76,7 +76,7 @@ Vue.component('user-overview', {
 							<b-row v-if="meta.length !== 0">
 								<b-col>
 									<h3 class="h4 mt-3">Meta data:</h3>
-									<table class="table table-sm">
+									<table class="table table-sm cms-table-no-border-top">
 										<tr>
 											<th>Key</th>
 											<th>Value</th>
