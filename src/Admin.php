@@ -348,22 +348,30 @@ final class Admin
 
 	private function renderNeedOtpAuth(): string
 	{
-		return '<div style="margin:6em auto;max-width:32em;padding:0 1em">
-	<img src="https://cdn.baraja.cz/icon/warning-triangle.png" alt="Warning">
-	<h1 style="display:inline-block">Permission denied</h1>
+		return '<link type="text/css" rel="stylesheet" href="https://cdn.baraja.cz/bootstrap/bootstrap.min.css">
+<div style="margin:6em auto;max-width:32em;padding:0 1em">
+	<div class="row mb-4">
+		<div class="col-sm-3"><img src="https://cdn.baraja.cz/icon/warning-triangle.png" alt="Warning"></div>
+		<div class="col text-right"><h1>Permission denied</h1></div>
+	</div>
 	<p>To visit this page, you must first verify through 2-step verification.</p>
-	<p><a href="' . Helpers::getBaseUrl() . '/admin/cms/sign-out">Sign out</a></p>
+	<p class="text-secondary">That’s all we know.</p>
+	<p><a href="' . Helpers::getBaseUrl() . '/admin/cms/sign-out" class="btn btn-primary">Sign out</a></p>
 </div>';
 	}
 
 
 	private function renderPermissionDenied(): string
 	{
-		return '<div style="margin:6em auto;max-width:32em;padding:0 1em">
-	<img src="https://cdn.baraja.cz/icon/warning-triangle.png" alt="Warning">
-	<h1 style="display:inline-block">Permission denied</h1>
+		return '<link type="text/css" rel="stylesheet" href="https://cdn.baraja.cz/bootstrap/bootstrap.min.css">
+<div style="margin:6em auto;max-width:32em;padding:0 1em">
+	<div class="row mb-4">
+		<div class="col-sm-3"><img src="https://cdn.baraja.cz/icon/warning-triangle.png" alt="Warning"></div>
+		<div class="col text-right"><h1>Permission denied</h1></div>
+	</div>
 	<p>Open this page is not permitted for your account.</p>
-	<p><a href="' . Helpers::getBaseUrl() . '/admin/cms/sign-out">Sign out</a></p>
+	<p class="text-secondary">That’s all we know.</p>
+	<p><a href="' . Helpers::getBaseUrl() . '/admin/cms/sign-out" class="btn btn-primary">Sign out</a></p>
 </div>';
 	}
 
