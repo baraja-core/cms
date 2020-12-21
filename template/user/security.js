@@ -77,7 +77,7 @@ Vue.component('modal-change-password', {
 	<b-modal id="modal-change-password" title="Change password" hide-footer>
 		<modal-generate-password></modal-generate-password>
 		<p>Choose a&nbsp;strong password and don't reuse it for other accounts.</p>
-		<b-card class="mb-3">
+		<b-card class="bg-light mb-3">
 			<b-form autocomplete="off" ref="passForm">
 				<b-form-group label="New password">
 					<b-input-group>
