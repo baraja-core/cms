@@ -64,6 +64,14 @@ Vue.component('cms-footer', {
 </footer>`
 });
 
+Vue.component('cms-filter', {
+	template: `<div class="card" style="border-bottom:0 !important">
+	<div class="card-header py-2">
+		<slot></slot>
+	</div>
+</div>`
+});
+
 Vue.component('breadcrumb', {
 	props: ['items'],
 	template: `<b-breadcrumb>
