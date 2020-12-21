@@ -93,13 +93,25 @@ final class Settings
 
 	public function getProjectName(): ?string
 	{
-		return $this->configuration->get('name', 'core');
+		return $this->getOption('name');
 	}
 
 
 	public function getAdminEmail(): ?string
 	{
-		return $this->configuration->get('admin-email', 'core');
+		return $this->getOption('admin-email');
+	}
+
+
+	public function getOption(string $key): ?string
+	{
+		return $this->configuration->get($key, 'core');
+	}
+
+
+	public function setConfiguration(string $key, ?string $value): void
+	{
+		$this->configuration->save($key, $value, 'core');
 	}
 
 
