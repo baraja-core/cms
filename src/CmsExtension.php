@@ -6,6 +6,7 @@ namespace Baraja\Cms;
 
 
 use Baraja\Cms\Component\ErrorComponent;
+use Baraja\Cms\Plugin\CommonSettingsPlugin;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Plugin\HomepagePlugin;
 use Baraja\Cms\Plugin\UserPlugin;
@@ -189,6 +190,17 @@ final class CmsExtension extends CompilerExtension
 			'position' => 100,
 			'tab' => 'Login history',
 			'params' => ['id'],
+		]]);
+		$pluginManager->addSetup('?->addComponent(?)', ['@self', [
+			'key' => 'commonSettings',
+			'name' => 'common-settings',
+			'implements' => CommonSettingsPlugin::class,
+			'componentClass' => VueComponent::class,
+			'view' => 'default',
+			'source' => __DIR__ . '/../template/vue/common-settings.js',
+			'position' => 100,
+			'tab' => 'Common settings',
+			'params' => [],
 		]]);
 	}
 
