@@ -6,116 +6,122 @@
 	<meta name="description" content="Baraja administration">
 	<meta name="author" content="Baraja.cz">
 	<meta name="robots" content="noindex, nofollow">
-	<title>Baraja CMS</title>
-	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+	<title>{$projectName} CMS</title>
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css">
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css">
 	<script>
-	  window.onerror = function (message, file, line, col, error) {
-		  if (error !== null) {
-			  document.getElementById('unsupportedErrorMessage').innerHTML += message + '<br><code>' + file + '</code>:' + line + '<hr>';
-			  document.getElementById('unsupportedErrorDiv').style.display = 'block';
-			  document.getElementById('loginFormContainer').style.display = 'none';
-		  }
+		window.onerror = function (message, file, line, col, error) {
+			if (error !== null) {
+				document.getElementById('unsupportedErrorMessage').innerHTML += message + '<br><code>' + file + '</code>:' + line + '<hr>';
+				document.getElementById('unsupportedErrorDiv').style.display = 'block';
+				document.getElementById('loginFormContainer').style.display = 'none';
+			}
 
-		  return false;
-	  };
+			return false;
+		};
 	</script>
 
 	<style>
-		body {
-			background: #f3f3f3;
-		}
-
-		.modal-backdrop {
-			background: rgba(0, 0, 0, .5);
-		}
-
-		a {
-			color: #007bff;
-			text-decoration: none;
-		}
-
-		a:hover, a:focus {
-			color: #004386;
-		}
-
-		.page-wrapper {
-			height: 75vh;
-		}
-
-		@media (min-width: 769px) {
-			.card-wrapper {
-				width: 400px;
+			body {
+				background: #f3f3f3;
 			}
-		}
 
-		.card {
-			border: 0;
-			border-radius: 0.25rem;
-			-webkit-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
-			box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-		}
+			.modal-backdrop {
+				background: rgba(0, 0, 0, .5);
+			}
 
-		.card-header, .card-footer {
-			border-bottom-color: #e9ecef;
-		}
+			a {
+				color: #007bff;
+				text-decoration: none;
+			}
 
-		.card-header {
-			background-color: #00000008;
-		}
+			a:hover, a:focus {
+				color: #004386;
+			}
 
-		.card-footer {
-			background-color: #fff;
-		}
+			.corner-logo {
+				color: #555;
+				text-decoration: underline;
+			}
 
-		.btn-primary, .btn-primary:disabled {
-			background-color: #007bff;
-			border-color: #007bff;
-		}
+			.page-wrapper {
+				height: 75vh;
+			}
 
-		.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
-			background-color: #007bff !important;
-			border-color: #007bff !important;
-			-webkit-box-shadow: 0 0 0 0.2rem rgba(17, 27, 185, 0.5) !important;
-			box-shadow: 0 0 0 0.2rem rgba(55, 42, 179, 0.5) !important;
-		}
+			@media (min-width: 769px) {
+				.card-wrapper {
+					width: 400px;
+				}
+			}
 
-		.custom-control-input:checked ~ .custom-control-label::before {
-			background-color: #007bff;
-			border-color: #007bff;
-		}
+			.card {
+				border: 0;
+				border-radius: 0.25rem;
+				-webkit-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+				box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+			}
 
-		.form-control {
-			display: block;
-			width: 100%;
-			height: calc(1.5em + 0.876rem + 2px);
-			padding: 0.438rem 1rem;
-			font-size: 1rem;
-			font-weight: 400;
-			line-height: 1.5;
-			color: #495057;
-			background-color: #fff;
-			background-clip: padding-box;
-			border: 1px solid #ced4da;
-			border-radius: 0.25rem;
-			-webkit-transition: border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
-			transition: border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
-			-o-transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-			transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-			transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
-		}
+			.card-header, .card-footer {
+				border-bottom-color: #e9ecef;
+			}
 
-		.form-control:focus {
-			color: #495057;
-			background-color: #fff;
-			border-color: #8dc9ff;
-			outline: 0;
-			-webkit-box-shadow: 0 0 0 0.2rem rgba(50, 100, 165, 0.25);
-			box-shadow: 0 0 0 0.2rem rgba(63, 106, 165, 0.25);
-		}
+			.card-header {
+				background-color: #00000008;
+			}
 
-		.text-muted {
-			color: #6c757d !important;
-		}
+			.card-footer {
+				background-color: #fff;
+			}
+
+			.btn-primary, .btn-primary:disabled {
+				background-color: #007bff;
+				border-color: #007bff;
+			}
+
+			.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+				background-color: #007bff !important;
+				border-color: #007bff !important;
+				-webkit-box-shadow: 0 0 0 0.2rem rgba(17, 27, 185, 0.5) !important;
+				box-shadow: 0 0 0 0.2rem rgba(55, 42, 179, 0.5) !important;
+			}
+
+			.custom-control-input:checked ~ .custom-control-label::before {
+				background-color: #007bff;
+				border-color: #007bff;
+			}
+
+			.form-control {
+				display: block;
+				width: 100%;
+				height: calc(1.5em + 0.876rem + 2px);
+				padding: 0.438rem 1rem;
+				font-size: 1rem;
+				font-weight: 400;
+				line-height: 1.5;
+				color: #495057;
+				background-color: #fff;
+				background-clip: padding-box;
+				border: 1px solid #ced4da;
+				border-radius: 0.25rem;
+				-webkit-transition: border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+				transition: border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+				-o-transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+				transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+				transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+			}
+
+			.form-control:focus {
+				color: #495057;
+				background-color: #fff;
+				border-color: #8dc9ff;
+				outline: 0;
+				-webkit-box-shadow: 0 0 0 0.2rem rgba(50, 100, 165, 0.25);
+				box-shadow: 0 0 0 0.2rem rgba(63, 106, 165, 0.25);
+			}
+
+			.text-muted {
+				color: #6c757d !important;
+			}
 	</style>
 </head>
 <body>
@@ -126,14 +132,16 @@
 				<div class="card">
 					<div class="card-header d-flex justify-content-between">
 						<a href="https://baraja.cz" class="corner-logo" target="_blank">
-							Baraja&nbsp;CMS
+							{$projectName}
 						</a>
 					</div>
 					<div class="card-body py-4">
 						<table class="w-100 mb-3">
 							<tr>
-								<td class="p-2">❌</td>
-								<td class="text-center text-danger">Your browser does not support javascript.</td>
+								<td valign="top" class="pr-4">❌</td>
+								<td valign="top" class="text-center text-danger">
+									Your browser does not support javascript.
+								</td>
 							</tr>
 						</table>
 						<p>
@@ -142,7 +150,7 @@
 						</p>
 						<p>
 							If&nbsp;you are unsure, please contact your administrator
-							or&nbsp;<a href="https://baraja.cz/kontakt" target="_blank">Official Support</a>.
+							or&nbsp;<a href="https://help.baraja.cz" target="_blank">official support</a>.
 						</p>
 					</div>
 				</div>
@@ -153,17 +161,22 @@
 				<div class="card">
 					<div class="card-header d-flex justify-content-between">
 						<a href="https://baraja.cz" class="corner-logo" target="_blank">
-							Baraja&nbsp;CMS
+							{$projectName}
 						</a>
 					</div>
 					<div class="card-body py-4">
-						<p>
-							Your browser is not supported yet. We are compatible with browsers:<br>
-							<b>Chrome&nbsp;55+, Firefox&nbsp;53+, MS&nbsp;Edge&nbsp;16+, Safari&nbsp;11+ and iOS&nbsp;Safari&nbsp;11+</b>
-						</p>
+						<table class="w-100 mb-3">
+							<tr>
+								<td valign="top" class="pr-4">❌</td>
+								<td valign="top">
+									Your browser is not supported yet. We are compatible with browsers:<br>
+									<b>Chrome&nbsp;55+, Firefox&nbsp;53+, MS&nbsp;Edge&nbsp;16+, Safari&nbsp;11+ and iOS&nbsp;Safari&nbsp;11+</b>
+								</td>
+							</tr>
+						</table>
 						<p>
 							If&nbsp;you are unsure, please contact your administrator
-							or&nbsp;<a href="https://baraja.cz/kontakt" target="_blank">Official Support</a>.
+							or&nbsp;<a href="https://help.baraja.cz" target="_blank">official support</a>.
 						</p>
 						<p>List of errors:</p>
 						<i id="unsupportedErrorMessage" class="text-secondary"></i>
@@ -248,7 +261,9 @@
 						<b-col>
 							<b-form-group label-for="remember" v-if="!isOAuth" class="mb-0">
 								<b-form-checkbox id="remember" v-model="form.remember" value="yes" unchecked-value="no">
-									<span v-b-tooltip :title="translator[locale].form.rememberAlt">{{ translator[locale].form.rememberText }}</span>
+									<span v-b-tooltip :title="translator[locale].form.rememberAlt" style="cursor:pointer">
+										{{ translator[locale].form.rememberText }}
+									</span>
 								</b-form-checkbox>
 							</b-form-group>
 						</b-col>
@@ -282,7 +297,7 @@
 						<b-alert v-if="reportProblem.state === 'error'" show variant="danger">
 							{{ reportProblem.serverMessage }}
 						</b-alert>
-						<template v-if="needHelpPage == 'forgotPassword'">
+						<template v-if="needHelpPage === 'forgotPassword'">
 							<p>{{ translator[locale].needHelp.forgotPasswordDescription }}</p>
 							<b-form @submit="onReportProblem">
 								<b-form-group>
@@ -293,7 +308,7 @@
 								</b-button>
 							</b-form>
 						</template>
-						<template v-if="needHelpPage == 'forgotUsername'">
+						<template v-if="needHelpPage === 'forgotUsername'">
 							<p>{{ translator[locale].needHelp.forgotUsernameDescription }}</p>
 							<b-form @submit="onReportProblem">
 								<b-form-group>
@@ -304,7 +319,7 @@
 								</b-button>
 							</b-form>
 						</template>
-						<template v-if="needHelpPage == 'other'">
+						<template v-if="needHelpPage === 'other'">
 							<p>{{ translator[locale].needHelp.otherProblemDescription }}</p>
 							<b-form @submit="onReportProblem">
 								<b-form-group>
@@ -337,7 +352,7 @@
 					oauth: '',
 					remember: 'yes'
 				},
-		  	reportProblem: {
+				reportProblem: {
 					realName: '',
 					username: '',
 					problemDescription: '',
@@ -356,22 +371,22 @@
 							help: 'Need help?'
 						},
 						otp: {
-							invalidCode: 'Invalid authentication code',
-							info: 'Code from your Two-Factor Verfication App'
+							invalidCode: 'The entered code does not correspond to the real one.',
+							info: 'Enter the code from your 2-step verification application.'
 						},
 						needHelp: {
-							title: 'Potřebuji pomoct',
-							description: 'S čím vám můžeme pomoct?',
-							forgotPassword: 'Zapomenuté heslo',
-							forgotPasswordDescription: 'Zadejte vaše uživatelské jméno nebo e-mail:',
-							forgotUsername: 'Zapomenuté uživatelské jméno',
-							forgotUsernameDescription: 'Zadejte vaše reálné jméno a příjmení. Pokud bude uživatel s tímto jménem existovat, pošleme na jeho e-mailovou adresu další instrukce.',
-							otherProblem: 'Jiný problém',
-							otherProblemDescription: 'Popište, prosím, váš problém co nejvíc podrobně a nezapomeňte zmínit všechny důležité detaily. Vaše zpráva bude doručena přímo správci tohoto projektu, který vás bude kontaktovat.',
-							backButton: 'Zpět',
-							sendButton: 'Odeslat',
-							success: 'Děkujeme za vyplnění formuláře. Až budeme vědět více informací, pošleme vám e-mail na adresu uvedenou ve vašem uživatelském profilu. Pokud budeme potřebovat více informací, pošleme vám odkaz na formulář pro další doplnění.'
-					  }
+							title: 'Helper center',
+							description: 'What can we help you with?',
+							forgotPassword: 'Forgotten password',
+							forgotPasswordDescription: 'Enter your username or email:',
+							forgotUsername: 'Forgotten username',
+							forgotUsernameDescription: 'Enter your real name and last name. If a user with this name exists, we will send further instructions to their email address.',
+							otherProblem: 'Other problem',
+							otherProblemDescription: 'Please describe your problem in as much detail as possible and be sure to mention all the important details. Your message will be delivered directly to the administrator of this project, who will contact you.',
+							backButton: 'Back',
+							sendButton: 'Send',
+							success: 'Thank you for filling out the form. Once we know more information, we will send an email to the address listed in your user profile. If we need more information, we will send you a link to the form for further completion.'
+						}
 					},
 					cs: {
 						form: {
@@ -407,8 +422,7 @@
 			let nLang = navigator.language;
 			if (nLang === 'cs' || nLang === 'cs-cz' || nLang === 'cz') {
 				nLang = 'cs';
-			}
-			else {
+			} else {
 				nLang = 'en';
 			}
 			this.locale = nLang;
@@ -432,7 +446,6 @@
 							window.location.href = this.redirect;
 						}
 					}).finally(json => this.isLoading = false)
-
 			},
 			loginProcess: function (e) {
 				this.isLoading = true;
@@ -449,7 +462,6 @@
 					.then(data => {
 						this.isLoading = false;
 						this.errorMessage = '';
-
 						if ('state' in data && data.state === 'error') {
 							this.errorMessage = data.message;
 						} else {
@@ -463,21 +475,21 @@
 					});
 			},
 			resetReportProblem() {
-		  	this.needHelpPage = null;
+				this.needHelpPage = null;
 				this.reportProblem.serverMessage = null;
 				this.reportProblem.isBusy = false;
-			 	this.reportProblem.state = null;
+				this.reportProblem.state = null;
 			},
 			onReportProblem(evt) {
 				evt.preventDefault();
 				this.reportProblem.isBusy = true;
-		  	this.reportProblem.state = null;
-		  	let queryUrl = '';
-		  	let queryParameters = {};
+				this.reportProblem.state = null;
+				let queryUrl = '';
+				let queryParameters = {};
 
-		  	if (this.needHelpPage === 'forgotPassword') {
+				if (this.needHelpPage === 'forgotPassword') {
 					queryUrl = 'forgot-password';
-		  		queryParameters = {
+					queryParameters = {
 						locale: this.locale,
 						username: this.reportProblem.username
 					};
@@ -485,13 +497,13 @@
 					queryUrl = 'forgot-username';
 					queryParameters = {
 						locale: this.locale,
-			  		realName: this.reportProblem.realName
+						realName: this.reportProblem.realName
 					};
 				} else {
 					queryUrl = 'report-problem';
 					queryParameters = {
 						locale: this.locale,
-					  description: this.reportProblem.problemDescription,
+						description: this.reportProblem.problemDescription,
 						username: this.reportProblem.username
 					};
 				}
@@ -504,13 +516,12 @@
 					.then(data => {
 						this.reportProblem.isBusy = false;
 						this.reportProblem.serverMessage = data.message;
-			  		this.reportProblem.state = data.state;
+						this.reportProblem.state = data.state;
 					});
 			},
 		}
 	});
-
-	new Vue({
+	const app = new Vue({
 		el: '#app',
 	})
 </script>
