@@ -219,6 +219,12 @@
 							<img src="https://baraja.cz/content/jan-barasek.jpg" class="rounded-circle" style="max-height:8em" alt="Baraja">
 						</a>
 					</div>
+					<b-alert v-if="form.username === '42'" :show="true" variant="warning" class="mb-3">
+						<p>What is the meaning of life, the universe and everything? <b>42</b>!</p>
+						<p>Douglas Adams, the only person who knew what this question really was about is
+						now dead, unfortunately.  So now you might wonder what the meaning of death
+						is...</p>
+					</b-alert>
 					<form v-if="!isOAuth" @submit.prevent id="loginForm" role="form">
 						<b-form-group :label="translator[locale].form.username + ':'" label-for="username">
 							<b-form-input type="text" v-model="form.username" id="username" tabindex="1" required></b-form-input>
