@@ -440,7 +440,10 @@
 					method: 'POST',
 					body: JSON.stringify({
 						locale: this.locale,
-						code: this.form.oauth.replace(/\s+/, '')
+						code: this.form.oauth.replace(/\s+/, ''),
+						username: this.form.username,
+						password: this.form.password,
+						remember: this.form.remember === 'yes'
 					})
 				})
 					.then(json => json.json())
