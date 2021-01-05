@@ -19,9 +19,9 @@
 		"baraja-core/baraja-cloud": "^1.0",
 		"nette/di": "^3.0",
 		"latte/latte": "^2.5",
-		"nette/security": "^3.0",
+		"nette/security": "^3.1",
 		"nette/utils": "^3.0",
-		"nette/http": "^3.0",
+		"nette/http": "^3.1",
 		"nette/caching": "^3.0"
 	},
 	"require-dev": {
@@ -29,6 +29,10 @@
 		"tracy/tracy": "^2.7",
 		"phpstan/phpstan-nette": "^0.12.6",
 		"symplify/easy-coding-standard": "^7.2"
+	},
+	"conflict": {
+		"nette/security": "<3.1.2",
+		"nette/http": "<3.1"
 	},
 	"autoload": {
 		"classmap": [

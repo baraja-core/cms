@@ -6,14 +6,14 @@ namespace Baraja\Cms;
 
 
 use Latte\Runtime\FilterInfo;
-use Nette\Localization\ITranslator;
+use Nette\Localization\Translator;
 
 final class TranslatorFilter
 {
-	private ITranslator $translator;
+	private Translator $translator;
 
 
-	public function __construct(ITranslator $translator)
+	public function __construct(Translator $translator)
 	{
 		$this->translator = $translator;
 	}
