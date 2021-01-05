@@ -61,10 +61,9 @@ final class CmsEndpoint extends BaseEndpoint
 			return;
 		}
 
-		// TODO: Verify after refreshing the page
 		$needOauth = false;
 		if ($user instanceof User && $user->getOtpCode() !== null) { // need OTP authentication
-			$this->getUser()->getStorage()->setAuthenticated(false);
+			$this->userManager->logout();
 			$needOauth = $user->getOtpCode() !== null;
 		}
 
@@ -75,7 +74,7 @@ final class CmsEndpoint extends BaseEndpoint
 	}
 
 
-	public function postCheckOauthCode(string $locale, string $code): void
+	public function postCheckOauthCode(string $locale, string $code, string $username, string $password, bool $remember = false): void
 	{
 		if (($userEntity = $this->getUserEntity()) === null) {
 			$this->sendError('User is not logged in.');
@@ -95,7 +94,7 @@ final class CmsEndpoint extends BaseEndpoint
 			return;
 		}
 		if (Helpers::checkAuthenticatorOtpCodeManually($otpCode, (int) $code) === true) {
-			$this->getUser()->getStorage()->setAuthenticated(true);
+			$this->userManager->authenticate($username, $password, $remember);
 			$this->sendOk();
 		} else {
 			$this->sendError('OTP code is invalid. Please try again.');
