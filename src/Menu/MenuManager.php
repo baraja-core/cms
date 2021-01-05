@@ -56,7 +56,7 @@ final class MenuManager
 					'title' => $plugin['label'],
 					'priority' => $plugin['priority'],
 					'link' => 'admin/' . $route,
-					'icon' => $plugin['icon'] ?? 'fa fa-warning tx-danger',
+					'icon' => $plugin['icon'] ?? null,
 					'child' => [],
 				];
 			}
