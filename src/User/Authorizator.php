@@ -6,22 +6,26 @@ namespace Baraja\Cms\User;
 
 
 use Baraja\Cms\User\Entity\User;
-use Nette\Security\IAuthorizator;
-use Nette\Security\IUserStorage;
+use Nette\Security\Authorizator as NetteAuthorizator;
+use Nette\Security\UserStorage;
 
-final class Authorizator implements IAuthorizator
+final class Authorizator implements NetteAuthorizator
 {
 	public const ALIASES = ['default' => 'list', 'detail' => 'overview'];
 
-	private IUserStorage $userStorage;
+	private UserStorage $userStorage;
 
 	/** @var mixed[][] */
 	private array $map;
 
 
-	public function __construct(IUserStorage $userStorage)
+	/**
+	 * @param mixed[][] $map
+	 */
+	public function __construct(UserStorage $userStorage, array $map)
 	{
 		$this->userStorage = $userStorage;
+		$this->map = $map;
 	}
 
 
@@ -42,22 +46,12 @@ final class Authorizator implements IAuthorizator
 
 
 	/**
-	 * @internal for API
 	 * @return mixed[][]
+	 * @internal for API
 	 */
 	public function getMap(): array
 	{
 		return $this->map;
-	}
-
-
-	/**
-	 * @internal for DIC
-	 * @param mixed[][] $map
-	 */
-	public function setMap(array $map): void
-	{
-		$this->map = $map;
 	}
 
 
@@ -87,7 +81,7 @@ final class Authorizator implements IAuthorizator
 
 	private function checkPrivilege(string $plugin, string $privilege): bool
 	{
-		$user = $this->userStorage->getIdentity();
+		$user = $this->userStorage->getState()[1];
 
 		if (!$user instanceof User) {
 			return false;

@@ -27,7 +27,7 @@ final class PermissionExtension extends CompilerExtension
 	{
 		/** @var ServiceDefinition $authorizator */
 		$authorizator = $this->getContainerBuilder()->getDefinitionByType(Authorizator::class);
-		$authorizator->addSetup('?->setMap(?)', ['@self', $this->validatePermissions()]);
+		$authorizator->setArgument('map', $this->validatePermissions());
 	}
 
 

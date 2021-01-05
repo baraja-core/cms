@@ -49,7 +49,7 @@ final class CmsEndpoint extends BaseEndpoint
 			$this->sendError('Empty username or password.');
 		}
 		try {
-			$user = $this->userManager->login($username, $password, $remember);
+			$user = $this->userManager->authenticate($username, $password, $remember);
 		} catch (AuthenticationException $e) {
 			$this->sendError('Wrong username or password.');
 

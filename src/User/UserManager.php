@@ -16,23 +16,23 @@ use Baraja\Doctrine\EntityManager;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Nette\Security\AuthenticationException;
-use Nette\Security\IAuthenticator;
+use Nette\Security\Authenticator;
 use Nette\Security\IIdentity;
-use Nette\Security\IUserStorage;
 use Nette\Security\Passwords;
+use Nette\Security\UserStorage;
 
-final class UserManager implements IAuthenticator
+final class UserManager implements Authenticator
 {
 	private EntityManager $entityManager;
 
-	private IUserStorage $userStorage;
+	private UserStorage $userStorage;
 
 	private CloudManager $cloudManager;
 
 	private ?AuthenticationService $authenticationService = null;
 
 
-	public function __construct(EntityManager $entityManager, IUserStorage $userStorage, CloudManager $cloudManager)
+	public function __construct(EntityManager $entityManager, UserStorage $userStorage, CloudManager $cloudManager)
 	{
 		$this->entityManager = $entityManager;
 		$this->userStorage = $userStorage;
@@ -51,7 +51,7 @@ final class UserManager implements IAuthenticator
 
 	public function getIdentity(): ?IIdentity
 	{
-		return $this->userStorage->getIdentity();
+		return $this->userStorage->getState()[1];
 	}
 
 
@@ -64,32 +64,27 @@ final class UserManager implements IAuthenticator
 			$avatarUrl = $user->getAvatarUrl();
 		}
 
-		$this->userStorage
-			->setIdentity($identity = new AdminIdentity($user->getId(), $user->getRoles(), [], $name, $avatarUrl))
-			->setAuthenticated(true)
-			->setExpiration($expiration);
+		$identity = new AdminIdentity($user->getId(), $user->getRoles(), [], $name, $avatarUrl);
+		$this->userStorage->saveAuthentication($identity);
+		$this->userStorage->setExpiration($expiration, false);
 
 		return $identity;
 	}
 
 
-	public function getUserStorage(): IUserStorage
+	public function getUserStorage(): UserStorage
 	{
 		return $this->userStorage;
 	}
 
 
 	/**
-	 * @param mixed[] $credentials
 	 * @throws AuthenticationException
 	 */
-	public function authenticate(array $credentials): IIdentity
+	public function authenticate(string $username, string $password, bool $remember = false): IIdentity
 	{
-		$username = trim((string) ($credentials[0] ?? ''));
-		$password = trim((string) ($credentials[1] ?? ''));
-		$expiration = ($credentials[2] ?? false) ? '14 days' : '15 minutes';
-
-		if ($username === '' || $password === '') {
+		$expiration = $remember ? '14 days' : '15 minutes';
+		if (($username = trim($username)) === '' || ($password = trim($password)) === '') {
 			throw new AuthenticationException('Username or password is empty.');
 		}
 
@@ -118,17 +113,18 @@ final class UserManager implements IAuthenticator
 
 	/**
 	 * @throws AuthenticationException
+	 * @deprecated use authenticate().
 	 */
 	public function login(string $username, string $password, bool $remember = false): IIdentity
 	{
-		return $this->authenticate([$username, $password, $remember]);
+		return $this->authenticate($username, $password, $remember);
 	}
 
 
 	public function logout(): void
 	{
-		$this->userStorage->setIdentity(null);
-		$this->userStorage->setAuthenticated(false);
+		$this->userStorage->clearAuthentication(true);
+		$this->userStorage->setExpiration(null, true);
 	}
 
 
