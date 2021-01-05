@@ -1,5 +1,5 @@
 #app-cms {
-	background: #f3f6f9;
+	background: #F3F2EE;
 }
 
 #app {
@@ -11,8 +11,6 @@
 	padding-bottom: 1em;
 	max-width: 256px !important;
 	min-height: calc(100vh - 45px - 80px); /* 100% - header - footer */
-	background: white !important;
-	border-right: 1px solid #dbdde3;
 }
 
 #cms-menu .cms-menu-item {
@@ -25,13 +23,25 @@
 }
 
 #cms-menu .cms-menu-item a {
-	color: black;
+	color: #171717;
 }
 
 #cms-menu .cms-menu-item-selected {
-	background: #272a2d !important;
-	color: white !important;
+	background: #ebebeb !important;
+	color: #171717 !important;
 	font-weight: bold;
+}
+
+.cms-menu-container {
+	background: white;
+	border-radius: 8px !important;
+	margin: .75em .5em;
+	-webkit-box-shadow: 0 5px 16px 0 rgba(214, 206, 194, 0.5);
+	box-shadow: 0 5px 16px 0 rgba(214, 206, 194, 0.5);
+}
+
+.cms-main .nav-pills .nav-link {
+	padding: .25em .75em;
 }
 
 #cms-support {

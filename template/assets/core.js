@@ -1,6 +1,6 @@
 Vue.component('cms-menu', {
 	props: ['structure', 'activeKey', 'dashboardLink', 'isDashboard', 'debugMode'],
-	template: `<div>
+	template: `<div class="cms-menu-container">
 		<div :class="{'cms-menu-item': true, 'cms-menu-item-selected': isDashboard}" @click="window.location.href=dashboardLink">
 			<b-icon icon="compass" class="mr-2"></b-icon>Dashboard
 		</div>
@@ -14,7 +14,7 @@ Vue.component('cms-menu-item', {
 	props: ['itemKey', 'title', 'link', 'icon', 'child', 'priority', 'activeKey', 'debugMode'],
 	template: `<div :class="{'cms-menu-item': true, 'cms-menu-item-selected': itemKey === activeKey}" @click="processLink(link)">
 	<template v-if="debugMode">({{ priority }})</template>
-	<b-icon :icon="icon ? icon : 'compass'" class="mr-2"></b-icon>{{ title }}
+	<b-icon :icon="icon ? icon : 'hash'" class="mr-2"></b-icon>{{ title }}
 	<div class="cms-menu-item" v-if="child.length > 0">
 		<template v-for="item in child">
 			<cms-menu-item :item-key="item.key" :title="item.title" :link="item.link" :icon="item.icon" :child="item.child" :priority="item.priority" :debug-mode="debugMode"></cms-menu-item>
