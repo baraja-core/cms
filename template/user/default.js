@@ -87,9 +87,8 @@ Vue.component('user-default', {
 						<span v-if="user.statusCount" class="small">({{ user.statusCount.deleted }})</span>
 					</b-nav-item>
 				</b-nav>
-				</b-col>
-				
-				<b-col cols="4" class="d-flex justify-content-end align-items-center pr-4 mb-1">
+			</b-col>
+			<b-col cols="4" class="d-flex justify-content-end align-items-center pr-4 mb-1">
 				<span class="text-muted small">Items found: <b>{{ paginator.itemCount }}</b></span>
 			</b-col>
 		</b-row>
@@ -104,6 +103,14 @@ Vue.component('user-default', {
 			</b-form>
 		</cms-filter>
 		<b-card>
+			<b-alert :show="isCurrentUserUsing2fa === false" variant="warning">
+				<h4 class="alert-heading">Security warning for your account!</h4>
+				<p><b>Your user account does not use 2-step authentication.</b></p>
+				<p>
+					If an attacker reveals your password, he can impersonate you.
+					If you set up 2-step login authentication, an attacker will still need to obtain your cell phone.
+				</p>
+			</b-alert>
 			<table class="table table-sm cms-table-no-border-top">
 				<tr>
 					<th>Full name</th>
@@ -118,6 +125,7 @@ Vue.component('user-default', {
 							<img v-if="item.avatarUrl" :src="item.avatarUrl" :alt="item.name" style="max-height:32px">
 							{{ item.name }}
 						</a>
+						<div v-if="item['2fa']" class="badge badge-primary" v-b-tooltip title="This user is using 2-step login authentication (better security).">2FA</div>
 					</td>
 					<td>{{ item.email }}</td>
 					<td>
@@ -196,6 +204,7 @@ Vue.component('user-default', {
 				statusCount: null,
 				items: [],
 			},
+			isCurrentUserUsing2fa: null,
 			isUserCreating: false,
 			roles: {},
 			rolesSimple: {},
@@ -248,6 +257,7 @@ Vue.component('user-default', {
 					this.rolesSimple = data.roles;
 					this.paginator = data.paginator;
 					this.user.form.role = this.rolesSimple[0].value;
+					this.isCurrentUserUsing2fa = data.isCurrentUserUsing2fa;
 				})
 			})
 		},

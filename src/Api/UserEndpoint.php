@@ -72,7 +72,7 @@ final class UserEndpoint extends BaseEndpoint
 			}
 		}
 
-		$users = $selection->select('PARTIAL user.{id, firstName, lastName, emails, phone, roles, active, avatarUrl}')
+		$users = $selection->select('PARTIAL user.{id, firstName, lastName, emails, phone, roles, active, avatarUrl, otpCode}')
 			->setMaxResults($limit)
 			->setFirstResult(($page - 1) * $limit)
 			->orderBy('user.createDate', 'DESC')
@@ -95,12 +95,14 @@ final class UserEndpoint extends BaseEndpoint
 				'phone' => $user['phone'],
 				'isActive' => $user['active'],
 				'avatarUrl' => $user['avatarUrl'],
+				'2fa' => $user['otpCode'] !== null,
 			];
 		}
 
 		$this->sendJson([
 			'list' => $return,
 			'roles' => $this->formatBootstrapSelectArray($allRoles),
+			'isCurrentUserUsing2fa' => false,
 			'statusCount' => [
 				'all' => \count($allUsers = $this->getAllUsers()),
 				'active' => \count(array_filter($allUsers, static function (array $item): bool {
