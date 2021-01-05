@@ -43,7 +43,7 @@ final class UserPlugin extends BasePlugin
 
 	public function getIcon(): ?string
 	{
-		return 'fa fa-users';
+		return 'person-circle';
 	}
 
 
