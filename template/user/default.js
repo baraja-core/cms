@@ -215,6 +215,7 @@ Vue.component('user-default', {
 	},
 	mounted() {
 		this.sync();
+		setInterval(this.sync, 15000);
 	},
 	methods: {
 		loginAs(id) {
