@@ -376,7 +376,6 @@ function httpBuildQuery(queryData, numericPrefix, argSeparator, tempKey) {
 			}
 
 			let val = queryData[k];
-
 			val = val === true ? '1' : val;
 			val = val === false ? '0' : val;
 			val = val === 0 ? '0' : val;
