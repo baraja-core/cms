@@ -6,6 +6,7 @@ namespace Baraja\Cms;
 
 
 use Baraja\AdminBar\AdminBar;
+use Baraja\AssetsLoader\Minifier\DefaultJsMinifier;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Proxy\Proxy;
 use Baraja\Cms\User\AdminBarUser;
@@ -80,10 +81,15 @@ final class Admin
 				header('Content-Type: ' . Proxy::CONTENT_TYPES[$assetType]);
 				$assetContent = file_get_contents(__DIR__ . '/../template/assets/core.' . $assetType)
 					. (($customAssetPath = $this->context->getCustomAssetPath($assetType)) !== null ? "\n\n" . file_get_contents($customAssetPath) : '');
+				if ($assetType === 'css') {
+					$assetContent = Helpers::minifyHtml($assetContent);
+				} elseif ($assetType === 'js' && \class_exists(DefaultJsMinifier::class)) {
+					$assetContent = (new DefaultJsMinifier)->minify($assetContent);
+				}
 				echo '/*' . "\n"
 					. ' * This file is part of Baraja CMS.' . "\n"
 					. ' */' . "\n\n"
-					. ($assetType === 'css' ? Helpers::minifyHtml($assetContent) : $assetContent);
+					. $assetContent;
 				die;
 			}
 			if (strncmp($path, 'cms/', 4) !== 0 && $this->context->getUser()->isLoggedIn() === false) { // route login form
