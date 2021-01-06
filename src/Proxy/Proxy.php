@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Baraja\Cms\Proxy;
 
 
+use Baraja\AssetsLoader\Minifier\DefaultJsMinifier;
 use Baraja\Plugin\Plugin;
 use Baraja\Plugin\PluginManager;
 
@@ -53,8 +54,13 @@ final class Proxy
 
 		$return .= ' * MD5 content hash: ' . md5($content = $this->renderContent($plugin)) . "\n";
 		$return .= ' */' . "\n\n\n";
+		$return .= $content;
 
-		echo $return . $content;
+		if (\class_exists(DefaultJsMinifier::class)) {
+			$return = (new DefaultJsMinifier)->minify($return);
+		}
+
+		echo $return;
 		die;
 	}
 
@@ -65,16 +71,13 @@ final class Proxy
 	private function renderContent(Plugin $plugin): string
 	{
 		$return = '';
-
 		foreach ($this->pluginManager->getComponents($plugin, null) as $component) {
 			$return .= '/* Component ' . $component->getKey() . ' */' . "\n";
 			if (\is_file($component->getSource()) === true) {
 				$content = trim((string) file_get_contents($component->getSource()));
-
 				if (substr($content, -2) === '})') {
 					$content .= ';';
 				}
-
 				$return .= $content . "\n\n\n";
 			}
 		}
