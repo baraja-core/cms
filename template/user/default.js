@@ -121,11 +121,12 @@ Vue.component('user-default', {
 				</tr>
 				<tr v-for="(item, offset) of user.items">
 					<td>
-						<a :href="link('User:detail', {id: item.id})">
-							<img v-if="item.avatarUrl" :src="item.avatarUrl" :alt="item.name" style="max-height:32px">
-							{{ item.name }}
-						</a>
-						<div v-if="item['2fa']" class="badge badge-primary" v-b-tooltip title="This user is using 2-step login authentication (better security).">2FA</div>
+						<template v-if="item.avatarUrl">
+							<a :href="link('User:detail', {id: item.id})"><img v-if="item.avatarUrl" :src="item.avatarUrl" :alt="item.name" style="max-height:32px"></a>
+						</template>
+						<a :href="link('User:detail', {id: item.id})">{{ item.name }}</a>
+						<div v-if="item['2fa']" class="badge badge-pill badge-primary" v-b-tooltip title="This user is using 2-step login authentication (better security).">2FA</div>
+						<div v-if="item.id === currentUserId" class="badge badge-pill badge-primary" v-b-tooltip title="This is your account.">You</div>
 					</td>
 					<td>{{ item.email }}</td>
 					<td>
@@ -206,6 +207,7 @@ Vue.component('user-default', {
 			},
 			isCurrentUserUsing2fa: null,
 			isUserCreating: false,
+			currentUserId: null,
 			roles: {},
 			rolesSimple: {},
 			isInputPasswordOpen: false
@@ -258,6 +260,7 @@ Vue.component('user-default', {
 					this.paginator = data.paginator;
 					this.user.form.role = this.rolesSimple[0].value;
 					this.isCurrentUserUsing2fa = data.isCurrentUserUsing2fa;
+					this.currentUserId = data.currentUserId;
 				})
 			})
 		},

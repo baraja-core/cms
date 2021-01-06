@@ -47,6 +47,9 @@ final class UserEndpoint extends BaseEndpoint
 	 */
 	public function actionDefault(int $page = 1, int $limit = 32, ?string $role = null, ?string $query = null, ?string $active = null): void
 	{
+		$currentUserId = $this->getUser()->getId();
+		/** @var User $currentUser */
+		$currentUser = $this->entityManager->getRepository(User::class)->find($currentUserId);
 		$selection = $this->entityManager->getRepository(User::class)->createQueryBuilder('user');
 		if ($active !== null) {
 			$selection->andWhere('user.active = ' . ($active === 'active' ? 'TRUE' : 'FALSE'));
@@ -102,7 +105,8 @@ final class UserEndpoint extends BaseEndpoint
 		$this->sendJson([
 			'list' => $return,
 			'roles' => $this->formatBootstrapSelectArray($allRoles),
-			'isCurrentUserUsing2fa' => false,
+			'isCurrentUserUsing2fa' => $currentUser->getOtpCode() !== null,
+			'currentUserId' => $currentUserId,
 			'statusCount' => [
 				'all' => \count($allUsers = $this->getAllUsers()),
 				'active' => \count(array_filter($allUsers, static function (array $item): bool {
