@@ -78,11 +78,12 @@ final class Admin
 			}
 			if (($assetType = ($path === 'assets/core.js') ? 'js' : null) || ($assetType = ($path === 'assets/core.css') ? 'css' : null)) { // route static assets from template directory
 				header('Content-Type: ' . Proxy::CONTENT_TYPES[$assetType]);
+				$assetContent = file_get_contents(__DIR__ . '/../template/assets/core.' . $assetType)
+					. (($customAssetPath = $this->context->getCustomAssetPath($assetType)) !== null ? "\n\n" . file_get_contents($customAssetPath) : '');
 				echo '/*' . "\n"
 					. ' * This file is part of Baraja CMS.' . "\n"
 					. ' */' . "\n\n"
-					. file_get_contents(__DIR__ . '/../template/assets/core.' . $assetType)
-					. (($customAssetPath = $this->context->getCustomAssetPath($assetType)) !== null ? "\n\n" . file_get_contents($customAssetPath) : '');
+					. ($assetType === 'css' ? Helpers::minifyHtml($assetContent) : $assetContent);
 				die;
 			}
 			if (strncmp($path, 'cms/', 4) !== 0 && $this->context->getUser()->isLoggedIn() === false) { // route login form
