@@ -8,7 +8,6 @@ namespace Baraja\Cms\User\Entity;
 use Baraja\Cms\Helpers;
 use Baraja\Doctrine\UUID\UuidIdentifier;
 use Doctrine\ORM\Mapping as ORM;
-use Nette\SmartObject;
 use Nette\Utils\DateTime;
 use Nette\Utils\Strings;
 
@@ -19,7 +18,6 @@ use Nette\Utils\Strings;
 class UserLoginAttempt
 {
 	use UuidIdentifier;
-	use SmartObject;
 
 	/** @ORM\ManyToOne(targetEntity="User", inversedBy="loginAttempts") */
 	private ?User $user;

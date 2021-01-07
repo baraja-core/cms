@@ -8,7 +8,6 @@ namespace Baraja\Cms\User\Entity;
 use Baraja\Cms\Helpers;
 use Baraja\Doctrine\UUID\UuidIdentifier;
 use Doctrine\ORM\Mapping as ORM;
-use Nette\SmartObject;
 use Nette\Utils\DateTime;
 
 /**
@@ -18,7 +17,6 @@ use Nette\Utils\DateTime;
 class UserLogin
 {
 	use UuidIdentifier;
-	use SmartObject;
 
 	/** @ORM\ManyToOne(targetEntity="User", inversedBy="logins") */
 	private User $user;

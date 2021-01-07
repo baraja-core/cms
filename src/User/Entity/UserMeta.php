@@ -7,7 +7,6 @@ namespace Baraja\Cms\User\Entity;
 
 use Baraja\Doctrine\UUID\UuidIdentifier;
 use Doctrine\ORM\Mapping as ORM;
-use Nette\SmartObject;
 
 /**
  * @ORM\Entity()
@@ -16,7 +15,6 @@ use Nette\SmartObject;
 class UserMeta
 {
 	use UuidIdentifier;
-	use SmartObject;
 
 	/** @ORM\ManyToOne(targetEntity="User", inversedBy="metas") */
 	private User $user;
