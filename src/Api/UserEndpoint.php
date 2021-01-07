@@ -478,7 +478,7 @@ final class UserEndpoint extends BaseEndpoint
 
 	/**
 	 * @param string[] $roles
-	 * @param string[][]|bool[][]|string[][][]|bool[][][] $permissions
+	 * @param mixed[] $permissions
 	 */
 	public function postSavePermissions(string $id, array $roles, array $permissions): void
 	{
