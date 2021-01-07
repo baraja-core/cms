@@ -9,6 +9,7 @@ use Baraja\BarajaCloud\CloudManager;
 use Baraja\Cms\Helpers;
 use Baraja\Cms\Settings;
 use Baraja\Cms\User\Entity\CmsUser;
+use Baraja\Cms\User\Entity\User;
 use Baraja\Cms\User\Entity\UserResetPasswordRequest;
 use Baraja\Cms\User\UserManager;
 use Baraja\Doctrine\EntityManager;
@@ -117,6 +118,12 @@ final class CmsEndpoint extends BaseEndpoint
 				->setMaxResults(1)
 				->getQuery()
 				->getSingleResult();
+
+			if (!$user instanceof User) {
+				$this->sendError('Reset password is available only for system CMS Users. Please contact your administrator');
+
+				return;
+			}
 
 			$this->entityManager->persist($request = new UserResetPasswordRequest($user, '3 hours'));
 			$this->entityManager->flush();

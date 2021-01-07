@@ -87,21 +87,21 @@ interface CmsUser extends IIdentity
 	 */
 	public function getMetaData(): array;
 
-	public function getOtpCode();
+	public function getOtpCode(): ?string;
 
-	public function setOtpCode(?string $otpCode);
+	public function setOtpCode(?string $otpCode): void;
 
-	public function isActive();
+	public function isActive(): bool;
 
-	public function setActive(bool $active);
+	public function setActive(bool $active): void;
 
-	public function getAvatarUrl();
+	public function getAvatarUrl(): ?string;
 
-	public function setAvatarUrl(?string $avatarUrl);
+	public function setAvatarUrl(?string $avatarUrl): void;
 
-	public function getName(bool $reverse = false);
+	public function getName(bool $reverse = false): string;
 
-	public function getPhone();
+	public function getPhone(): ?string;
 
-	public function setPhone(?string $phone, int $region = 420);
+	public function setPhone(?string $phone, int $region = 420): void;
 }
