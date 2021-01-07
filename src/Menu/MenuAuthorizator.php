@@ -48,7 +48,6 @@ final class MenuAuthorizator
 			$this->privileges = array_flip($user[0]['privileges'] ?? []);
 		} else {
 			throw new \InvalidArgumentException('User does not exist or is not logged in.');
-
 		}
 	}
 

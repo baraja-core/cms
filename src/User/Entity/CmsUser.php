@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Baraja\Cms\User\Entity;
 
 
-use Doctrine\Common\Collections\Collection;
 use Nette\Security\IIdentity;
 
 interface CmsUser extends IIdentity
 {
 	public const ROLE_USER = 'user';
 
-	public function __construct(string $username, string $password, string $email, string $role = CmsUser::ROLE_USER);
+	public function __construct(string $username, string $password, string $email, string $role = self::ROLE_USER);
 
 	/**
 	 * @return string[]
