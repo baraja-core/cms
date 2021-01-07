@@ -169,6 +169,36 @@ class User implements IIdentity
 	}
 
 
+	public function isAdmin(): bool
+	{
+		return $this->containRole('admin');
+	}
+
+
+	public function containRole(string $role): bool
+	{
+		foreach ($this->getRoles() as $roleItem) {
+			if ($roleItem === $role) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
+	public function containPrivilege(string $privilege): bool
+	{
+		foreach ($this->getPrivileges() as $privilegeItem) {
+			if ($privilegeItem === $privilege) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
 	public function getSalutation(): ?string
 	{
 		if (trim($name = $this->getName()) !== '') {
