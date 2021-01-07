@@ -6,7 +6,7 @@ Vue.component('user-login-history', {
 			</div>
 			<template v-else>
 				<div v-if="items.length === 0">
-					<p><i>History is empty.</i></p>
+					<p class="mb-0"><i>History is empty.</i></p>
 				</div>
 				<template v-else>
 					<table class="table table-sm cms-table-no-border-top">
