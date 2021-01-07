@@ -10,7 +10,7 @@ use Baraja\AssetsLoader\Minifier\DefaultJsMinifier;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Proxy\Proxy;
 use Baraja\Cms\User\AdminBarUser;
-use Baraja\Cms\User\Entity\User;
+use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\UserResetPasswordRequest;
 use Baraja\Plugin\BasePlugin;
 use Baraja\Plugin\CmsPluginPanel;
@@ -120,7 +120,7 @@ final class Admin
 			$this->panel->setView($this->getView());
 			$this->panel->setPluginService($pluginService);
 
-			if ($this->context->checkPermission($this->getPlugin(), $this->getView()) === false) {
+			if ($this->context->checkPermission($this->getPlugin(), null) === false) {
 				$this->terminate($this->renderPermissionDenied());
 			}
 
@@ -224,8 +224,8 @@ final class Admin
 	private function renderSetUserPasswordTemplate(string $userId): string
 	{
 		try {
-			/** @var User $user */
-			$user = $this->context->getEntityManager()->getRepository(User::class)
+			/** @var CmsUser $user */
+			$user = $this->context->getEntityManager()->getRepository($this->context->getUserManager()->get()->getDefaultEntity())
 				->createQueryBuilder('user')
 				->where('user.id = :userId')
 				->setParameter('userId', $userId)
@@ -296,7 +296,7 @@ final class Admin
 
 			$first = true;
 			foreach ($components as $component) {
-				if ($this->context->checkPermission($this->getPlugin(), $component->getKey())) {
+				if ($this->context->checkPermission($this->getPlugin(), $component->getName())) {
 					$active = $first === true;
 					$componentsData[] = '<b-tab lazy @click="$emit(\'activeMe\')" title="' . Helpers::escapeHtmlAttr($component->getTab()) . '"'
 						. ($active ? ' active' : '')
@@ -326,7 +326,11 @@ final class Admin
 				. '</cms-detail>' . "\n"
 				. '</div>';
 		} elseif (\count($components) === 1) {
-			$return = $this->renderVueComponent($components[0], $plugin);
+			if ($this->context->checkPermission($this->getPlugin(), $components[0]->getName())) {
+				$return = $this->renderVueComponent($components[0], $plugin);
+			} else {
+				$return = null;
+			}
 		} else {
 			$return = null;
 		}
@@ -418,7 +422,7 @@ final class Admin
 		AdminBar::addPanel($this->context->getBasicInformation());
 		AdminBar::setUser(new AdminBarUser($this->context->getUser()->getIdentity()));
 
-		if ($this->context->getUser()->isAllowed('user', 'detail') === true) { // Show link only in case of user can edit profile
+		if ($this->context->checkPermission('user', 'user-overview') === true) { // Show link only in case of user can edit profile
 			AdminBar::addLink('My Profile', $this->linkGenerator->link('User:detail', ['id' => $this->context->getUser()->getId()]));
 			AdminBar::addSeparator();
 		}
