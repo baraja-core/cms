@@ -11,9 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
-use Nette\Security\IIdentity;
 use Nette\Security\Passwords;
-use Nette\SmartObject;
 use Nette\Utils\DateTime;
 use Nette\Utils\Strings;
 use Nette\Utils\Validators;
@@ -38,12 +36,9 @@ use Nette\Utils\Validators;
  *    }
  * )
  */
-class User implements IIdentity
+class User implements CmsUser
 {
 	use UuidIdentifier;
-	use SmartObject;
-
-	public const ROLE_USER = 'user';
 
 	/** @ORM\Column(type="string", length=64, unique=true) */
 	private string $username;
@@ -138,7 +133,7 @@ class User implements IIdentity
 	private $otpCode;
 
 
-	public function __construct(string $username, string $password, string $email, string $role = 'user')
+	public function __construct(string $username, string $password, string $email, string $role = CmsUser::ROLE_USER)
 	{
 		$this->username = trim(Strings::lower($username));
 		$this->password = $password ? (new Passwords)->hash($password) : '---empty-password---';
@@ -196,6 +191,15 @@ class User implements IIdentity
 		}
 
 		return false;
+	}
+
+
+	/**
+	 * @return string[]
+	 */
+	public function getData(): array
+	{
+		return $this->getMetaData();
 	}
 
 
