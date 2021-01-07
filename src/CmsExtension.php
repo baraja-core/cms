@@ -176,8 +176,19 @@ final class CmsExtension extends CompilerExtension
 			'componentClass' => VueComponent::class,
 			'view' => 'detail',
 			'source' => __DIR__ . '/../template/user/security.js',
-			'position' => 100,
+			'position' => 80,
 			'tab' => 'Security',
+			'params' => ['id'],
+		]]);
+		$pluginManager->addSetup('?->addComponent(?)', ['@self', [
+			'key' => 'userPermissions',
+			'name' => 'user-permissions',
+			'implements' => UserPlugin::class,
+			'componentClass' => VueComponent::class,
+			'view' => 'detail',
+			'source' => __DIR__ . '/../template/user/permissions.js',
+			'position' => 50,
+			'tab' => 'Permissions',
 			'params' => ['id'],
 		]]);
 		$pluginManager->addSetup('?->addComponent(?)', ['@self', [
@@ -187,7 +198,7 @@ final class CmsExtension extends CompilerExtension
 			'componentClass' => VueComponent::class,
 			'view' => 'detail',
 			'source' => __DIR__ . '/../template/user/login-history.js',
-			'position' => 100,
+			'position' => 20,
 			'tab' => 'Login history',
 			'params' => ['id'],
 		]]);

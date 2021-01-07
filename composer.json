@@ -14,7 +14,7 @@
 		"baraja-core/doctrine": "^2.0",
 		"baraja-core/structured-api": "^2.0",
 		"baraja-core/admin-bar": "^1.0",
-		"baraja-core/plugin-system": "^1.0",
+		"baraja-core/plugin-system": "^1.2",
 		"baraja-core/localization": "^1.0",
 		"baraja-core/baraja-cloud": "^1.0",
 		"nette/di": "^3.0",

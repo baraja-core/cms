@@ -64,6 +64,10 @@ h1 {
 	font-size: 24pt;
 }
 
+.pointer {
+	cursor: pointer;
+}
+
 .btn-add {
 	background: #7fb01d;
 	background: linear-gradient(0, #7fb01d 0%, #9cca3f 100%);

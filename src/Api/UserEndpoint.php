@@ -12,6 +12,7 @@ use Baraja\Cms\User\Entity\UserLogin;
 use Baraja\Cms\User\Entity\UserMeta;
 use Baraja\Cms\User\UserManager;
 use Baraja\Doctrine\EntityManager;
+use Baraja\Plugin\PluginManager;
 use Baraja\StructuredApi\BaseEndpoint;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -31,12 +32,15 @@ final class UserEndpoint extends BaseEndpoint
 
 	private CloudManager $cloudManager;
 
+	private PluginManager $pluginManager;
 
-	public function __construct(UserManager $userManager, EntityManager $entityManager, CloudManager $cloudManager)
+
+	public function __construct(UserManager $userManager, EntityManager $entityManager, CloudManager $cloudManager, PluginManager $pluginManager)
 	{
 		$this->userManager = $userManager;
 		$this->entityManager = $entityManager;
 		$this->cloudManager = $cloudManager;
+		$this->pluginManager = $pluginManager;
 	}
 
 
@@ -288,7 +292,7 @@ final class UserEndpoint extends BaseEndpoint
 			'numbers' => Random::generate(12, '0-9'),
 			'simple' => Random::generate(8),
 			'normal' => Random::generate(12, '0-9a-zA-Z'),
-			'advance' => trim(Random::generate(16, '0-9a-zA-Z.-'), '.-'),
+			'advance' => Random::generate(6, '0-9a-zA-Z') . '-' . Random::generate(6, '0-9a-zA-Z') . '-' . Random::generate(6, '0-9a-zA-Z'),
 		]);
 	}
 
@@ -431,8 +435,12 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function postMarkUserAsAdmin(string $id, string $password): void
+	public function actionPermissions(string $id): void
 	{
+		$currentUser = $this->userManager->getUserById($this->getUser()->getId());
+		if ($currentUser->isAdmin() === false) {
+			$this->sendError('Permissions settings is available only for admin user.');
+		}
 		try {
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException $e) {
@@ -441,10 +449,105 @@ final class UserEndpoint extends BaseEndpoint
 			return;
 		}
 
-		/** @var User $adminUser */
-		$adminUser = $this->getUserEntity();
+		$plugins = [];
+		foreach ($this->pluginManager->getPluginInfoEntities() as $plugin) {
+			$components = [];
+			foreach ($this->pluginManager->getComponents($plugin, null) as $component) {
+				$components[] = [
+					'active' => $user->containPrivilege('component-' . $component->getName()),
+					'tab' => $component->getTab(),
+					'name' => $component->getName(),
+				];
+			}
+			$plugins[] = [
+				'active' => $user->containPrivilege('plugin-' . $plugin->getSanitizedName()),
+				'name' => $plugin->getSanitizedName(),
+				'type' => $plugin->getType(),
+				'realName' => $plugin->getRealName(),
+				'components' => $components,
+			];
+		}
 
-		if ($adminUser->passwordVerify($password) === false) {
+		$this->sendJson([
+			'isAdmin' => $user->isAdmin(),
+			'roles' => $user->getRoles(),
+			'items' => $plugins,
+		]);
+	}
+
+
+	/**
+	 * @param string[] $roles
+	 * @param string[][]|bool[][]|string[][][]|bool[][][] $permissions
+	 */
+	public function postSavePermissions(string $id, array $roles, array $permissions): void
+	{
+		$currentUser = $this->userManager->getUserById($this->getUser()->getId());
+		if ($currentUser->isAdmin() === false) {
+			$this->sendError('Permissions settings is available only for admin user.');
+		}
+		try {
+			$user = $this->userManager->getUserById($id);
+		} catch (NoResultException | NonUniqueResultException $e) {
+			$this->sendError('User "' . $id . '" does not exist.');
+
+			return;
+		}
+		$roles = array_map(fn (string $role): string => strtolower($role), $roles);
+		if ($user->isAdmin() === false && \in_array('admin', $roles, true) === true) {
+			$this->sendError('You cannot set the administrator role manually. To maintain security, use the "Set as admin" button.');
+		}
+
+		$privileges = [];
+		foreach ($permissions as $plugin) {
+			if (($plugin['active'] ?? false) === true) {
+				$pluginName = (string) ($plugin['name'] ?? '');
+				$pluginEntity = $this->pluginManager->getPluginByName(Helpers::formatPresenterNameByUri($pluginName));
+				$pluginComponents = $this->pluginManager->getComponents($pluginEntity, null);
+				$privileges[] = 'plugin-' . $pluginName;
+				foreach ($plugin['components'] ?? [] as $component) {
+					if (($component['active'] ?? false) === true) {
+						foreach ($pluginComponents as $componentEntity) {
+							if ($componentEntity->getName() === ($component['name'] ?? '')) {
+								$privileges[] = 'component-' . $componentEntity->getName();
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		$user->resetPrivileges();
+		foreach ($privileges as $privilege) {
+			$user->addPrivilege((string) $privilege);
+		}
+
+		$user->resetRoles();
+		foreach ($roles as $role) {
+			$user->addRole($role);
+		}
+
+		$this->entityManager->flush();
+		$this->flashMessage('User permissions has been set.', 'success');
+		$this->sendOk();
+	}
+
+
+	public function postMarkUserAsAdmin(string $id, string $password): void
+	{
+		$currentUser = $this->userManager->getUserById($this->getUser()->getId());
+		if ($currentUser->isAdmin() === false) {
+			$this->sendError('Permissions settings is available only for admin user.');
+		}
+		try {
+			$user = $this->userManager->getUserById($id);
+		} catch (NoResultException | NonUniqueResultException $e) {
+			$this->sendError('User "' . $id . '" does not exist.');
+
+			return;
+		}
+		if ($currentUser->passwordVerify($password) === false) {
 			$this->sendError('Admin password is incorrect.');
 		}
 
