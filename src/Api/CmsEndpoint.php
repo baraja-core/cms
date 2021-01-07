@@ -8,7 +8,7 @@ namespace Baraja\Cms\Api;
 use Baraja\BarajaCloud\CloudManager;
 use Baraja\Cms\Helpers;
 use Baraja\Cms\Settings;
-use Baraja\Cms\User\Entity\User;
+use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\UserResetPasswordRequest;
 use Baraja\Cms\User\UserManager;
 use Baraja\Doctrine\EntityManager;
@@ -62,7 +62,7 @@ final class CmsEndpoint extends BaseEndpoint
 		}
 
 		$needOauth = false;
-		if ($user instanceof User && $user->getOtpCode() !== null) { // need OTP authentication
+		if ($user instanceof CmsUser && $user->getOtpCode() !== null) { // need OTP authentication
 			$this->userManager->logout();
 			$needOauth = $user->getOtpCode() !== null;
 		}
@@ -105,8 +105,8 @@ final class CmsEndpoint extends BaseEndpoint
 	public function postForgotPassword(string $locale, string $username): void
 	{
 		try {
-			/** @var \Baraja\Cms\User\Entity\User $user */
-			$user = $this->entityManager->getRepository(\Baraja\Cms\User\Entity\User::class)
+			/** @var CmsUser $user */
+			$user = $this->entityManager->getRepository($this->userManager->getDefaultEntity())
 				->createQueryBuilder('user')
 				->where('user.username = :username')
 				->orWhere('user.email = :email')
@@ -140,8 +140,8 @@ final class CmsEndpoint extends BaseEndpoint
 	{
 		if (preg_match('/^(\S+)\s+(\S+)$/', trim($realName), $parser)) {
 			try {
-				/** @var \Baraja\Cms\User\Entity\User $user */
-				$user = $this->entityManager->getRepository(\Baraja\Cms\User\Entity\User::class)
+				/** @var CmsUser $user */
+				$user = $this->entityManager->getRepository($this->userManager->getDefaultEntity())
 					->createQueryBuilder('user')
 					->where('user.firstName = :firstName')
 					->andWhere('user.lastName = :lastName')
@@ -228,8 +228,8 @@ final class CmsEndpoint extends BaseEndpoint
 	public function postSetUserPassword(string $locale, string $userId, string $password): void
 	{
 		try {
-			/** @var User $user */
-			$user = $this->entityManager->getRepository(User::class)
+			/** @var CmsUser $user */
+			$user = $this->entityManager->getRepository($this->userManager->getDefaultEntity())
 				->createQueryBuilder('user')
 				->where('user.id = :userId')
 				->setParameter('userId', $userId)

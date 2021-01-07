@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Baraja\Cms\Plugin;
 
 
-use Baraja\Cms\User\Entity\User;
 use Baraja\Cms\User\UserManager;
 use Baraja\Plugin\BasePlugin;
 use Baraja\Plugin\SimpleComponent\Breadcrumb;
@@ -37,7 +36,7 @@ final class UserPlugin extends BasePlugin
 
 	public function getBaseEntity(): ?string
 	{
-		return User::class;
+		return $this->userManager->getDefaultEntity();
 	}
 
 

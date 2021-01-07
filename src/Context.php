@@ -6,6 +6,7 @@ namespace Baraja\Cms;
 
 
 use Baraja\AdminBar\BasicPanel;
+use Baraja\Cms\User\UserManagerAccessor;
 use Baraja\Doctrine\EntityManager;
 use Baraja\DynamicConfiguration\Configuration;
 use Baraja\Localization\Localization;
@@ -38,11 +39,15 @@ final class Context
 
 	private PluginManager $pluginManager;
 
+	private MenuAuthorizatorAccessor $authorizator;
+
+	private UserManagerAccessor $userManager;
+
 	/** @var string[] (type => path) */
 	private array $customAssets = [];
 
 
-	public function __construct(Request $request, Response $response, Localization $localization, EntityManager $entityManager, Configuration $configuration, Settings $settings, User $user, TranslatorFilter $translatorFilter, BasicPanel $basicInformation, PluginManager $pluginManager)
+	public function __construct(Request $request, Response $response, Localization $localization, EntityManager $entityManager, Configuration $configuration, Settings $settings, User $user, TranslatorFilter $translatorFilter, BasicPanel $basicInformation, PluginManager $pluginManager, MenuAuthorizatorAccessor $authorizator, UserManagerAccessor $userManager)
 	{
 		$this->request = $request;
 		$this->response = $response;
@@ -54,6 +59,8 @@ final class Context
 		$this->translatorFilter = $translatorFilter;
 		$this->basicInformation = $basicInformation;
 		$this->pluginManager = $pluginManager;
+		$this->authorizator = $authorizator;
+		$this->userManager = $userManager;
 	}
 
 
@@ -160,10 +167,14 @@ final class Context
 	}
 
 
-	public function checkPermission(string $plugin, string $view): bool
+	public function checkPermission(string $plugin, ?string $view = null): bool
 	{
-		return $plugin === 'Homepage' || $plugin === 'Cms' || $plugin === 'Error'
-			|| $this->user->isAllowed(Helpers::formatPresenterNameToUri($plugin), $view);
+		$pluginName = Helpers::formatPresenterNameToUri($plugin);
+		if ($view === null) {
+			return $this->authorizator->get()->isAllowedPlugin($pluginName);
+		}
+
+		return $this->authorizator->get()->isAllowedComponent($pluginName, $view);
 	}
 
 
@@ -182,5 +193,11 @@ final class Context
 			throw new \RuntimeException('Custom asset "' . $type . '" already exist.');
 		}
 		$this->customAssets[$type] = $path;
+	}
+
+
+	public function getUserManager(): UserManagerAccessor
+	{
+		return $this->userManager;
 	}
 }

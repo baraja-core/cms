@@ -7,6 +7,7 @@ namespace Baraja\Cms\Api;
 
 use Baraja\BarajaCloud\CloudManager;
 use Baraja\Cms\Helpers;
+use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\User;
 use Baraja\Cms\User\Entity\UserLogin;
 use Baraja\Cms\User\Entity\UserMeta;
@@ -23,6 +24,8 @@ use Nette\Utils\Paginator;
 use Nette\Utils\Random;
 use Nette\Utils\Strings;
 use Nette\Utils\Validators;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 final class UserEndpoint extends BaseEndpoint
 {
@@ -52,9 +55,9 @@ final class UserEndpoint extends BaseEndpoint
 	public function actionDefault(int $page = 1, int $limit = 32, ?string $role = null, ?string $query = null, ?string $active = null): void
 	{
 		$currentUserId = $this->getUser()->getId();
-		/** @var User $currentUser */
-		$currentUser = $this->entityManager->getRepository(User::class)->find($currentUserId);
-		$selection = $this->entityManager->getRepository(User::class)->createQueryBuilder('user');
+		/** @var CmsUser $currentUser */
+		$currentUser = $this->entityManager->getRepository($this->userManager->getDefaultEntity())->find($currentUserId);
+		$selection = $this->entityManager->getRepository($this->userManager->getDefaultEntity())->createQueryBuilder('user');
 		if ($active !== null) {
 			$selection->andWhere('user.active = ' . ($active === 'active' ? 'TRUE' : 'FALSE'));
 		}
@@ -134,10 +137,26 @@ final class UserEndpoint extends BaseEndpoint
 			$this->sendError('User "' . $email . '" already exist.');
 		}
 		try {
-			$this->entityManager->persist($user = new User($email, $password ?? '', $email, User::ROLE_USER));
+			try {
+				$ref = new \ReflectionClass($this->userManager->getDefaultEntity());
+				/** @var CmsUser $user */
+				$user = $ref->newInstanceArgs([
+					'username' => $email,
+					'password' => $password,
+					'email' => $email,
+					'role' => CmsUser::ROLE_USER,
+				]);
+			} catch (\Throwable $e) {
+				if (class_exists(Debugger::class)) {
+					Debugger::log($e, ILogger::CRITICAL);
+				}
+				$this->sendError('Can not create user because user storage is broken.');
+
+				return;
+			}
 			$user->setPhone($phone);
 			$user->addRole($role);
-			$this->entityManager->flush();
+			$this->entityManager->persist($user)->flush();
 		} catch (\InvalidArgumentException $e) {
 			$this->sendError($e->getMessage());
 
@@ -323,6 +342,7 @@ final class UserEndpoint extends BaseEndpoint
 	public function actionSecurity(string $id): void
 	{
 		try {
+			/** @var User $user */
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException $e) {
 			$this->sendError('User "' . $id . '" does not exist.');
@@ -731,7 +751,7 @@ final class UserEndpoint extends BaseEndpoint
 	private function userExist(string $email): bool
 	{
 		try {
-			$this->entityManager->getRepository(User::class)
+			$this->entityManager->getRepository($this->userManager->getDefaultEntity())
 				->createQueryBuilder('user')
 				->select('PARTIAL user.{id}')
 				->where('user.username = :username')
@@ -779,7 +799,7 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	private function setRealUserName(User $user, string $name): void
+	private function setRealUserName(CmsUser $user, string $name): void
 	{
 		$nameParser = Helpers::nameParser($name);
 		$user->setFirstName($nameParser['firstName']);
@@ -797,7 +817,7 @@ final class UserEndpoint extends BaseEndpoint
 	{
 		static $cache;
 
-		return $cache ?? $cache = $this->entityManager->getRepository(User::class)
+		return $cache ?? $cache = $this->entityManager->getRepository($this->userManager->getDefaultEntity())
 				->createQueryBuilder('user')
 				->select('PARTIAL user.{id, roles, active}')
 				->getQuery()
