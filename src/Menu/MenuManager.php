@@ -17,6 +17,8 @@ final class MenuManager
 
 	private User $user;
 
+	private MenuAuthorizatorAccessor $authorizator;
+
 	/** @var true[] */
 	private array $ignorePlugins = [
 		CmsPlugin::class => true,
@@ -25,10 +27,11 @@ final class MenuManager
 	];
 
 
-	public function __construct(PluginManager $pluginManager, User $user)
+	public function __construct(PluginManager $pluginManager, MenuAuthorizatorAccessor $authorizator, User $user)
 	{
 		$this->pluginManager = $pluginManager;
 		$this->user = $user;
+		$this->authorizator = $authorizator;
 	}
 
 
@@ -50,7 +53,7 @@ final class MenuManager
 				$return[] = $menuItem;
 				continue;
 			}
-			if ($this->checkPermission($plugin, $route = Helpers::formatPresenterNameToUri($plugin['name'])) === true) {
+			if ($this->authorizator->get()->isAllowedPlugin($route = Helpers::formatPresenterNameToUri($plugin['name']))) {
 				$return[] = [
 					'key' => $plugin['service'],
 					'title' => $plugin['label'],
@@ -65,36 +68,5 @@ final class MenuManager
 		usort($return, fn (array $a, array $b): int => $a['priority'] < $b['priority'] ? 1 : -1);
 
 		return $return;
-	}
-
-
-	/**
-	 * Check user permission by fallback cascade:
-	 *
-	 * - Call route to plugin as privilege (for ex. "file-manager")
-	 * - Check plugin required roles
-	 * - Check plugin required privileges
-	 * - Is superuser? If yes, allow always
-	 *
-	 * @param mixed[] $plugin
-	 */
-	private function checkPermission(array $plugin, string $route): bool
-	{
-		if ($this->user->isAllowed($route) === true) {
-			return true;
-		}
-
-		foreach ($plugin['roles'] ?? [] as $role) {
-			if ($this->user->isInRole((string) $role) === true) {
-				return true;
-			}
-		}
-		foreach ($plugin['privileges'] ?? [] as $privilege) {
-			if ($this->user->isAllowed((string) $privilege) === true) {
-				return true;
-			}
-		}
-
-		return $this->user->isInRole('admin');
 	}
 }
