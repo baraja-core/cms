@@ -63,7 +63,7 @@ final class MenuAuthorizator
 	 */
 	public function getRoles(): array
 	{
-		return $this->roles;
+		return array_keys($this->roles);
 	}
 
 
@@ -72,7 +72,7 @@ final class MenuAuthorizator
 	 */
 	public function getPrivileges(): array
 	{
-		return $this->privileges;
+		return array_keys($this->privileges);
 	}
 
 

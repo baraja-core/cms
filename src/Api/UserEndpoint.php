@@ -138,14 +138,10 @@ final class UserEndpoint extends BaseEndpoint
 		}
 		try {
 			try {
+				/* @phpstan-ignore-next-line */
 				$ref = new \ReflectionClass($this->userManager->getDefaultEntity());
 				/** @var CmsUser $user */
-				$user = $ref->newInstanceArgs([
-					'username' => $email,
-					'password' => $password,
-					'email' => $email,
-					'role' => CmsUser::ROLE_USER,
-				]);
+				$user = $ref->newInstanceArgs([$email, $password, $email, CmsUser::ROLE_USER]);
 			} catch (\Throwable $e) {
 				if (class_exists(Debugger::class)) {
 					Debugger::log($e, ILogger::CRITICAL);
