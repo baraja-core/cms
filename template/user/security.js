@@ -215,18 +215,36 @@ Vue.component('modal-two-step-verification', {
 				<b-button variant="secondary" @click="showInstructions=!showInstructions" class="btn-sm mb-3">
 					{{ showInstructions ? 'Hide instructions' : 'Show instructions' }}
 				</b-button>
+				<b-button variant="secondary" @click="showAppInfo=!showAppInfo" class="btn-sm mb-3">
+					{{ showAppInfo ? 'Hide authenticator app info' : 'Get authenticator app' }}
+				</b-button>
 				<b-card v-if="showInstructions" class="mb-3">
-					<h3 class="h5">Setup instructions:</h3>
+					<h3 class="h5">Setup instructions</h3>
 					<p>
-						In a mobile application
-						(such as <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en" target="_blank"
-						>Google Authenticator</a>),
-						load the generated QR code or copy the generated data manually.
+						In a mobile authenticator application, load the generated QR code or copy the generated data manually.
 					</p>
-					<p>
+					<p class="mb-0">
 						If everything works, verify the generated code in the form.
 						If the verification is successful, the settings will be saved automatically.
 					</p>
+				</b-card>
+				<b-card v-if="showAppInfo" class="mb-3 bg-light border rounded">
+					<h4 class="h5">Get authenticator app</h4>
+					<b-list-group>
+						<b-list-group-item class="flex-column align-items-start">
+							<div class="d-flex w-100 justify-content-between">
+								<h5 class="mb-1">iOS app</h5>
+								<small class="text-muted">Most secure</small>
+							</div>
+							<a href="https://apps.apple.com/us/app/google-authenticator/id388497605" target="_blank" class="btn btn-sm btn-outline-primary">download</a>
+						</b-list-group-item>
+						<b-list-group-item class="flex-column align-items-start">
+							<div class="d-flex w-100 justify-content-between">
+								<h5 class="mb-1">Android app</h5>
+							</div>
+							<a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en" target="_blank" class="btn btn-sm btn-outline-primary">download</a>
+						</b-list-group-item>
+					</b-list-group>
 				</b-card>
 				<b-card class="bg-light border rounded">
 					<h4 class="h5">Manual registration</h4>
@@ -242,12 +260,12 @@ Vue.component('modal-two-step-verification', {
 					<b-skeleton-img v-if="loading.qrCode" no-aspect height="200px" class="m-auto"></b-skeleton-img>
 				</div>
 				<div class="d-flex">
-					<b-btn variant="secondary" class="mx-auto mt-3" size="sm" @click="verified = !verified">Continue to Verification</b-btn>
+					<b-btn variant="primary" class="mx-auto mt-3" size="sm" @click="verified = !verified">Continue to Verification</b-btn>
 				</div>
 				<b-form-group v-show="verified" label="For verification type the generated code" class="mt-3">
 					<form ref="codeForm">
 						<b-input-group>
-							<input type="text" v-mask="codeMask" v-model="codeValue" maxlength="7" minlength="7" placeholder="XXX XXX" required :class="['form-control', isValid ?  'is-valid' : codeValue === null ? '' : 'is-invalid']">
+							<input type="number" v-mask="codeMask" v-model="codeValue" maxlength="6" minlength="6" placeholder="XXXXXX" required :class="['form-control', isValid ? 'is-valid' : codeValue === null ? '' : 'is-invalid']">
 							<b-input-group-append>
 								<b-button variant="primary" @click="verifyCode">Verify</b-button>
 							</b-input-group-append>
@@ -267,10 +285,11 @@ Vue.component('modal-two-step-verification', {
 		return {
 			verified: false,
 			progressValue: 0,
-			codeMask: '### ###',
+			codeMask: '######',
 			codeValue: null,
 			isValid: false,
 			showInstructions: false,
+			showAppInfo: false,
 			loading: {
 				global: true,
 				qrCode: true,
@@ -289,7 +308,7 @@ Vue.component('modal-two-step-verification', {
 	},
 	watch: {
 		codeValue(newVal, old) {
-			this.isValid = newVal.length === 7
+			this.isValid = newVal.length === 6
 		}
 	},
 	methods: {
