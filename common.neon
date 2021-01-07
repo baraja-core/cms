@@ -1,3 +1,2 @@
 extensions:
 	cms: Baraja\Cms\CmsExtension
-	permission: Baraja\Cms\User\PermissionExtension
