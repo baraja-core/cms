@@ -6,8 +6,8 @@ namespace Baraja\Cms\User;
 
 
 use Baraja\AdminBar\AdminIdentity;
-use Baraja\BarajaCloud\CloudManager;
 use Baraja\Cms\Helpers;
+use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\User;
 use Baraja\Cms\User\Entity\UserLogin;
 use Baraja\Cms\User\Entity\UserLoginAttempt;
@@ -27,16 +27,19 @@ final class UserManager implements Authenticator
 
 	private UserStorage $userStorage;
 
-	private CloudManager $cloudManager;
-
 	private ?AuthenticationService $authenticationService = null;
 
+	private string $defaultEntity;
 
-	public function __construct(EntityManager $entityManager, UserStorage $userStorage, CloudManager $cloudManager)
+
+	public function __construct(EntityManager $entityManager, UserStorage $userStorage, ?string $userEntity = null)
 	{
+		if ((class_implements($userEntity = $userEntity ?? User::class)[CmsUser::class] ?? false) === false) {
+			throw new \InvalidArgumentException('User entity "' . $userEntity . '" must implements "' . CmsUser::class . '" interface.');
+		}
 		$this->entityManager = $entityManager;
 		$this->userStorage = $userStorage;
-		$this->cloudManager = $cloudManager;
+		$this->defaultEntity = $userEntity;
 	}
 
 
@@ -55,11 +58,17 @@ final class UserManager implements Authenticator
 	}
 
 
+	public function getDefaultEntity(): string
+	{
+		return $this->defaultEntity;
+	}
+
+
 	public function createIdentity(IIdentity $user, string $expiration = '2 hours'): IIdentity
 	{
 		$name = null;
 		$avatarUrl = null;
-		if ($user instanceof User) {
+		if ($user instanceof CmsUser) {
 			$name = $user->getName();
 			$avatarUrl = $user->getAvatarUrl();
 		}
@@ -131,9 +140,9 @@ final class UserManager implements Authenticator
 	/**
 	 * @throws NoResultException|NonUniqueResultException
 	 */
-	public function getUserByUsername(string $username): User
+	public function getUserByUsername(string $username): CmsUser
 	{
-		return $this->entityManager->getRepository(User::class)
+		return $this->entityManager->getRepository($this->defaultEntity)
 			->createQueryBuilder('user')
 			->where('user.username = :username')
 			->setParameter('username', $username)
@@ -146,12 +155,12 @@ final class UserManager implements Authenticator
 	/**
 	 * @throws NoResultException|NonUniqueResultException
 	 */
-	public function getUserById(string $id): User
+	public function getUserById(string $id): CmsUser
 	{
-		/** @var User[] $cache */
+		/** @var CmsUser[] $cache */
 		static $cache = [];
 
-		return $cache[$id] ?? $cache[$id] = $this->entityManager->getRepository(User::class)
+		return $cache[$id] ?? $cache[$id] = $this->entityManager->getRepository($this->defaultEntity)
 				->createQueryBuilder('user')
 				->where('user.id = :id')
 				->setParameter('id', $id)
@@ -172,7 +181,7 @@ final class UserManager implements Authenticator
 	}
 
 
-	public function checkAuthenticatorOtpCode(User $user, int $code): bool
+	public function checkAuthenticatorOtpCode(CmsUser $user, int $code): bool
 	{
 		if (($otpCode = $user->getOtpCode()) === null) {
 			return false;
@@ -226,6 +235,7 @@ final class UserManager implements Authenticator
 				return $this;
 			}
 			try {
+				/** @var User $user */
 				$user = $this->getUserById($userId);
 			} catch (NoResultException | NonUniqueResultException $eUser) {
 				throw new \InvalidArgumentException('User "' . $userId . '" does not exist.', $e->getCode(), $e);
@@ -266,14 +276,11 @@ final class UserManager implements Authenticator
 		try {
 			$user = $this->getUserByUsername($username);
 		} catch (NoResultException | NonUniqueResultException $e) {
-			// TODO: Reserved for future use
-			// TODO: if (($externalEmail = $this->authenticateByCloudAccount($username, $password)) !== null) {
-			// TODO: $user = $this->entityManager->persist($user = new User($username, $password, $externalEmail))->flush();
-			// TODO: } else {
 			throw new AuthenticationException('The username is incorrect. Username "' . $username . '" given.');
 		}
-
-		$attempt->setUser($user);
+		if ($user instanceof User) {
+			$attempt->setUser($user);
+		}
 		$this->entityManager->flush();
 
 		if (($hash = $user->getPassword()) === '---empty-password---') {
@@ -289,18 +296,5 @@ final class UserManager implements Authenticator
 		$this->logLoginAttempt($attempt, $user);
 
 		return $this->createIdentity($user, $expiration);
-	}
-
-
-	/**
-	 * Return user e-mail in case of this account exist and credentials match.
-	 *
-	 * @return null
-	 */
-	private function authenticateByCloudAccount(string $username, string $password)
-	{
-		// TODO: Implement me in future version.
-
-		return null;
 	}
 }
