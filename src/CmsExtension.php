@@ -12,8 +12,8 @@ use Baraja\Cms\Plugin\HomepagePlugin;
 use Baraja\Cms\Plugin\UserPlugin;
 use Baraja\Cms\Proxy\Proxy;
 use Baraja\Cms\Support\Support;
-use Baraja\Cms\User\Authorizator;
 use Baraja\Cms\User\UserManager;
+use Baraja\Cms\User\UserManagerAccessor;
 use Baraja\Doctrine\ORM\DI\OrmAnnotationsExtension;
 use Baraja\Plugin\Component\VueComponent;
 use Baraja\Plugin\PluginComponentExtension;
@@ -114,12 +114,18 @@ final class CmsExtension extends CompilerExtension
 		$builder->addDefinition($this->prefix('menuManager'))
 			->setFactory(MenuManager::class);
 
+		$builder->addDefinition($this->prefix('menuAuthorizator'))
+			->setFactory(MenuAuthorizator::class);
+
+		$builder->addAccessorDefinition($this->prefix('menuAuthorizatorAccessor'))
+			->setImplement(MenuAuthorizatorAccessor::class);
+
 		// user
 		$builder->addDefinition($this->prefix('userManager'))
 			->setFactory(UserManager::class);
 
-		$builder->addDefinition($this->prefix('authorizator'))
-			->setFactory(Authorizator::class);
+		$builder->addAccessorDefinition($this->prefix('userManagerAccessor'))
+			->setImplement(UserManagerAccessor::class);
 
 		/** @var ServiceDefinition $pluginManager */
 		$pluginManager = $this->getContainerBuilder()->getDefinitionByType(PluginManager::class);
