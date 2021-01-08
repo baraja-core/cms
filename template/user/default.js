@@ -127,6 +127,7 @@ Vue.component('user-default', {
 						<a :href="link('User:detail', {id: item.id})">{{ item.name }}</a>
 						<div v-if="item['2fa']" class="badge badge-pill badge-primary" v-b-tooltip title="This user is using 2-step login authentication (better security).">2FA</div>
 						<div v-if="item.id === currentUserId" class="badge badge-pill badge-primary" v-b-tooltip title="This is your account.">You</div>
+						<div v-if="item.verifying" class="badge badge-pill badge-secondary" v-b-tooltip title="We are awaiting user authentication and password entry for this account.">Verifying</div>
 					</td>
 					<td>{{ item.email }}</td>
 					<td>
