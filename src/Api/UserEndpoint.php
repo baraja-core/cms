@@ -82,7 +82,7 @@ final class UserEndpoint extends BaseEndpoint
 			}
 		}
 
-		$users = $selection->select('PARTIAL user.{id, firstName, lastName, emails, phone, roles, active, avatarUrl, otpCode}')
+		$users = $selection->select('PARTIAL user.{id, firstName, lastName, password, emails, phone, roles, active, avatarUrl, otpCode}')
 			->setMaxResults($limit)
 			->setFirstResult(($page - 1) * $limit)
 			->orderBy('user.createDate', 'DESC')
@@ -106,6 +106,7 @@ final class UserEndpoint extends BaseEndpoint
 				'isActive' => $user['active'],
 				'avatarUrl' => $user['avatarUrl'],
 				'2fa' => $user['otpCode'] !== null,
+				'verifying' => $user['password'] === '---empty-password---',
 			];
 		}
 
