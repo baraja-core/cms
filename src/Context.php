@@ -170,11 +170,13 @@ final class Context
 	public function checkPermission(string $plugin, ?string $view = null): bool
 	{
 		$pluginName = Helpers::formatPresenterNameToUri($plugin);
-		if ($view === null) {
-			return $this->authorizator->get()->isAllowedPlugin($pluginName);
+		try {
+			return $view === null
+				? $this->authorizator->get()->isAllowedPlugin($pluginName)
+				: $this->authorizator->get()->isAllowedComponent($pluginName, $view);
+		} catch (\InvalidArgumentException $e) {
+			return false;
 		}
-
-		return $this->authorizator->get()->isAllowedComponent($pluginName, $view);
 	}
 
 
