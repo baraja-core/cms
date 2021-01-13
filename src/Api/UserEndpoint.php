@@ -72,12 +72,29 @@ final class UserEndpoint extends BaseEndpoint
 		}
 
 		if ($query !== null) {
+			$orx = $selection->expr()->orX();
+			$isMysql = ($this->entityManager->getConnection()->getParams()['driver'] ?? '') === 'pdo_mysql';
 			if (preg_match('/^(\S+)\s+(.+)$/', $query = trim((string) preg_replace('/\s+/', ' ', $query)), $queryParser)) {
-				$selection->andWhere('user.username LIKE :firstName OR user.username LIKE :lastName OR user.firstName LIKE :firstName OR user.lastName LIKE :lastName OR user.emails LIKE :firstName OR user.emails LIKE :lastName')
+				$orx->add('user.username LIKE :firstName');
+				$orx->add('user.username LIKE :lastName');
+				$orx->add('user.firstName LIKE :firstName');
+				$orx->add('user.lastName LIKE :lastName');
+				if ($isMysql) {
+					$orx->add('user.emails LIKE :firstName');
+					$orx->add('user.emails LIKE :lastName');
+				}
+				$selection->andWhere($orx)
 					->setParameter('firstName', $queryParser[1] . '%')
 					->setParameter('lastName', $queryParser[2] . '%');
 			} else {
-				$selection->andWhere('user.username LIKE :query OR user.firstName LIKE :query OR user.lastName LIKE :query OR user.emails LIKE :query OR user.phone LIKE :query')
+				$orx->add('user.username LIKE :query');
+				$orx->add('user.firstName LIKE :query');
+				$orx->add('user.lastName LIKE :query');
+				$orx->add('user.phone LIKE :query');
+				if ($isMysql) {
+					$orx->add('user.emails LIKE :query');
+				}
+				$selection->andWhere($orx)
 					->setParameter('query', '%' . $query . '%');
 			}
 		}
