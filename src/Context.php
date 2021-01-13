@@ -175,7 +175,7 @@ final class Context
 				? $this->authorizator->get()->isAllowedPlugin($pluginName)
 				: $this->authorizator->get()->isAllowedComponent($pluginName, $view);
 		} catch (\InvalidArgumentException $e) {
-			return false;
+			return $pluginName === 'cms';
 		}
 	}
 
