@@ -6,6 +6,7 @@ namespace Baraja\Cms;
 
 
 use Baraja\AdminBar\BasicPanel;
+use Baraja\Cms\Translator\TranslatorFilter;
 use Baraja\Cms\User\UserManagerAccessor;
 use Baraja\Doctrine\EntityManager;
 use Baraja\DynamicConfiguration\Configuration;
