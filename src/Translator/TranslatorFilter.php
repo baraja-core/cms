@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Baraja\Cms;
+namespace Baraja\Cms\Translator;
 
 
 use Latte\Runtime\FilterInfo;
@@ -13,9 +13,9 @@ final class TranslatorFilter
 	private Translator $translator;
 
 
-	public function __construct(Translator $translator)
+	public function __construct(?Translator $translator = null)
 	{
-		$this->translator = $translator;
+		$this->translator = $translator ?? new CmsDefaultTranslator;
 	}
 
 

@@ -12,6 +12,7 @@ use Baraja\Cms\Plugin\HomepagePlugin;
 use Baraja\Cms\Plugin\UserPlugin;
 use Baraja\Cms\Proxy\Proxy;
 use Baraja\Cms\Support\Support;
+use Baraja\Cms\Translator\TranslatorFilter;
 use Baraja\Cms\User\UserManager;
 use Baraja\Cms\User\UserManagerAccessor;
 use Baraja\Doctrine\ORM\DI\OrmAnnotationsExtension;
