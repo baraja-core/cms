@@ -253,7 +253,6 @@ Vue.component('modal-two-step-verification', {
 				</b-card>
 				<div class="d-flex align-items-center pt-1 my-3">
 					<span class="mr-3">Either load QR code or type parameters above manually.</span>
-					
 				</div>
 				<div v-if="twoFactor.qrCodeUrl" class="text-center">
 					<img :src="twoFactor.qrCodeUrl" @load="loading.qrCode=false" :width="loading.qrCode ? 1 : 200" :height="loading.qrCode ? 1 : 200" alt="QR code" style="image-rendering:-moz-crisp-edges;image-rendering:-o-crisp-edges;image-rendering:-webkit-optimize-contrast;image-rendering:pixelated;-ms-interpolation-mode:nearest-neighbor">

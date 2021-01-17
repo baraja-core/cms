@@ -15,10 +15,8 @@ Vue.component('user-permissions', {
 				<b-alert :show="isAdmin === true" variant="success">
 					<b>This user is administrator.</b>
 				</b-alert>
-				
 				<label for="tags-basic">Roles</label>
 				<b-form-tags v-model="roles" separator=" ,;" tag-variant="primary" tag-pills placeholder="Add new role..."></b-form-tags>
-
 				<h3 class="mt-3">Plugins</h3>
 				<table class="table table-sm">
 					<tr v-for="plugin in items">

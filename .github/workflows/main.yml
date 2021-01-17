@@ -32,7 +32,6 @@ jobs:
     - name: The PHP Security Checker
       uses: symfonycorp/security-checker-action@v2
 
-    # Check code checker and coding standards
     - name: Check coding standards
       run: |
         php temp/code-checker/code-checker --short-arrays --strict-types --fix --no-progress
