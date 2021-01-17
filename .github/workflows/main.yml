@@ -1,6 +1,13 @@
 name: Integrity check
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [ assigned, opened, synchronize, reopened ]
+  schedule:
+    - cron: '1 * * * *'
 
 jobs:
   build:
@@ -8,7 +15,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@master
-    
+
     - name: Install PHP
       uses: shivammathur/setup-php@master
       with:
@@ -21,6 +28,9 @@ jobs:
 
         # Install app deps
         composer install --no-interaction --prefer-dist
+
+    - name: The PHP Security Checker
+      uses: symfonycorp/security-checker-action@v2
 
     # Check code checker and coding standards
     - name: Check coding standards
