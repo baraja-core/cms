@@ -150,7 +150,7 @@ Vue.component('user-default', {
 					</td>
 				</tr>
 			</table>
-			<b-pagination 
+			<b-pagination
 				v-model="paginator.page" 
 				:per-page="paginator.itemsPerPage" 
 				@change="sync()"
