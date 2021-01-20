@@ -83,8 +83,8 @@ final class Settings
 				->renderToString(__DIR__ . '/../../template/install-basic.latte', [
 					'basePath' => Url::get()->getBaseUrl(),
 					'locale' => $this->localization->getLocale(),
-					'isLocalhost' => $url === null || strpos($url, 'localhost') !== false,
-					'isBarajaCz' => $url !== null && strpos($url, 'baraja.cz') !== false,
+					'isLocalhost' => strpos($url, 'localhost') !== false,
+					'isBarajaCz' => strpos($url, 'baraja.cz') !== false,
 				]);
 		}
 
