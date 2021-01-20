@@ -17,6 +17,7 @@
 		"baraja-core/plugin-system": "^1.2",
 		"baraja-core/localization": "^1.0",
 		"baraja-core/baraja-cloud": "^1.0",
+		"baraja-core/url": "^1.0",
 		"nette/di": "^3.0",
 		"latte/latte": "^2.5",
 		"nette/security": "^3.1",

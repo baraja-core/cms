@@ -12,7 +12,7 @@ use Baraja\Cms\User\Entity\User;
 use Baraja\Doctrine\EntityManager;
 use Baraja\DynamicConfiguration\Configuration;
 use Baraja\StructuredApi\BaseEndpoint;
-use Nette\Http\Url;
+use Baraja\Url\Url;
 use Nette\Utils\Strings;
 use Nette\Utils\Validators;
 
@@ -117,8 +117,7 @@ final class CmsInstallEndpoint extends BaseEndpoint
 			$this->sendError('Zadejte vaše reálné jméno, které musí existovat.');
 		}
 
-		$url = new Url(Helpers::getCurrentUrl());
-		$response = (array) json_decode(@file_get_contents(CloudManager::ENDPOINT_URL . '/cloud-status/create-account?domain=' . urlencode($url->getDomain(3)) . '&email=' . urlencode($email) . '&password=' . urlencode($password) . '&firstName=' . urlencode($firstName) . '&lastName=' . urlencode($lastName) . ($phone ? '&phone=' . urlencode($phone) : '')) ?: '{}', true);
+		$response = (array) json_decode(@file_get_contents(CloudManager::ENDPOINT_URL . '/cloud-status/create-account?domain=' . urlencode(Url::get()->getNetteUrl()->getDomain(3)) . '&email=' . urlencode($email) . '&password=' . urlencode($password) . '&firstName=' . urlencode($firstName) . '&lastName=' . urlencode($lastName) . ($phone ? '&phone=' . urlencode($phone) : '')) ?: '{}', true);
 		if (isset($response['token']) === false) {
 			$this->sendError($response['message'] ?? 'Account with given e-mail or password does not exist.');
 		}
@@ -141,8 +140,7 @@ final class CmsInstallEndpoint extends BaseEndpoint
 			$this->sendError('E-mail nemá správný formát.');
 		}
 
-		$url = new Url(Helpers::getCurrentUrl());
-		$response = (array) json_decode(@file_get_contents(CloudManager::ENDPOINT_URL . '/cloud-status/token-by-user?domain=' . urlencode($url->getDomain(3)) . '&email=' . urlencode($email) . '&password=' . urlencode($password)) ?: '{}', true);
+		$response = (array) json_decode(@file_get_contents(CloudManager::ENDPOINT_URL . '/cloud-status/token-by-user?domain=' . urlencode(Url::get()->getNetteUrl()->getDomain(3)) . '&email=' . urlencode($email) . '&password=' . urlencode($password)) ?: '{}', true);
 		if (isset($response['token']) === false) {
 			$this->sendError($response['message'] ?? 'Account with given e-mail or password does not exist.');
 		}

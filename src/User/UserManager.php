@@ -13,6 +13,7 @@ use Baraja\Cms\User\Entity\UserLogin;
 use Baraja\Cms\User\Entity\UserLoginAttempt;
 use Baraja\Cms\User\Entity\UserMeta;
 use Baraja\Doctrine\EntityManager;
+use Baraja\Url\Url;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Nette\Security\AuthenticationException;
@@ -99,7 +100,7 @@ final class UserManager implements Authenticator
 		}
 
 		$attempt = new UserLoginAttempt(null, $username);
-		$attempt->setLoginUrl(Helpers::getCurrentUrl());
+		$attempt->setLoginUrl(Url::get()->getCurrentUrl());
 		$this->entityManager->persist($attempt)->flush();
 
 		if ($this->authenticationService !== null) {

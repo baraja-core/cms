@@ -21,6 +21,7 @@ use Baraja\Plugin\Exception\PluginUserErrorException;
 use Baraja\Plugin\Plugin;
 use Baraja\Plugin\SimpleComponent\SimpleComponent;
 use Baraja\ServiceMethodInvoker;
+use Baraja\Url\Url;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Latte\Engine;
@@ -67,7 +68,7 @@ final class Admin
 		try {
 			if ($this->context->getSettings()->isOk() === false) { // route installation workflow
 				if ($path !== '') { // canonize configuration request to base admin URL
-					$this->redirect(Helpers::getBaseUrl() . '/admin');
+					$this->redirect(Url::get()->getBaseUrl() . '/admin');
 				}
 				$this->terminate($this->context->getSettings()->run());
 			}
@@ -134,7 +135,7 @@ final class Admin
 
 				$pluginService->afterRender();
 			} catch (PluginRedirectException $e) {
-				$this->redirect(Helpers::getBaseUrl() . '/admin' . (($path = $e->getPath()) === '' ? '' : '/' . $path));
+				$this->redirect(Url::get()->getBaseUrl() . '/admin' . (($path = $e->getPath()) === '' ? '' : '/' . $path));
 			} catch (PluginTerminateException $e) {
 				$this->terminate();
 			} catch (PluginUserErrorException $e) {
@@ -179,7 +180,7 @@ final class Admin
 			->setTempDirectory($this->cacheDir)
 			->addFilter('translate', $this->context->getTranslatorFilter())
 			->renderToString(__DIR__ . '/../template/login.latte', [
-				'basePath' => Helpers::getBaseUrl(),
+				'basePath' => Url::get()->getBaseUrl(),
 				'availableLocales' => self::SUPPORTED_LOCALES,
 				'projectName' => $this->context->getConfiguration()->get('name', 'core'),
 				'locale' => $this->getLocale(),
@@ -212,8 +213,8 @@ final class Admin
 			->setTempDirectory($this->cacheDir)
 			->addFilter('translate', $this->context->getTranslatorFilter())
 			->renderToString(__DIR__ . '/../template/reset-password.latte', [
-				'basePath' => Helpers::getBaseUrl(),
-				'loginUrl' => Helpers::getBaseUrl() . '/admin',
+				'basePath' => Url::get()->getBaseUrl(),
+				'loginUrl' => Url::get()->getBaseUrl() . '/admin',
 				'locale' => $this->getLocale(),
 				'username' => $request->getUser()->getUsername(),
 				'token' => $request->getToken(),
@@ -243,8 +244,8 @@ final class Admin
 			->setTempDirectory($this->cacheDir)
 			->addFilter('translate', $this->context->getTranslatorFilter())
 			->renderToString(__DIR__ . '/../template/set-user-password.latte', [
-				'basePath' => Helpers::getBaseUrl(),
-				'loginUrl' => Helpers::getBaseUrl() . '/admin',
+				'basePath' => Url::get()->getBaseUrl(),
+				'loginUrl' => Url::get()->getBaseUrl() . '/admin',
 				'locale' => $this->getLocale(),
 				'userId' => $user->getId(),
 				'username' => $user->getUsername(),
@@ -260,7 +261,7 @@ final class Admin
 		ob_start(static function () {
 		});
 		$isDebug = (string) ($_GET['debugMode'] ?? '') === '1';
-		$basePath = $baseUrl = Helpers::getBaseUrl();
+		$basePath = $baseUrl = Url::get()->getBaseUrl();
 		$assetsPath = 'admin-assets/web-loader/' . $this->context->getPluginNameByType($plugin) . '.js';
 		$content = $this->renderContentCode($plugin, $components);
 		$menu = [
@@ -367,7 +368,7 @@ final class Admin
 	</div>
 	<p>To visit this page, you must first verify through 2-step verification.</p>
 	<p class="text-secondary">That’s all we know.</p>
-	<p><a href="' . Helpers::getBaseUrl() . '/admin/cms/sign-out" class="btn btn-primary">Sign out</a></p>
+	<p><a href="' . Url::get()->getBaseUrl() . '/admin/cms/sign-out" class="btn btn-primary">Sign out</a></p>
 </div>';
 	}
 
@@ -382,7 +383,7 @@ final class Admin
 	</div>
 	<p>Open this page is not permitted for your account.</p>
 	<p class="text-secondary">That’s all we know.</p>
-	<p><a href="' . Helpers::getBaseUrl() . '/admin/cms/sign-out" class="btn btn-primary">Sign out</a></p>
+	<p><a href="' . Url::get()->getBaseUrl() . '/admin/cms/sign-out" class="btn btn-primary">Sign out</a></p>
 </div>';
 	}
 
