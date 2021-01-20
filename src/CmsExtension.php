@@ -242,6 +242,9 @@ final class CmsExtension extends CompilerExtension
 			'translate', '@' . TranslatorFilter::class,
 		]);
 
+		if (PHP_SAPI === 'cli') {
+			return;
+		}
 		$class->getMethod('initialize')->addBody(
 			'// admin (cms).' . "\n"
 			. '(function () {' . "\n"
