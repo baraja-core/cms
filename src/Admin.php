@@ -78,6 +78,9 @@ final class Admin
 			if (strncmp($path, 'set-user-password', 17) === 0) { // route reset password form
 				$this->terminate($this->renderSetUserPasswordTemplate($_GET['userId'] ?? ''));
 			}
+			if (strncmp($path, 'cms-web-loader', 14) === 0) { // route dynamic assets
+				(new Proxy($this->context->getPluginManager()))->run($path);
+			}
 			if (($assetType = ($path === 'assets/core.js') ? 'js' : null) || ($assetType = ($path === 'assets/core.css') ? 'css' : null)) { // route static assets from template directory
 				header('Content-Type: ' . Proxy::CONTENT_TYPES[$assetType]);
 				$assetContent = file_get_contents(__DIR__ . '/../template/assets/core.' . $assetType)
@@ -262,7 +265,7 @@ final class Admin
 		});
 		$isDebug = (string) ($_GET['debugMode'] ?? '') === '1';
 		$basePath = $baseUrl = Url::get()->getBaseUrl();
-		$assetsPath = 'admin-assets/web-loader/' . $this->context->getPluginNameByType($plugin) . '.js';
+		$assetsPath = 'admin/cms-web-loader/' . $this->context->getPluginNameByType($plugin) . '.js';
 		$content = $this->renderContentCode($plugin, $components);
 		$menu = [
 			'dashboardLink' => $baseUrl . '/admin',
