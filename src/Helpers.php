@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Baraja\Cms;
 
 
+use Baraja\Url\Url;
 use Latte\Engine;
 use Nette\Http\Request;
 use Nette\Utils\Strings;
@@ -26,7 +27,7 @@ final class Helpers
 	 */
 	public static function processPath(Request $httpRequest): string
 	{
-		return trim(str_replace(rtrim($httpRequest->getUrl()->withoutUserInfo()->getBaseUrl(), '/'), '', (string) self::getCurrentUrl()), '/');
+		return trim(str_replace(rtrim($httpRequest->getUrl()->withoutUserInfo()->getBaseUrl(), '/'), '', Url::get()->getCurrentUrl()), '/');
 	}
 
 
@@ -185,43 +186,6 @@ final class Helpers
 	}
 
 
-	/**
-	 * Return current absolute URL.
-	 * Return null, if current URL does not exist (for example in CLI mode).
-	 */
-	public static function getCurrentUrl(): ?string
-	{
-		if (!isset($_SERVER['REQUEST_URI'], $_SERVER['HTTP_HOST'])) {
-			return null;
-		}
-
-		return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
-			. '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-	}
-
-
-	public static function getBaseUrl(): ?string
-	{
-		static $return;
-
-		if ($return !== null) {
-			return $return;
-		}
-		if (($currentUrl = self::getCurrentUrl()) !== null) {
-			if (preg_match('/^(https?:\/\/.+)\/www\//', $currentUrl, $localUrlParser)) {
-				$return = $localUrlParser[0];
-			} elseif (preg_match('/^(https?:\/\/[^\/]+)/', $currentUrl, $publicUrlParser)) {
-				$return = $publicUrlParser[1];
-			}
-		}
-		if ($return !== null) {
-			$return = rtrim($return, '/');
-		}
-
-		return $return;
-	}
-
-
 	public static function formatPresenterNameToUri(string $name): string
 	{
 		return trim((string) preg_replace_callback('/([A-Z])/', static function (array $match): string {
@@ -306,7 +270,7 @@ final class Helpers
 	{
 		echo self::minifyHtml((new Engine)
 			->renderToString(__DIR__ . '/../template/broken-admin.latte', [
-				'basePath' => self::getBaseUrl(),
+				'basePath' => Url::get()->getBaseUrl(),
 				'exception' => $e,
 				'isDebug' => Debugger::isEnabled(),
 			]));

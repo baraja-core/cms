@@ -15,10 +15,10 @@ use Baraja\Cms\User\UserManager;
 use Baraja\Doctrine\EntityManager;
 use Baraja\Plugin\PluginManager;
 use Baraja\StructuredApi\BaseEndpoint;
+use Baraja\Url\Url;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Nette\Caching\Cache;
-use Nette\Http\Url;
 use Nette\Utils\DateTime;
 use Nette\Utils\Paginator;
 use Nette\Utils\Random;
@@ -181,11 +181,11 @@ final class UserEndpoint extends BaseEndpoint
 		$this->entityManager->flush();
 
 		$this->cloudManager->callRequest('cloud/confirm-user-registration', [
-			'domain' => (new Url(Helpers::getCurrentUrl()))->getDomain(3),
+			'domain' => Url::get()->getNetteUrl()->getDomain(3),
 			'locale' => 'cs',
 			'email' => $email,
-			'setPasswordUrl' => $password ? null : Helpers::getBaseUrl() . '/admin/set-user-password?userId=' . $user->getId(),
-			'loginUrl' => Helpers::getBaseUrl() . '/admin',
+			'setPasswordUrl' => $password ? null : Url::get()->getBaseUrl() . '/admin/set-user-password?userId=' . $user->getId(),
+			'loginUrl' => Url::get()->getBaseUrl() . '/admin',
 		], 'POST');
 
 		$this->sendOk([
@@ -433,7 +433,7 @@ final class UserEndpoint extends BaseEndpoint
 				'human' => $opCodeHuman,
 			],
 			'qrCodeUrl' => Helpers::getOtpQrUrl(
-				(new Url(Helpers::getCurrentUrl()))->getDomain(3) . ' | Baraja',
+				Url::get()->getNetteUrl()->getDomain(3) . ' | Baraja',
 				$user->getUsername(),
 				$otpCode
 			),
@@ -671,7 +671,7 @@ final class UserEndpoint extends BaseEndpoint
 		}
 
 		$this->sendOk([
-			'redirectUrl' => Helpers::getBaseUrl(),
+			'redirectUrl' => Url::get()->getBaseUrl(),
 		]);
 	}
 

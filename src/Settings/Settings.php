@@ -10,6 +10,7 @@ use Baraja\Doctrine\EntityManager;
 use Baraja\DoctrineConfiguration\Option;
 use Baraja\DynamicConfiguration\Configuration;
 use Baraja\Localization\Localization;
+use Baraja\Url\Url;
 use Latte\Engine;
 use Nette\Caching\Cache;
 use Nette\Caching\IStorage;
@@ -50,7 +51,7 @@ final class Settings
 
 	public function run(): string
 	{
-		$url = Helpers::getCurrentUrl();
+		$url = Url::get()->getCurrentUrl();
 		$databaseException = null;
 		try {
 			$dbOk = $this->isDatabaseConnectionOk();
@@ -62,7 +63,7 @@ final class Settings
 		if ($dbOk === false) {
 			return (new Engine)
 				->renderToString(__DIR__ . '/../../template/install-database.latte', [
-					'basePath' => Helpers::getBaseUrl(),
+					'basePath' => Url::get()->getBaseUrl(),
 					'locale' => $this->localization->getLocale(),
 					'isCloudHost' => (bool) preg_match('/^.+?\.ondigitalocean\.com$/', $host = $this->entityManager->getConnection()->getParams()['host'] ?? ''),
 					'host' => $host,
@@ -73,14 +74,14 @@ final class Settings
 		if ($this->isCloudConnectionOk() === false) {
 			return (new Engine)
 				->renderToString(__DIR__ . '/../../template/install-cloud-connection.latte', [
-					'basePath' => Helpers::getBaseUrl(),
+					'basePath' => Url::get()->getBaseUrl(),
 					'locale' => $this->localization->getLocale(),
 				]);
 		}
 		if ($this->isBasicConfigurationOk() === false) {
 			return (new Engine)
 				->renderToString(__DIR__ . '/../../template/install-basic.latte', [
-					'basePath' => Helpers::getBaseUrl(),
+					'basePath' => Url::get()->getBaseUrl(),
 					'locale' => $this->localization->getLocale(),
 					'isLocalhost' => $url === null || strpos($url, 'localhost') !== false,
 					'isBarajaCz' => $url !== null && strpos($url, 'baraja.cz') !== false,

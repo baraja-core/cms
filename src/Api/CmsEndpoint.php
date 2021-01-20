@@ -14,9 +14,9 @@ use Baraja\Cms\User\Entity\UserResetPasswordRequest;
 use Baraja\Cms\User\UserManager;
 use Baraja\Doctrine\EntityManager;
 use Baraja\StructuredApi\BaseEndpoint;
+use Baraja\Url\Url;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
-use Nette\Http\Url;
 use Nette\Security\AuthenticationException;
 use Tracy\Debugger;
 use Tracy\ILogger;
@@ -129,8 +129,8 @@ final class CmsEndpoint extends BaseEndpoint
 			$this->entityManager->flush();
 
 			$this->cloudManager->callRequest('cloud/forgot-password', [
-				'domain' => (new Url(Helpers::getCurrentUrl()))->getDomain(3),
-				'resetLink' => Helpers::getBaseUrl() . '/admin/reset-password?token=' . urlencode($request->getToken()),
+				'domain' => Url::get()->getNetteUrl()->getDomain(3),
+				'resetLink' => Url::get()->getBaseUrl() . '/admin/reset-password?token=' . urlencode($request->getToken()),
 				'locale' => $locale,
 				'username' => $username,
 				'email' => $user->getEmail(),
@@ -161,11 +161,11 @@ final class CmsEndpoint extends BaseEndpoint
 					->getSingleResult();
 
 				$this->cloudManager->callRequest('cloud/forgot-username', [
-					'domain' => (new Url(Helpers::getCurrentUrl()))->getDomain(3),
+					'domain' => Url::get()->getNetteUrl()->getDomain(3),
 					'locale' => $locale,
 					'username' => $user->getUsername(),
 					'email' => $user->getEmail(),
-					'loginUrl' => Helpers::getBaseUrl() . '/admin',
+					'loginUrl' => Url::get()->getBaseUrl() . '/admin',
 				]);
 			} catch (NoResultException | NonUniqueResultException $e) {
 			}
@@ -184,7 +184,7 @@ final class CmsEndpoint extends BaseEndpoint
 		}
 
 		$this->cloudManager->callRequest('cloud/report-problem', [
-			'domain' => (new Url(Helpers::getCurrentUrl()))->getDomain(3),
+			'domain' => Url::get()->getNetteUrl()->getDomain(3),
 			'locale' => $locale,
 			'adminEmail' => $adminEmail,
 			'description' => $description,
@@ -219,7 +219,7 @@ final class CmsEndpoint extends BaseEndpoint
 			$this->entityManager->flush([$request, $request->getUser()]);
 
 			$this->cloudManager->callRequest('cloud/forgot-password-has-been-changed', [
-				'domain' => (new Url(Helpers::getCurrentUrl()))->getDomain(3),
+				'domain' => Url::get()->getNetteUrl()->getDomain(3),
 				'locale' => $locale,
 				'username' => $request->getUser()->getUsername(),
 				'email' => $request->getUser()->getEmail(),
