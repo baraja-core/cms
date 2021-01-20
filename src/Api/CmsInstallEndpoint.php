@@ -6,7 +6,6 @@ namespace Baraja\Cms\Api;
 
 
 use Baraja\BarajaCloud\CloudManager;
-use Baraja\Cms\Helpers;
 use Baraja\Cms\Settings;
 use Baraja\Cms\User\Entity\User;
 use Baraja\Doctrine\EntityManager;
