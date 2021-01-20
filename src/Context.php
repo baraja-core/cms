@@ -65,6 +65,12 @@ final class Context
 	}
 
 
+	public function getPluginManager(): PluginManager
+	{
+		return $this->pluginManager;
+	}
+
+
 	public function getPluginByName(string $name): Plugin
 	{
 		return $this->pluginManager->getPluginByName($name);

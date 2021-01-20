@@ -10,7 +10,6 @@ use Baraja\Cms\Plugin\CommonSettingsPlugin;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Plugin\HomepagePlugin;
 use Baraja\Cms\Plugin\UserPlugin;
-use Baraja\Cms\Proxy\Proxy;
 use Baraja\Cms\Support\Support;
 use Baraja\Cms\Translator\TranslatorFilter;
 use Baraja\Cms\User\UserManager;
@@ -70,10 +69,6 @@ final class CmsExtension extends CompilerExtension
 		} catch (MissingServiceException $e) {
 			throw new \RuntimeException('Can not compile CMS extension, because service "' . \Baraja\Plugin\Context::class . '" (from package baraja-core/plugin-system) does not exist. Did you register Plugin system extension before CMS?', $e->getCode(), $e);
 		}
-
-		// proxy
-		$builder->addDefinition($this->prefix('proxy'))
-			->setFactory(Proxy::class);
 
 		// admin
 		$builder->addDefinition($this->prefix('admin'))
@@ -227,9 +222,6 @@ final class CmsExtension extends CompilerExtension
 	{
 		$builder = $this->getContainerBuilder();
 
-		/** @var ServiceDefinition $proxy */
-		$proxy = $builder->getDefinitionByType(Proxy::class);
-
 		/** @var ServiceDefinition $application */
 		$application = $builder->getDefinitionByType(Application::class);
 
@@ -248,13 +240,6 @@ final class CmsExtension extends CompilerExtension
 		$class->getMethod('initialize')->addBody(
 			'// admin (cms).' . "\n"
 			. '(function () {' . "\n"
-			. "\t" . '// Assets' . "\n"
-			. "\t" . 'if (strncmp($assetLoader = ' . Helpers::class . '::processPath($this->getService(\'http.request\')), \'admin-assets/web-loader/\', 24) === 0) {' . "\n"
-			. "\t\t" . '$this->getByType(' . Application::class . '::class)->onStartup[] = function(' . Application::class . ' $a) use ($assetLoader): void {' . "\n"
-			. "\t\t\t" . '$this->getService(?)->run($assetLoader);' . "\n"
-			. "\t\t" . '};' . "\n"
-			. "\t" . '}' . "\n"
-			. "\t" . '// Run admin' . "\n"
 			. "\t" . 'if (preg_match(?, $this->getService(\'http.request\')->getUrl()->getRelativeUrl(), $parser)) {' . "\n"
 			. "\t\t" . '$this->getService(?)->onStartup[] = function(' . Application::class . ' $a) use ($parser): void {' . "\n"
 			. "\t\t\t" . 'try {' . "\n"
@@ -265,7 +250,6 @@ final class CmsExtension extends CompilerExtension
 			. "\t\t" . '};' . "\n"
 			. "\t" . '}' . "\n"
 			. '})();', [
-				$proxy->getName(),
 				'/^admin(?:\/+(?<locale>' . implode('|', Admin::SUPPORTED_LOCALES) . '))?(?<path>\/.*|\?.*|)$/',
 				$application->getName(),
 				$admin->getName(),
