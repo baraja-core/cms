@@ -6,6 +6,7 @@ namespace Baraja\Cms;
 
 
 use Baraja\AdminBar\BasicPanel;
+use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManagerAccessor;
 use Baraja\Cms\Translator\TranslatorFilter;
 use Baraja\Cms\User\UserManagerAccessor;
 use Baraja\Doctrine\EntityManager;
@@ -44,11 +45,13 @@ final class Context
 
 	private UserManagerAccessor $userManager;
 
+	private CustomGlobalAssetManagerAccessor $customGlobalAssetManager;
+
 	/** @var string[] (type => path) */
 	private array $customAssets = [];
 
 
-	public function __construct(Request $request, Response $response, Localization $localization, EntityManager $entityManager, Configuration $configuration, Settings $settings, User $user, TranslatorFilter $translatorFilter, BasicPanel $basicInformation, PluginManager $pluginManager, MenuAuthorizatorAccessor $authorizator, UserManagerAccessor $userManager)
+	public function __construct(Request $request, Response $response, Localization $localization, EntityManager $entityManager, Configuration $configuration, Settings $settings, User $user, TranslatorFilter $translatorFilter, BasicPanel $basicInformation, PluginManager $pluginManager, MenuAuthorizatorAccessor $authorizator, UserManagerAccessor $userManager, CustomGlobalAssetManagerAccessor $customGlobalAssetManager)
 	{
 		$this->request = $request;
 		$this->response = $response;
@@ -62,6 +65,7 @@ final class Context
 		$this->pluginManager = $pluginManager;
 		$this->authorizator = $authorizator;
 		$this->userManager = $userManager;
+		$this->customGlobalAssetManager = $customGlobalAssetManager;
 	}
 
 
@@ -190,6 +194,15 @@ final class Context
 	public function getCustomAssetPath(string $type): ?string
 	{
 		return $this->customAssets[$type] ?? null;
+	}
+
+
+	/**
+	 * @return string[] (path => format)
+	 */
+	public function getCustomGlobalAssetPaths(): array
+	{
+		return $this->customGlobalAssetManager->get()->toArray();
 	}
 
 

@@ -266,6 +266,7 @@ final class Admin
 		$isDebug = (string) ($_GET['debugMode'] ?? '') === '1';
 		$basePath = $baseUrl = Url::get()->getBaseUrl();
 		$assetsPath = 'admin/cms-web-loader/' . $this->context->getPluginNameByType($plugin) . '.js';
+		$customAssetPaths = $this->context->getCustomGlobalAssetPaths();
 		$content = $this->renderContentCode($plugin, $components);
 		$menu = [
 			'dashboardLink' => $baseUrl . '/admin',

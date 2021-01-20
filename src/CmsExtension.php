@@ -10,6 +10,8 @@ use Baraja\Cms\Plugin\CommonSettingsPlugin;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Plugin\HomepagePlugin;
 use Baraja\Cms\Plugin\UserPlugin;
+use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManager;
+use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManagerAccessor;
 use Baraja\Cms\Support\Support;
 use Baraja\Cms\Translator\TranslatorFilter;
 use Baraja\Cms\User\UserManager;
@@ -115,6 +117,13 @@ final class CmsExtension extends CompilerExtension
 
 		$builder->addAccessorDefinition($this->prefix('menuAuthorizatorAccessor'))
 			->setImplement(MenuAuthorizatorAccessor::class);
+
+		// global asset manager
+		$builder->addDefinition($this->prefix('customGlobalAssetManager'))
+			->setFactory(CustomGlobalAssetManager::class);
+
+		$builder->addAccessorDefinition($this->prefix('customGlobalAssetManagerAccessor'))
+			->setImplement(CustomGlobalAssetManagerAccessor::class);
 
 		// user
 		$builder->addDefinition($this->prefix('userManager'))
