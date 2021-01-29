@@ -29,8 +29,12 @@ final class CmsInstallEndpoint extends BaseEndpoint
 	private Settings $settings;
 
 
-	public function __construct(EntityManager $entityManager, Configuration $configuration, CloudManager $cloudManager, Settings $settings)
-	{
+	public function __construct(
+		EntityManager $entityManager,
+		Configuration $configuration,
+		CloudManager $cloudManager,
+		Settings $settings
+	) {
 		$this->entityManager = $entityManager;
 		$this->configuration = $configuration;
 		$this->cloudManager = $cloudManager;
@@ -38,8 +42,16 @@ final class CmsInstallEndpoint extends BaseEndpoint
 	}
 
 
-	public function postBasic(string $name, string $username, string $firstName, string $lastName, string $mail, string $password, string $passwordVerify, bool $vop = false): void
-	{
+	public function postBasic(
+		string $name,
+		string $username,
+		string $firstName,
+		string $lastName,
+		string $mail,
+		string $password,
+		string $passwordVerify,
+		bool $vop = false
+	): void {
 		if ($this->settings->isBasicConfigurationOk() === true) {
 			$this->sendError('Unauthorized request.');
 		}
@@ -101,8 +113,13 @@ final class CmsInstallEndpoint extends BaseEndpoint
 	}
 
 
-	public function postCloudCreateAccount(string $email, string $password, string $firstName, string $lastName, ?string $phone = null): void
-	{
+	public function postCloudCreateAccount(
+		string $email,
+		string $password,
+		string $firstName,
+		string $lastName,
+		?string $phone = null
+	): void {
 		if ($this->settings->isCloudConnectionOk() === true) {
 			$this->sendError('Unauthorized request.');
 		}

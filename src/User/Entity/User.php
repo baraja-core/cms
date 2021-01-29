@@ -136,7 +136,9 @@ class User implements CmsUser
 	public function __construct(string $username, string $password, string $email, string $role = CmsUser::ROLE_USER)
 	{
 		$this->username = trim(Strings::lower($username));
-		$this->password = $password ? (new Passwords)->hash($password) : '---empty-password---';
+		$this->password = $password
+			? (new Passwords)->hash($password)
+			: '---empty-password---';
 		$this->setEmail($email);
 		$this->addRole(trim($role));
 		$this->registerIp = Helpers::userIp();

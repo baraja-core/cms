@@ -29,8 +29,13 @@ final class Settings
 	private CloudManager $cloudManager;
 
 
-	public function __construct(IStorage $storage, EntityManager $entityManager, Localization $localization, Configuration $configuration, CloudManager $cloudManager)
-	{
+	public function __construct(
+		IStorage $storage,
+		EntityManager $entityManager,
+		Localization $localization,
+		Configuration $configuration,
+		CloudManager $cloudManager
+	) {
 		$this->cache = new Cache($storage, 'cms-settings');
 		$this->entityManager = $entityManager;
 		$this->localization = $localization;
@@ -130,7 +135,7 @@ final class Settings
 				->createQueryBuilder('option')
 				->select('COUNT(option.id)')
 				->getQuery()
-				->getSingleScalarResult()
+				->getSingleScalarResult(),
 		);
 
 		if ($status === true) {

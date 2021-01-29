@@ -25,8 +25,12 @@ final class CmsSettingsEndpoint extends BaseEndpoint
 	private EntityManager $entityManager;
 
 
-	public function __construct(Settings $settings, Configuration $configuration, CloudManager $cloudManager, EntityManager $entityManager)
-	{
+	public function __construct(
+		Settings $settings,
+		Configuration $configuration,
+		CloudManager $cloudManager,
+		EntityManager $entityManager
+	) {
 		$this->settings = $settings;
 		$this->configuration = $configuration;
 		$this->cloudManager = $cloudManager;

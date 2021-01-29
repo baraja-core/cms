@@ -13,11 +13,10 @@ use Tracy\Debugger;
 
 final class Helpers
 {
-
 	/** @throws \Error */
 	public function __construct()
 	{
-		throw new \Error('Class ' . get_class($this) . ' is static and cannot be instantiated.');
+		throw new \Error('Class ' . static::class . ' is static and cannot be instantiated.');
 	}
 
 
@@ -35,9 +34,7 @@ final class Helpers
 	{
 		$return = 'action' . str_replace('.', '', Strings::firstUpper($signal));
 
-		$return = (string) preg_replace_callback('/-([a-z])/', static function (array $match): string {
-			return mb_strtoupper($match[1], 'UTF-8');
-		}, $return);
+		$return = (string) preg_replace_callback('/-([a-z])/', static fn (array $match): string => mb_strtoupper($match[1], 'UTF-8'), $return);
 
 		return $return;
 	}
@@ -97,7 +94,7 @@ final class Helpers
 			. urlencode(
 				'otpauth://totp/' . rawurlencode($issuer)
 				. ':' . $user . '?secret=' . self::otpBase32Encode($secret)
-				. '&issuer=' . rawurlencode($issuer)
+				. '&issuer=' . rawurlencode($issuer),
 			);
 	}
 
@@ -122,9 +119,7 @@ final class Helpers
 
 	public static function checkAuthenticatorOtpCodeManually(string $otpCode, int $code): bool
 	{
-		$checker = static function (int $timeSlot) use ($otpCode, $code): bool {
-			return self::getOtp($otpCode, (string) $timeSlot) === $code;
-		};
+		$checker = static fn (int $timeSlot): bool => self::getOtp($otpCode, (string) $timeSlot) === $code;
 
 		return $checker($slot = (int) floor(time() / 30)) || $checker($slot - 1) || $checker($slot + 1);
 	}
@@ -188,9 +183,7 @@ final class Helpers
 
 	public static function formatPresenterNameToUri(string $name): string
 	{
-		return trim((string) preg_replace_callback('/([A-Z])/', static function (array $match): string {
-			return '-' . mb_strtolower($match[1], 'UTF-8');
-		}, $name), '-');
+		return trim((string) preg_replace_callback('/([A-Z])/', static fn (array $match): string => '-' . mb_strtolower($match[1], 'UTF-8'), $name), '-');
 	}
 
 
@@ -213,9 +206,7 @@ final class Helpers
 	 */
 	public static function formatPresenter(string $haystack): string
 	{
-		return (string) preg_replace_callback('/-([a-z])/', static function (array $match): string {
-			return mb_strtoupper($match[1], 'UTF-8');
-		}, $haystack);
+		return (string) preg_replace_callback('/-([a-z])/', static fn (array $match): string => mb_strtoupper($match[1], 'UTF-8'), $haystack);
 	}
 
 
@@ -255,14 +246,12 @@ final class Helpers
 		$return = (string) preg_replace_callback(
 			'#[ \t\r\n]+|<(/)?(textarea|pre)(?=\W)#i',
 			fn (array $match): string => empty($match[2]) ? ' ' : $match[0],
-			$haystack
+			$haystack,
 		);
 		$return = (string) preg_replace('/(\w|;)\s+({|})\s+(\w|\.|#)/', '$1$2$3', $return);
 		$return = str_replace(';}', '}', $return);
 		$return = (string) preg_replace('/(\w)\s*:\s+(\w|#|-|.)/', '$1:$2', $return);
-		$return = (string) preg_replace('/\s*\/\*+[^\*]+\*+\/\s*/', '', $return);
-
-		return $return;
+		return (string) preg_replace('/\s*\/\*+[^\*]+\*+\/\s*/', '', $return);
 	}
 
 

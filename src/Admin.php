@@ -52,8 +52,13 @@ final class Admin
 	private ?string $locale;
 
 
-	public function __construct(string $cacheDir, Context $context, LinkGenerator $linkGenerator, MenuManager $menuManager, CmsPluginPanel $panel)
-	{
+	public function __construct(
+		string $cacheDir,
+		Context $context,
+		LinkGenerator $linkGenerator,
+		MenuManager $menuManager,
+		CmsPluginPanel $panel
+	) {
 		$this->cacheDir = $cacheDir;
 		$this->context = $context;
 		$this->linkGenerator = $linkGenerator;
@@ -81,7 +86,10 @@ final class Admin
 			if (strncmp($path, 'cms-web-loader', 14) === 0) { // route dynamic assets
 				(new Proxy($this->context->getPluginManager()))->run($path);
 			}
-			if (($assetType = ($path === 'assets/core.js') ? 'js' : null) || ($assetType = ($path === 'assets/core.css') ? 'css' : null)) { // route static assets from template directory
+			if (
+				($assetType = $path === 'assets/core.js' ? 'js' : null)
+				|| ($assetType = $path === 'assets/core.css' ? 'css' : null)
+			) { // route static assets from template directory
 				header('Content-Type: ' . Proxy::CONTENT_TYPES[$assetType]);
 				$assetContent = file_get_contents(__DIR__ . '/../template/assets/core.' . $assetType)
 					. (($customAssetPath = $this->context->getCustomAssetPath($assetType)) !== null ? "\n\n" . file_get_contents($customAssetPath) : '');
@@ -96,7 +104,10 @@ final class Admin
 					. $assetContent;
 				die;
 			}
-			if (strncmp($path, 'cms/', 4) !== 0 && $this->context->getUser()->isLoggedIn() === false) { // route login form
+			if (
+				strncmp($path, 'cms/', 4) !== 0
+				&& $this->context->getUser()->isLoggedIn() === false
+			) { // route login form
 				if ($this->context->getUser()->getId() !== null) {
 					$this->terminate($this->renderNeedOtpAuth());
 				}

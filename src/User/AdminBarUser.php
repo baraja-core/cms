@@ -33,7 +33,7 @@ final class AdminBarUser implements User
 				$name = 'Admin';
 			}
 		} elseif (method_exists($this->identity, 'getName')) {
-			$name = ((string) $this->identity->getName()) ?: null;
+			$name = (string) $this->identity->getName() ?: null;
 		}
 
 		return $name ? Shorts::process($name, 16) : null;

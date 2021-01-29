@@ -273,8 +273,12 @@ final class UserManager implements Authenticator
 	/**
 	 * @throws AuthenticationException
 	 */
-	private function fallbackAuthenticate(UserLoginAttempt $attempt, string $username, string $password, string $expiration): IIdentity
-	{
+	private function fallbackAuthenticate(
+		UserLoginAttempt $attempt,
+		string $username,
+		string $password,
+		string $expiration
+	): IIdentity {
 		try {
 			$user = $this->getUserByUsername($username);
 		} catch (NoResultException | NonUniqueResultException $e) {
