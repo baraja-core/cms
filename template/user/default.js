@@ -151,8 +151,8 @@ Vue.component('user-default', {
 				</tr>
 			</table>
 			<b-pagination
-				v-model="paginator.page" 
-				:per-page="paginator.itemsPerPage" 
+				v-model="paginator.page"
+				:per-page="paginator.itemsPerPage"
 				@change="sync()"
 				:total-rows="paginator.itemCount" align="right" size="sm" class="mb-0">
 			</b-pagination>
@@ -252,7 +252,6 @@ Vue.component('user-default', {
 					active: (this.search.status.label === "" || this.search.status.label === "null") ? null : this.search.status.label,
 					page: this.paginator.page
 				};
-
 				axiosApi.get('user?' + httpBuildQuery(query)).then(req => {
 					let data = req.data;
 					this.user.items = data.list;
@@ -269,7 +268,6 @@ Vue.component('user-default', {
 		createUser() {
 			let valid = this.$refs.form.checkValidity();
 			if (!valid) this.$refs.form.classList.add('was-validated');
-
 			if (valid) {
 				this.isUserCreating = true;
 				axiosApi.post('user', this.user.form).then((req) => {
