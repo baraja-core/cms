@@ -251,6 +251,18 @@ class User implements CmsUser
 	}
 
 
+	public function getNick(): ?string
+	{
+		return $this->nick;
+	}
+
+
+	public function setNick(?string $nick): void
+	{
+		$this->nick = $nick;
+	}
+
+
 	public function getPassword(): string
 	{
 		return $this->password;

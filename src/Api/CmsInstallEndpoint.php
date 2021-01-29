@@ -85,7 +85,7 @@ final class CmsInstallEndpoint extends BaseEndpoint
 		}
 		if (Strings::length($password) < 6) {
 			$errors[] = 'Heslo musí mít aspoň 6 znaků.';
-		} elseif (Strings::length($password) > 2048) {
+		} elseif (Strings::length($password) > 2_048) {
 			$errors[] = 'Maximální délka hesla je 2048 znaků.';
 		}
 		if ($password !== $passwordVerify && Strings::length($password) >= 1) {
