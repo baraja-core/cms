@@ -36,7 +36,6 @@ use Tracy\ILogger;
 
 final class CmsExtension extends CompilerExtension
 {
-
 	/**
 	 * @return string[]
 	 */
@@ -258,11 +257,12 @@ final class CmsExtension extends CompilerExtension
 			. "\t\t\t" . '}' . "\n"
 			. "\t\t" . '};' . "\n"
 			. "\t" . '}' . "\n"
-			. '})();', [
+			. '})();',
+			[
 				'/^admin(?:\/+(?<locale>' . implode('|', Admin::SUPPORTED_LOCALES) . '))?(?<path>\/.*|\?.*|)$/',
 				$application->getName(),
 				$admin->getName(),
-			]
+			],
 		);
 	}
 }

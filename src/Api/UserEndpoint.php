@@ -38,8 +38,12 @@ final class UserEndpoint extends BaseEndpoint
 	private PluginManager $pluginManager;
 
 
-	public function __construct(UserManager $userManager, EntityManager $entityManager, CloudManager $cloudManager, PluginManager $pluginManager)
-	{
+	public function __construct(
+		UserManager $userManager,
+		EntityManager $entityManager,
+		CloudManager $cloudManager,
+		PluginManager $pluginManager
+	) {
 		$this->userManager = $userManager;
 		$this->entityManager = $entityManager;
 		$this->cloudManager = $cloudManager;
@@ -52,8 +56,13 @@ final class UserEndpoint extends BaseEndpoint
 	 *
 	 * @param string|null $active String 'active' => show only active users, 'deleted' => show only deleted users, null => all users
 	 */
-	public function actionDefault(int $page = 1, int $limit = 32, ?string $role = null, ?string $query = null, ?string $active = null): void
-	{
+	public function actionDefault(
+		int $page = 1,
+		int $limit = 32,
+		?string $role = null,
+		?string $query = null,
+		?string $active = null
+	): void {
 		$currentUserId = $this->getUser()->getId();
 		/** @var CmsUser $currentUser */
 		$currentUser = $this->entityManager->getRepository($this->userManager->getDefaultEntity())->find($currentUserId);
@@ -134,12 +143,8 @@ final class UserEndpoint extends BaseEndpoint
 			'currentUserId' => $currentUserId,
 			'statusCount' => [
 				'all' => \count($allUsers = $this->getAllUsers()),
-				'active' => \count(array_filter($allUsers, static function (array $item): bool {
-					return $item['active'] === true;
-				})),
-				'deleted' => \count(array_filter($allUsers, static function (array $item): bool {
-					return $item['active'] === false;
-				})),
+				'active' => \count(array_filter($allUsers, static fn (array $item): bool => $item['active'] === true)),
+				'deleted' => \count(array_filter($allUsers, static fn (array $item): bool => $item['active'] === false)),
 			],
 			'paginator' => (new Paginator)
 				->setItemCount(\count($allUsers))
@@ -149,8 +154,13 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function createDefault(string $fullName, string $email, string $role, ?string $phone = null, ?string $password = null): void
-	{
+	public function createDefault(
+		string $fullName,
+		string $email,
+		string $role,
+		?string $phone = null,
+		?string $password = null
+	): void {
 		if ($this->userExist($email) === true) {
 			$this->sendError('User "' . $email . '" already exist.');
 		}
@@ -435,7 +445,7 @@ final class UserEndpoint extends BaseEndpoint
 			'qrCodeUrl' => Helpers::getOtpQrUrl(
 				Url::get()->getNetteUrl()->getDomain(3) . ' | Baraja',
 				$user->getUsername(),
-				$otpCode
+				$otpCode,
 			),
 		]);
 	}

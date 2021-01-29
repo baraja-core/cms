@@ -51,8 +51,21 @@ final class Context
 	private array $customAssets = [];
 
 
-	public function __construct(Request $request, Response $response, Localization $localization, EntityManager $entityManager, Configuration $configuration, Settings $settings, User $user, TranslatorFilter $translatorFilter, BasicPanel $basicInformation, PluginManager $pluginManager, MenuAuthorizatorAccessor $authorizator, UserManagerAccessor $userManager, CustomGlobalAssetManagerAccessor $customGlobalAssetManager)
-	{
+	public function __construct(
+		Request $request,
+		Response $response,
+		Localization $localization,
+		EntityManager $entityManager,
+		Configuration $configuration,
+		Settings $settings,
+		User $user,
+		TranslatorFilter $translatorFilter,
+		BasicPanel $basicInformation,
+		PluginManager $pluginManager,
+		MenuAuthorizatorAccessor $authorizator,
+		UserManagerAccessor $userManager,
+		CustomGlobalAssetManagerAccessor $customGlobalAssetManager
+	) {
 		$this->request = $request;
 		$this->response = $response;
 		$this->localization = $localization->setContextLocale($localization->getDefaultLocale());

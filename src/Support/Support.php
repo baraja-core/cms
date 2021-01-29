@@ -46,8 +46,13 @@ final class Support
 	}
 
 
-	public function createIssue(string $subject, string $message, string $priority, ?\DateTime $dueDate = null, ?string $url = null): void
-	{
+	public function createIssue(
+		string $subject,
+		string $message,
+		string $priority,
+		?\DateTime $dueDate = null,
+		?string $url = null
+	): void {
 		$this->cloudManager->callRequest('cms-issue', [
 			'domain' => $this->getDomain(),
 			'subject' => $subject,

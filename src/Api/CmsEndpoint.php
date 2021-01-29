@@ -35,8 +35,12 @@ final class CmsEndpoint extends BaseEndpoint
 	private EntityManager $entityManager;
 
 
-	public function __construct(UserManager $userManager, CloudManager $cloudManager, Settings $settings, EntityManager $entityManager)
-	{
+	public function __construct(
+		UserManager $userManager,
+		CloudManager $cloudManager,
+		Settings $settings,
+		EntityManager $entityManager
+	) {
 		$this->userManager = $userManager;
 		$this->cloudManager = $cloudManager;
 		$this->settings = $settings;
@@ -75,8 +79,13 @@ final class CmsEndpoint extends BaseEndpoint
 	}
 
 
-	public function postCheckOauthCode(string $locale, string $code, string $username, string $password, bool $remember = false): void
-	{
+	public function postCheckOauthCode(
+		string $locale,
+		string $code,
+		string $username,
+		string $password,
+		bool $remember = false
+	): void {
 		if (($userEntity = $this->getUserEntity()) === null) {
 			$this->sendError('User is not logged in.');
 

@@ -40,8 +40,13 @@ final class InternalSupportEndpoint extends BaseEndpoint
 	}
 
 
-	public function createIssue(string $subject, string $message, string $priority, ?string $dueDate = null, ?string $url = null): void
-	{
+	public function createIssue(
+		string $subject,
+		string $message,
+		string $priority,
+		?string $dueDate = null,
+		?string $url = null
+	): void {
 		if (isset(Support::PRIORITY_LIST[$priority]) === false) {
 			$this->sendError('Priority "' . $priority . '" does not exist. Did you mean "' . implode('", "', array_keys(Support::PRIORITY_LIST)) . '"?');
 		}
@@ -61,7 +66,7 @@ final class InternalSupportEndpoint extends BaseEndpoint
 				trim(Strings::normalize($message)),
 				$priority,
 				$dueDateReal,
-				$url
+				$url,
 			);
 		} catch (\Throwable $e) {
 			$this->sendError('Can not create new issue: ' . $e->getMessage());

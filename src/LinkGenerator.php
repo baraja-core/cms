@@ -10,7 +10,6 @@ use Baraja\Url\Url;
 
 final class LinkGenerator implements PluginLinkGenerator
 {
-
 	/**
 	 * @param mixed[] $params
 	 */
