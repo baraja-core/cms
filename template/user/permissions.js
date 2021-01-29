@@ -25,7 +25,7 @@ Vue.component('user-permissions', {
 						</td>
 						<td>
 							<span v-b-tooltip.hover :title="'Type: ' + plugin.type">
-								<b-icon icon="question-circle-fill" variant="info"></b-icon>	
+								<b-icon icon="question-circle-fill" variant="info"></b-icon>
 							</span>
 							<label :for="'permission-plugin-' + plugin.name" class="mb-0">
 								<span class="pointer">{{ plugin.realName }}</span>
@@ -42,7 +42,7 @@ Vue.component('user-permissions', {
 									</td>
 									<td>
 										<span v-b-tooltip.hover :title="component.name">
-											<b-icon icon="question-circle-fill" variant="info"></b-icon>	
+											<b-icon icon="question-circle-fill" variant="info"></b-icon>
 										</span>
 										<label :for="'permission-component-' + component.name" class="mb-0">
 											<span class="pointer">{{ component.tab }}</span>
