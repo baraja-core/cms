@@ -292,6 +292,7 @@ final class Admin
 			],
 		];
 
+		/** @phpstan-ignore-next-line */
 		extract($args, EXTR_OVERWRITE);
 
 		try {
