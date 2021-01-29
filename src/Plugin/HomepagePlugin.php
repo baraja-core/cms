@@ -29,6 +29,6 @@ final class HomepagePlugin extends BasePlugin
 
 	public function getPriority(): int
 	{
-		return 1000;
+		return 1_000;
 	}
 }

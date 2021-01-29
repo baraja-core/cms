@@ -7,7 +7,6 @@ namespace Baraja\Cms;
 
 use Baraja\BarajaCloud\CloudManager;
 use Baraja\Doctrine\EntityManager;
-use Baraja\DynamicConfiguration\Configuration;
 use Baraja\Localization\Domain;
 use Baraja\Localization\Locale;
 use Baraja\StructuredApi\BaseEndpoint;
@@ -18,8 +17,6 @@ final class CmsSettingsEndpoint extends BaseEndpoint
 {
 	private Settings $settings;
 
-	private Configuration $configuration;
-
 	private CloudManager $cloudManager;
 
 	private EntityManager $entityManager;
@@ -27,12 +24,10 @@ final class CmsSettingsEndpoint extends BaseEndpoint
 
 	public function __construct(
 		Settings $settings,
-		Configuration $configuration,
 		CloudManager $cloudManager,
 		EntityManager $entityManager
 	) {
 		$this->settings = $settings;
-		$this->configuration = $configuration;
 		$this->cloudManager = $cloudManager;
 		$this->entityManager = $entityManager;
 	}

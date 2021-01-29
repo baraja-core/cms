@@ -77,4 +77,10 @@ class UserResetPasswordRequest
 	{
 		$this->expired = true;
 	}
+
+
+	public function getInsertedDate(): \DateTime
+	{
+		return $this->insertedDate;
+	}
 }

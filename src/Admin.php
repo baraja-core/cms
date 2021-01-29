@@ -274,20 +274,25 @@ final class Admin
 
 		ob_start(static function () {
 		});
-		$isDebug = (string) ($_GET['debugMode'] ?? '') === '1';
-		$basePath = $baseUrl = Url::get()->getBaseUrl();
-		$assetsPath = 'admin/cms-web-loader/' . $this->context->getPluginNameByType($plugin) . '.js';
-		$customAssetPaths = $this->context->getCustomGlobalAssetPaths();
-		$content = $this->renderContentCode($plugin, $components);
-		$menu = [
-			'dashboardLink' => $baseUrl . '/admin',
-			'isDashboard' => $this->getPlugin() === 'Homepage' && $this->getView() === 'default',
-			'structure' => $this->menuManager->getItems(),
-			'activeKey' => $this->context->getPluginKey($plugin),
+
+		$args = [
+			'isDebug' => (string) ($_GET['debugMode'] ?? '') === '1',
+			'basePath' => $baseUrl = Url::get()->getBaseUrl(),
+			'assetsPath' => 'admin/cms-web-loader/' . $this->context->getPluginNameByType($plugin) . '.js',
+			'customAssetPaths' => $this->context->getCustomGlobalAssetPaths(),
+			'content' => $this->renderContentCode($plugin, $components),
+			'menu' => [
+				'dashboardLink' => $baseUrl . '/admin',
+				'isDashboard' => $this->getPlugin() === 'Homepage' && $this->getView() === 'default',
+				'structure' => $this->menuManager->getItems(),
+				'activeKey' => $this->context->getPluginKey($plugin),
+			],
+			'globalSettings' => [
+				'startWeekday' => 0,
+			],
 		];
-		$globalSettings = [
-			'startWeekday' => 0,
-		];
+
+		extract($args, EXTR_OVERWRITE);
 
 		try {
 			require __DIR__ . '/../template/@layout.phtml';

@@ -89,7 +89,7 @@ class UserLoginAttempt
 	public function setLoginUrl(?string $loginUrl): void
 	{
 		$this->loginUrl = $loginUrl !== null
-			? Strings::substring($loginUrl, 0, 2000)
+			? Strings::substring($loginUrl, 0, 2_000)
 			: null;
 	}
 
