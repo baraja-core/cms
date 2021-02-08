@@ -30,7 +30,7 @@ namespace Baraja\Cms;
 	<?php
 	foreach ($customAssetPaths as $customAssetPath => $customAssetPathFormat) {
 		if ($customAssetPathFormat === 'css') {
-			echo '<link type="text/css" rel="stylesheet" href="' . Helpers::escapeHtmlAttr($customAssetPath) .'>' . "\n";
+			echo '<link type="text/css" rel="stylesheet" href="' . Helpers::escapeHtmlAttr($customAssetPath) .'">' . "\n";
 		}
 	}
 	?>
