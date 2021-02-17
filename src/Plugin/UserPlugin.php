@@ -50,7 +50,7 @@ final class UserPlugin extends BasePlugin
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->error();
 
 			return;

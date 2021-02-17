@@ -127,7 +127,7 @@ final class Admin
 
 			try {
 				$pluginService = $this->context->getPluginByName($this->getPlugin());
-			} catch (\RuntimeException $e) {
+			} catch (\RuntimeException) {
 				$pluginService = $this->context->getPluginByType(ErrorPlugin::class);
 			}
 
@@ -150,7 +150,7 @@ final class Admin
 				$pluginService->afterRender();
 			} catch (PluginRedirectException $e) {
 				$this->redirect(Url::get()->getBaseUrl() . '/admin' . (($path = $e->getPath()) === '' ? '' : '/' . $path));
-			} catch (PluginTerminateException $e) {
+			} catch (PluginTerminateException) {
 				$this->terminate();
 			} catch (PluginUserErrorException $e) {
 				/** @var ErrorPlugin $pluginService */
@@ -219,7 +219,7 @@ final class Admin
 			if ($request->isExpired() === true) {
 				throw new \InvalidArgumentException('Token has been expired.');
 			}
-		} catch (NoResultException | NonUniqueResultException | \InvalidArgumentException $e) {
+		} catch (NoResultException | NonUniqueResultException | \InvalidArgumentException) {
 			return 'The password change token does not exist. Please request a new token again.';
 		}
 
@@ -247,7 +247,7 @@ final class Admin
 				->setMaxResults(1)
 				->getQuery()
 				->getSingleResult();
-		} catch (NoResultException | NonUniqueResultException | \InvalidArgumentException $e) {
+		} catch (NoResultException | NonUniqueResultException | \InvalidArgumentException) {
 			return 'This link does not work. For more information, please contact your project administrator.';
 		}
 		if ($user->getPassword() !== '---empty-password---') {

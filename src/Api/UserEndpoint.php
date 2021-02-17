@@ -208,7 +208,7 @@ final class UserEndpoint extends BaseEndpoint
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 
 			return;
@@ -225,7 +225,7 @@ final class UserEndpoint extends BaseEndpoint
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 
 			return;
@@ -253,7 +253,7 @@ final class UserEndpoint extends BaseEndpoint
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 
 			return;
@@ -308,7 +308,7 @@ final class UserEndpoint extends BaseEndpoint
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 
 			return;
@@ -344,7 +344,7 @@ final class UserEndpoint extends BaseEndpoint
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 
 			return;
@@ -368,7 +368,7 @@ final class UserEndpoint extends BaseEndpoint
 		try {
 			/** @var User $user */
 			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 
 			return;
@@ -386,7 +386,7 @@ final class UserEndpoint extends BaseEndpoint
 				->getQuery()
 				->getSingleResult();
 
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$meta = new UserMeta($user, 'password-last-changed-date', $user->getRegisterDate()->format('Y-m-d'));
 			$this->entityManager->persist($meta)->flush();
 		}
@@ -402,7 +402,7 @@ final class UserEndpoint extends BaseEndpoint
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 
 			return;
@@ -418,7 +418,7 @@ final class UserEndpoint extends BaseEndpoint
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 
 			return;
@@ -462,7 +462,7 @@ final class UserEndpoint extends BaseEndpoint
 		if (Helpers::checkAuthenticatorOtpCodeManually($otpCode, (int) $code) === true) {
 			try {
 				$user = $this->userManager->getUserById($id);
-			} catch (NoResultException | NonUniqueResultException $e) {
+			} catch (NoResultException | NonUniqueResultException) {
 				$this->sendError('User "' . $id . '" does not exist.');
 
 				return;
@@ -485,7 +485,7 @@ final class UserEndpoint extends BaseEndpoint
 		}
 		try {
 			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 
 			return;
@@ -530,7 +530,7 @@ final class UserEndpoint extends BaseEndpoint
 		}
 		try {
 			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 
 			return;
@@ -584,7 +584,7 @@ final class UserEndpoint extends BaseEndpoint
 		}
 		try {
 			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 
 			return;
@@ -624,7 +624,7 @@ final class UserEndpoint extends BaseEndpoint
 					->select('COUNT(userLogin.id)')
 					->getQuery()
 					->getSingleScalarResult();
-			} catch (NoResultException | NonUniqueResultException $e) {
+			} catch (NoResultException | NonUniqueResultException) {
 				$count = 0;
 			}
 		}
@@ -667,7 +667,7 @@ final class UserEndpoint extends BaseEndpoint
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 
 			return;
@@ -707,7 +707,7 @@ final class UserEndpoint extends BaseEndpoint
 		}
 		try {
 			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 
 			return;
@@ -724,7 +724,7 @@ final class UserEndpoint extends BaseEndpoint
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 
 			return;
@@ -745,14 +745,14 @@ final class UserEndpoint extends BaseEndpoint
 	{
 		try {
 			$currentUser = $this->userManager->getUserById((string) $this->getUser()->getId());
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User is not logged in.');
 
 			return;
 		}
 		try {
 			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 
 			return;
@@ -783,7 +783,7 @@ final class UserEndpoint extends BaseEndpoint
 				->getSingleResult();
 
 			return true;
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 		}
 
 		return false;

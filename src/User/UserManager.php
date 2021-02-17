@@ -112,7 +112,7 @@ final class UserManager implements Authenticator
 			} catch (\Throwable $serviceException) {
 				try {
 					return $this->fallbackAuthenticate($attempt, $username, $password, $expiration);
-				} catch (\Throwable $e) {
+				} catch (\Throwable) {
 					throw new AuthenticationException($serviceException->getMessage(), $serviceException->getCode(), $serviceException);
 				}
 			}
@@ -208,7 +208,7 @@ final class UserManager implements Authenticator
 				->getSingleResult();
 
 			return $meta->getValue();
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 		}
 
 		return null;
@@ -277,7 +277,7 @@ final class UserManager implements Authenticator
 	): IIdentity {
 		try {
 			$user = $this->getUserByUsername($username);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			throw new AuthenticationException('The username is incorrect. Username "' . $username . '" given.');
 		}
 		if ($user instanceof User) {

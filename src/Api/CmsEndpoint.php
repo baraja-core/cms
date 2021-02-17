@@ -55,7 +55,7 @@ final class CmsEndpoint extends BaseEndpoint
 		}
 		try {
 			$user = $this->userManager->authenticate($username, $password, $remember);
-		} catch (AuthenticationException $e) {
+		} catch (AuthenticationException) {
 			$this->sendError('Wrong username or password.');
 
 			return;
@@ -93,7 +93,7 @@ final class CmsEndpoint extends BaseEndpoint
 		}
 		try {
 			$user = $this->userManager->getUserById($userEntity->getId());
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $userEntity->getId() . '" does not exist.');
 
 			return;
@@ -143,7 +143,7 @@ final class CmsEndpoint extends BaseEndpoint
 				'email' => $user->getEmail(),
 				'expireDate' => $request->getExpireDate()->format('d. m. Y, H:i:s'),
 			]);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 		}
 
 		$this->sendOk();
@@ -172,7 +172,7 @@ final class CmsEndpoint extends BaseEndpoint
 					'email' => $user->getEmail(),
 					'loginUrl' => Url::get()->getBaseUrl() . '/admin',
 				]);
-			} catch (NoResultException | NonUniqueResultException $e) {
+			} catch (NoResultException | NonUniqueResultException) {
 			}
 		} else {
 			$this->sendError('Invalid name "' . $realName . '".');
@@ -229,7 +229,7 @@ final class CmsEndpoint extends BaseEndpoint
 				'username' => $request->getUser()->getUsername(),
 				'email' => $request->getUser()->getEmail(),
 			]);
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('The password change token does not exist. Please request a new token again.');
 		}
 
@@ -248,7 +248,7 @@ final class CmsEndpoint extends BaseEndpoint
 				->setMaxResults(1)
 				->getQuery()
 				->getSingleResult();
-		} catch (NoResultException | NonUniqueResultException | \InvalidArgumentException $e) {
+		} catch (NoResultException | NonUniqueResultException | \InvalidArgumentException) {
 			$this->sendError('User "' . $userId . '" does not exist.');
 
 			return;

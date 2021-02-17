@@ -48,7 +48,7 @@ final class Settings
 	{
 		try {
 			return $this->isDatabaseConnectionOk() && $this->isCloudConnectionOk() && $this->isBasicConfigurationOk();
-		} catch (\Throwable $e) {
+		} catch (\Throwable) {
 			return false;
 		}
 	}
@@ -157,7 +157,7 @@ final class Settings
 
 				return true;
 			}
-		} catch (\InvalidArgumentException $e) {
+		} catch (\InvalidArgumentException) {
 		}
 
 		return false;
