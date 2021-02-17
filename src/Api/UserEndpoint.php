@@ -380,10 +380,8 @@ final class UserEndpoint extends BaseEndpoint
 				->createQueryBuilder('meta')
 				->where('meta.user = :userId')
 				->andWhere('meta.key = :key')
-				->setParameters([
-					'userId' => $id,
-					'key' => 'password-last-changed-date',
-				])
+				->setParameter('userId', $id)
+				->setParameter('key', 'password-last-changed-date')
 				->setMaxResults(1)
 				->getQuery()
 				->getSingleResult();
