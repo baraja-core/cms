@@ -47,7 +47,7 @@ final class Proxy
 
 		try {
 			$plugin = $this->pluginManager->getPluginByName($pluginName);
-		} catch (\RuntimeException $e) {
+		} catch (\RuntimeException) {
 			echo '/* Plugin "' . $pluginName . '" does not exist. */';
 			die;
 		}
