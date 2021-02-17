@@ -120,10 +120,8 @@ final class CmsEndpoint extends BaseEndpoint
 				->createQueryBuilder('user')
 				->where('user.username = :username')
 				->orWhere('user.email = :email')
-				->setParameters([
-					'username' => $username,
-					'email' => $username,
-				])
+				->setParameter('username', $username)
+				->setParameter('email', $username)
 				->setMaxResults(1)
 				->getQuery()
 				->getSingleResult();
@@ -161,10 +159,8 @@ final class CmsEndpoint extends BaseEndpoint
 					->createQueryBuilder('user')
 					->where('user.firstName = :firstName')
 					->andWhere('user.lastName = :lastName')
-					->setParameters([
-						'firstName' => $parser[1],
-						'lastName' => $parser[2],
-					])
+					->setParameter('firstName', $parser[1])
+					->setParameter('lastName', $parser[2])
 					->setMaxResults(1)
 					->getQuery()
 					->getSingleResult();

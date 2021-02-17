@@ -201,10 +201,8 @@ final class UserManager implements Authenticator
 				->createQueryBuilder('meta')
 				->where('meta.user = :userId')
 				->andWhere('meta.key = :key')
-				->setParameters([
-					'userId' => $userId,
-					'key' => $key,
-				])
+				->setParameter('userId', $userId)
+				->setParameter('key', $key)
 				->setMaxResults(1)
 				->getQuery()
 				->getSingleResult();
@@ -225,10 +223,8 @@ final class UserManager implements Authenticator
 				->createQueryBuilder('meta')
 				->where('meta.user = :userId')
 				->andWhere('meta.key = :key')
-				->setParameters([
-					'userId' => $userId,
-					'key' => $key,
-				])
+				->setParameter('userId', $userId)
+				->setParameter('key', $key)
 				->setMaxResults(1)
 				->getQuery()
 				->getSingleResult();
