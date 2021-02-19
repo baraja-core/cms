@@ -63,6 +63,7 @@ final class Admin
 			throw new \RuntimeException('CMS is not available in CLI.');
 		}
 
+		$path = trim((string) preg_replace('/^\/?([a-zA-Z0-9-.\/]+).*$/', '$1', $path), '/');
 		[$plugin, $view, $more] = explode('/', $path . '///');
 
 		if ($more === '' && $view !== '') { // route plugin request in format "xxx/yyy"
