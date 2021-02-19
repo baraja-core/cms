@@ -129,7 +129,7 @@ final class TemplateRenderer
 					'availableLocales' => Admin::SUPPORTED_LOCALES,
 					'projectName' => $this->context->getConfiguration()->get('name', 'core'),
 					'locale' => $locale,
-				]
+				],
 			);
 	}
 
@@ -166,7 +166,7 @@ final class TemplateRenderer
 					'locale' => $locale,
 					'username' => $request->getUser()->getUsername(),
 					'token' => $request->getToken(),
-				]
+				],
 			);
 	}
 
@@ -200,7 +200,7 @@ final class TemplateRenderer
 					'locale' => $locale,
 					'userId' => $user->getId(),
 					'username' => $user->getUsername(),
-				]
+				],
 			);
 	}
 
