@@ -188,7 +188,7 @@ final class Application
 				'My Profile',
 				$this->linkGenerator->link('User:detail', [
 					'id' => $this->context->getUser()->getId(),
-				])
+				]),
 			);
 			AdminBar::addSeparator();
 		}
