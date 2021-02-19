@@ -16,7 +16,7 @@ final class Helpers
 	/** @throws \Error */
 	public function __construct()
 	{
-		throw new \Error('Class ' . static::class . ' is static and cannot be instantiated.');
+		throw new \Error('Class ' . self::class . ' is static and cannot be instantiated.');
 	}
 
 
@@ -215,7 +215,7 @@ final class Helpers
 	 */
 	public static function escapeHtmlAttr(string $s, bool $double = true): string
 	{
-		if (strpos($s, '`') !== false && strpbrk($s, ' <>"\'') === false) {
+		if (str_contains($s, '`') && strpbrk($s, ' <>"\'') === false) {
 			$s .= ' '; // protection against innerHTML mXSS vulnerability nette/nette#1496
 		}
 
@@ -228,7 +228,7 @@ final class Helpers
 	 */
 	public static function escapeHtmlComment(string $s): string
 	{
-		if ($s && (strpos($s, '-') === 0 || strpos($s, '>') === 0 || strpos($s, '!') === 0)) {
+		if ($s && (str_starts_with($s, '-') || str_starts_with($s, '>') || str_starts_with($s, '!'))) {
 			$s = ' ' . $s;
 		}
 
