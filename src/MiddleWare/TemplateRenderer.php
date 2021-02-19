@@ -123,12 +123,14 @@ final class TemplateRenderer
 			->setTempDirectory($this->cacheDir)
 			->addFilter('translate', $this->context->getTranslatorFilter())
 			->renderToString(
-				__DIR__ . '/../../template/login.latte', [
-				'basePath' => Url::get()->getBaseUrl(),
-				'availableLocales' => Admin::SUPPORTED_LOCALES,
-				'projectName' => $this->context->getConfiguration()->get('name', 'core'),
-				'locale' => $locale,
-			]);
+				__DIR__ . '/../../template/login.latte',
+				[
+					'basePath' => Url::get()->getBaseUrl(),
+					'availableLocales' => Admin::SUPPORTED_LOCALES,
+					'projectName' => $this->context->getConfiguration()->get('name', 'core'),
+					'locale' => $locale,
+				]
+			);
 	}
 
 
@@ -157,13 +159,15 @@ final class TemplateRenderer
 			->setTempDirectory($this->cacheDir)
 			->addFilter('translate', $this->context->getTranslatorFilter())
 			->renderToString(
-				__DIR__ . '/../../template/reset-password.latte', [
-				'basePath' => Url::get()->getBaseUrl(),
-				'loginUrl' => Url::get()->getBaseUrl() . '/admin',
-				'locale' => $locale,
-				'username' => $request->getUser()->getUsername(),
-				'token' => $request->getToken(),
-			]);
+				__DIR__ . '/../../template/reset-password.latte',
+				[
+					'basePath' => Url::get()->getBaseUrl(),
+					'loginUrl' => Url::get()->getBaseUrl() . '/admin',
+					'locale' => $locale,
+					'username' => $request->getUser()->getUsername(),
+					'token' => $request->getToken(),
+				]
+			);
 	}
 
 
@@ -189,13 +193,15 @@ final class TemplateRenderer
 			->setTempDirectory($this->cacheDir)
 			->addFilter('translate', $this->context->getTranslatorFilter())
 			->renderToString(
-				__DIR__ . '/../../template/set-user-password.latte', [
-				'basePath' => Url::get()->getBaseUrl(),
-				'loginUrl' => Url::get()->getBaseUrl() . '/admin',
-				'locale' => $locale,
-				'userId' => $user->getId(),
-				'username' => $user->getUsername(),
-			]);
+				__DIR__ . '/../../template/set-user-password.latte',
+				[
+					'basePath' => Url::get()->getBaseUrl(),
+					'loginUrl' => Url::get()->getBaseUrl() . '/admin',
+					'locale' => $locale,
+					'userId' => $user->getId(),
+					'username' => $user->getUsername(),
+				]
+			);
 	}
 
 
