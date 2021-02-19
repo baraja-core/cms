@@ -66,7 +66,7 @@ final class Application
 		$this->panel->setPlugin($plugin);
 		$this->panel->setView($view);
 
-		$this->trySystemWorkflow($path, $locale);
+		$this->trySystemWorkflow($plugin, $path, $locale);
 		$this->processLoginPage($path, $locale);
 		$this->setupAdminBar();
 
@@ -105,7 +105,7 @@ final class Application
 	}
 
 
-	private function trySystemWorkflow(string $path, string $locale): void
+	private function trySystemWorkflow(string $plugin, string $path, string $locale): void
 	{
 		if ($this->context->getSettings()->isOk() === false) { // route installation workflow
 			if ($path !== '') { // canonize configuration request to base admin URL
@@ -113,13 +113,13 @@ final class Application
 			}
 			$this->terminate($this->context->getSettings()->run());
 		}
-		if (str_starts_with($path = trim($path, '/'), 'reset-password')) { // route reset password form
+		if ($plugin === 'ResetPassword') { // route reset password form
 			$this->terminate($this->templateRenderer->renderResetPasswordTemplate($_GET['token'] ?? '', $locale));
 		}
-		if (str_starts_with($path, 'set-user-password')) { // route reset password form
+		if ($plugin === 'SetUserPassword') { // route reset password form
 			$this->terminate($this->templateRenderer->renderSetUserPasswordTemplate($_GET['userId'] ?? '', $locale));
 		}
-		if (str_starts_with($path, 'cms-web-loader')) { // route dynamic assets
+		if ($plugin === 'CmsWebLoader') { // route dynamic assets
 			(new Proxy($this->context->getPluginManager()))->run($path);
 		}
 		if (
@@ -127,7 +127,7 @@ final class Application
 			|| ($assetType = $path === 'assets/core.css' ? 'css' : null)
 		) { // route static assets from template directory
 			header('Content-Type: ' . Proxy::CONTENT_TYPES[$assetType]);
-			$assetContent = file_get_contents(__DIR__ . '/../template/assets/core.' . $assetType)
+			$assetContent = file_get_contents(__DIR__ . '/../../template/assets/core.' . $assetType)
 				. (($customAssetPath = $this->context->getCustomAssetPath($assetType)) !== null ? "\n\n" . file_get_contents($customAssetPath) : '');
 			if ($assetType === 'css') {
 				$assetContent = Helpers::minifyHtml($assetContent);
