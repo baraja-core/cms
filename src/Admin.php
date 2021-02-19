@@ -49,9 +49,9 @@ final class Admin
 				$cacheDir,
 				$context,
 				$panel,
-				$menuManager
+				$menuManager,
 			),
-			$linkGenerator
+			$linkGenerator,
 		);
 		Debugger::getBar()->addPanel($panel);
 	}
@@ -77,7 +77,7 @@ final class Admin
 				plugin: $plugin ?: 'Homepage',
 				view: $view ?: 'default',
 				locale: $locale ?? $this->context->getLocale(),
-				path: $path
+				path: $path,
 			);
 		} catch (AdminRedirect $redirect) {
 			$this->context->getResponse()->redirect($redirect->getUrl(), IResponse::S302_FOUND);
