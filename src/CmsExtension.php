@@ -59,6 +59,13 @@ final class CmsExtension extends CompilerExtension
 		OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\Cms\User\Entity', __DIR__ . '/User/Entity');
 		OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\DoctrineConfiguration', __DIR__ . '/Settings/Entity');
 
+		if ($builder->parameters === []) {
+			throw new \RuntimeException(
+				'DI parameters are not available. Did you export parameters to DI? '
+				. 'Did you not to use a "di > export > parameters: no"?'
+			);
+		}
+
 		// linkGenerator
 		$builder->addDefinition($this->prefix('linkGenerator'))
 			->setFactory(LinkGenerator::class);
