@@ -62,7 +62,7 @@ final class CmsExtension extends CompilerExtension
 		if ($builder->parameters === []) {
 			throw new \RuntimeException(
 				'DI parameters are not available. Did you export parameters to DI? '
-				. 'Did you not to use a "di > export > parameters: no"?'
+				. 'Did you not to use a "di > export > parameters: no"?',
 			);
 		}
 
