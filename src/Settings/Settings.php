@@ -13,34 +13,22 @@ use Baraja\Localization\Localization;
 use Baraja\Url\Url;
 use Latte\Engine;
 use Nette\Caching\Cache;
-use Nette\Caching\IStorage;
+use Nette\Caching\Storage;
 use Nette\Utils\Validators;
 
 final class Settings
 {
 	private Cache $cache;
 
-	private EntityManager $entityManager;
-
-	private Localization $localization;
-
-	private Configuration $configuration;
-
-	private CloudManager $cloudManager;
-
 
 	public function __construct(
-		IStorage $storage,
-		EntityManager $entityManager,
-		Localization $localization,
-		Configuration $configuration,
-		CloudManager $cloudManager
+		private EntityManager $entityManager,
+		private Localization $localization,
+		private Configuration $configuration,
+		private CloudManager $cloudManager,
+		Storage $storage,
 	) {
 		$this->cache = new Cache($storage, 'cms-settings');
-		$this->entityManager = $entityManager;
-		$this->localization = $localization;
-		$this->configuration = $configuration;
-		$this->cloudManager = $cloudManager;
 	}
 
 

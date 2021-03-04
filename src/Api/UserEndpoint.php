@@ -29,25 +29,12 @@ use Tracy\ILogger;
 
 final class UserEndpoint extends BaseEndpoint
 {
-	private UserManager $userManager;
-
-	private EntityManager $entityManager;
-
-	private CloudManager $cloudManager;
-
-	private PluginManager $pluginManager;
-
-
 	public function __construct(
-		UserManager $userManager,
-		EntityManager $entityManager,
-		CloudManager $cloudManager,
-		PluginManager $pluginManager
+		private UserManager $userManager,
+		private EntityManager $entityManager,
+		private CloudManager $cloudManager,
+		private PluginManager $pluginManager
 	) {
-		$this->userManager = $userManager;
-		$this->entityManager = $entityManager;
-		$this->cloudManager = $cloudManager;
-		$this->pluginManager = $pluginManager;
 	}
 
 

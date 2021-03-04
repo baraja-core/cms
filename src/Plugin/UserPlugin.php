@@ -13,12 +13,9 @@ use Doctrine\ORM\NoResultException;
 
 final class UserPlugin extends BasePlugin
 {
-	private UserManager $userManager;
-
-
-	public function __construct(UserManager $userManager)
-	{
-		$this->userManager = $userManager;
+	public function __construct(
+		private UserManager $userManager,
+	) {
 	}
 
 

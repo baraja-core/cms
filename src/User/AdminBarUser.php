@@ -12,12 +12,9 @@ use Nette\Security\IIdentity;
 
 final class AdminBarUser implements User
 {
-	private ?IIdentity $identity;
-
-
-	public function __construct(?IIdentity $identity)
-	{
-		$this->identity = $identity;
+	public function __construct(
+		private ?IIdentity $identity,
+	) {
 	}
 
 

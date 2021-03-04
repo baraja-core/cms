@@ -23,28 +23,16 @@ final class Admin
 
 	private Application $application;
 
-	private Context $context;
-
-	private LinkGenerator $linkGenerator;
-
-	private MenuManager $menuManager;
-
-	private CmsPluginPanel $panel;
-
 
 	public function __construct(
+		private Context $context,
 		TempDirResolver $tempDirResolver,
-		Context $context,
 		LinkGenerator $linkGenerator,
 		MenuManager $menuManager,
-		CmsPluginPanel $panel
+		CmsPluginPanel $panel,
 	) {
 		FileSystem::createDir($cacheDir = $tempDirResolver->get('cache/baraja.cms'));
 		$this->cacheDir = $cacheDir;
-		$this->context = $context;
-		$this->linkGenerator = $linkGenerator;
-		$this->menuManager = $menuManager;
-		$this->panel = $panel;
 		$this->application = new Application(
 			$context,
 			$panel,

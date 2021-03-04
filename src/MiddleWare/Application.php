@@ -25,25 +25,12 @@ use Nette\Http\IResponse;
 
 final class Application
 {
-	private Context $context;
-
-	private CmsPluginPanel $panel;
-
-	private TemplateRenderer $templateRenderer;
-
-	private LinkGenerator $linkGenerator;
-
-
 	public function __construct(
-		Context $context,
-		CmsPluginPanel $panel,
-		TemplateRenderer $templateRenderer,
-		LinkGenerator $linkGenerator
+		private Context $context,
+		private CmsPluginPanel $panel,
+		private TemplateRenderer $templateRenderer,
+		private LinkGenerator $linkGenerator
 	) {
-		$this->context = $context;
-		$this->panel = $panel;
-		$this->templateRenderer = $templateRenderer;
-		$this->linkGenerator = $linkGenerator;
 	}
 
 

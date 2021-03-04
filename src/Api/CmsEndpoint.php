@@ -26,25 +26,12 @@ use Tracy\ILogger;
  */
 final class CmsEndpoint extends BaseEndpoint
 {
-	private UserManager $userManager;
-
-	private CloudManager $cloudManager;
-
-	private Settings $settings;
-
-	private EntityManager $entityManager;
-
-
 	public function __construct(
-		UserManager $userManager,
-		CloudManager $cloudManager,
-		Settings $settings,
-		EntityManager $entityManager
+		private UserManager $userManager,
+		private CloudManager $cloudManager,
+		private Settings $settings,
+		private EntityManager $entityManager
 	) {
-		$this->userManager = $userManager;
-		$this->cloudManager = $cloudManager;
-		$this->settings = $settings;
-		$this->entityManager = $entityManager;
 	}
 
 

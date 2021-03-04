@@ -11,11 +11,10 @@ use Nette\Http\UrlScript;
 
 final class Support
 {
-	public const PRIORITY_LOW = 'low';
-
-	public const PRIORITY_NORMAL = 'normal';
-
-	public const PRIORITY_URGENT = 'urgent';
+	public const
+		PRIORITY_LOW = 'low',
+		PRIORITY_NORMAL = 'normal',
+		PRIORITY_URGENT = 'urgent';
 
 	public const PRIORITY_LIST = [
 		self::PRIORITY_LOW => 'Low (3 weeks)',
@@ -25,13 +24,12 @@ final class Support
 
 	private UrlScript $url;
 
-	private CloudManager $cloudManager;
 
-
-	public function __construct(Request $request, CloudManager $cloudManager)
-	{
+	public function __construct(
+		private CloudManager $cloudManager,
+		Request $request,
+	) {
 		$this->url = $request->getUrl();
-		$this->cloudManager = $cloudManager;
 	}
 
 

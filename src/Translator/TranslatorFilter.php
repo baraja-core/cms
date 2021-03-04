@@ -10,11 +10,9 @@ use Nette\Localization\Translator;
 
 final class TranslatorFilter
 {
-	private Translator $translator;
-
-
-	public function __construct(?Translator $translator = null)
-	{
+	public function __construct(
+		private ?Translator $translator = null,
+	) {
 		$this->translator = $translator ?? new CmsDefaultTranslator;
 	}
 

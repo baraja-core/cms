@@ -13,12 +13,6 @@ use Nette\Security\User;
 
 final class MenuManager
 {
-	private PluginManager $pluginManager;
-
-	private User $user;
-
-	private MenuAuthorizatorAccessor $authorizator;
-
 	/** @var true[] */
 	private array $ignorePlugins = [
 		CmsPlugin::class => true,
@@ -27,11 +21,11 @@ final class MenuManager
 	];
 
 
-	public function __construct(PluginManager $pluginManager, MenuAuthorizatorAccessor $authorizator, User $user)
-	{
-		$this->pluginManager = $pluginManager;
-		$this->user = $user;
-		$this->authorizator = $authorizator;
+	public function __construct(
+		private PluginManager $pluginManager,
+		private MenuAuthorizatorAccessor $authorizator,
+		private User $user,
+	) {
 	}
 
 
