@@ -16,17 +16,19 @@ final class TranslatorFilter
 	}
 
 
-	/**
-	 * @param string|object $haystack
-	 */
-	public function __invoke(FilterInfo $info, $haystack): string
+	public function __invoke(FilterInfo $info, mixed $haystack): string
 	{
 		if (is_object($haystack)) {
 			if (method_exists($haystack, '__toString')) {
 				$haystack = (string) $haystack;
 			} else {
-				throw new \InvalidArgumentException('Object "' . \get_class($haystack) . '" can not be serialized to string, because do not implement "__toString" method.');
+				throw new \InvalidArgumentException(
+					'Object "' . \get_debug_type($haystack) . '" can not be serialized to string, '
+					. 'because do not implement "__toString" method.',
+				);
 			}
+		} elseif (is_scalar($haystack)) {
+			$haystack = (string) $haystack;
 		}
 
 		return ($this->translator ?? $this->getDefaultTranslator())->translate($haystack);
