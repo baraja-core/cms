@@ -24,23 +24,20 @@ use Nette\Security\UserStorage;
 
 final class UserManager implements Authenticator
 {
-	private EntityManager $entityManager;
-
-	private UserStorage $userStorage;
-
 	private ?AuthenticationService $authenticationService = null;
 
 	private string $defaultEntity;
 
 
-	public function __construct(EntityManager $entityManager, UserStorage $userStorage, ?string $userEntity = null)
-	{
+	public function __construct(
+		private EntityManager $entityManager,
+		private UserStorage $userStorage,
+		?string $userEntity = null,
+	) {
 		/** @phpstan-ignore-next-line */
 		if ((class_implements($userEntity = $userEntity ?? User::class)[CmsUser::class] ?? false) === false) {
 			throw new \InvalidArgumentException('User entity "' . $userEntity . '" must implements "' . CmsUser::class . '" interface.');
 		}
-		$this->entityManager = $entityManager;
-		$this->userStorage = $userStorage;
 		$this->defaultEntity = $userEntity;
 	}
 

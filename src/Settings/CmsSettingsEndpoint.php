@@ -15,21 +15,11 @@ use Nette\Utils\Validators;
 
 final class CmsSettingsEndpoint extends BaseEndpoint
 {
-	private Settings $settings;
-
-	private CloudManager $cloudManager;
-
-	private EntityManager $entityManager;
-
-
 	public function __construct(
-		Settings $settings,
-		CloudManager $cloudManager,
-		EntityManager $entityManager
+		private Settings $settings,
+		private CloudManager $cloudManager,
+		private EntityManager $entityManager,
 	) {
-		$this->settings = $settings;
-		$this->cloudManager = $cloudManager;
-		$this->entityManager = $entityManager;
 	}
 
 

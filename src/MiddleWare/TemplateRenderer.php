@@ -26,25 +26,12 @@ use Tracy\ILogger;
 
 final class TemplateRenderer
 {
-	private string $cacheDir;
-
-	private Context $context;
-
-	private CmsPluginPanel $panel;
-
-	private MenuManager $menuManager;
-
-
 	public function __construct(
-		string $cacheDir,
-		Context $context,
-		CmsPluginPanel $panel,
-		MenuManager $menuManager
+		private string $cacheDir,
+		private Context $context,
+		private CmsPluginPanel $panel,
+		private MenuManager $menuManager
 	) {
-		$this->cacheDir = $cacheDir;
-		$this->context = $context;
-		$this->panel = $panel;
-		$this->menuManager = $menuManager;
 	}
 
 

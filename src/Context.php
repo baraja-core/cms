@@ -21,64 +21,26 @@ use Nette\Security\User;
 
 final class Context
 {
-	private Request $request;
-
-	private Response $response;
-
-	private Localization $localization;
-
-	private EntityManager $entityManager;
-
-	private Configuration $configuration;
-
-	private Settings $settings;
-
-	private User $user;
-
-	private TranslatorFilter $translatorFilter;
-
-	private BasicPanel $basicInformation;
-
-	private PluginManager $pluginManager;
-
-	private MenuAuthorizatorAccessor $authorizator;
-
-	private UserManagerAccessor $userManager;
-
-	private CustomGlobalAssetManagerAccessor $customGlobalAssetManager;
-
 	/** @var string[] (type => path) */
 	private array $customAssets = [];
 
 
 	public function __construct(
-		Request $request,
-		Response $response,
-		Localization $localization,
-		EntityManager $entityManager,
-		Configuration $configuration,
-		Settings $settings,
-		User $user,
-		TranslatorFilter $translatorFilter,
-		BasicPanel $basicInformation,
-		PluginManager $pluginManager,
-		MenuAuthorizatorAccessor $authorizator,
-		UserManagerAccessor $userManager,
-		CustomGlobalAssetManagerAccessor $customGlobalAssetManager
+		private Request $request,
+		private Response $response,
+		private EntityManager $entityManager,
+		private Configuration $configuration,
+		private Settings $settings,
+		private User $user,
+		private TranslatorFilter $translatorFilter,
+		private BasicPanel $basicInformation,
+		private PluginManager $pluginManager,
+		private MenuAuthorizatorAccessor $authorizator,
+		private UserManagerAccessor $userManager,
+		private CustomGlobalAssetManagerAccessor $customGlobalAssetManager,
+		private Localization $localization,
 	) {
-		$this->request = $request;
-		$this->response = $response;
-		$this->localization = $localization->setContextLocale($localization->getDefaultLocale());
-		$this->entityManager = $entityManager;
-		$this->configuration = $configuration;
-		$this->settings = $settings;
-		$this->user = $user;
-		$this->translatorFilter = $translatorFilter;
-		$this->basicInformation = $basicInformation;
-		$this->pluginManager = $pluginManager;
-		$this->authorizator = $authorizator;
-		$this->userManager = $userManager;
-		$this->customGlobalAssetManager = $customGlobalAssetManager;
+		$localization->setContextLocale($localization->getDefaultLocale());
 	}
 
 
