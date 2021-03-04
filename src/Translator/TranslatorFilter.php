@@ -13,7 +13,6 @@ final class TranslatorFilter
 	public function __construct(
 		private ?Translator $translator = null,
 	) {
-		$this->translator = $translator ?? new CmsDefaultTranslator;
 	}
 
 
@@ -30,6 +29,14 @@ final class TranslatorFilter
 			}
 		}
 
-		return $this->translator->translate($haystack);
+		return ($this->translator ?? $this->getDefaultTranslator())->translate($haystack);
+	}
+
+
+	private function getDefaultTranslator(): Translator
+	{
+		static $cache;
+
+		return $cache ?? $cache = new CmsDefaultTranslator;
 	}
 }
