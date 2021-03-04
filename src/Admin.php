@@ -7,9 +7,11 @@ namespace Baraja\Cms;
 
 use Baraja\Cms\MiddleWare\Application;
 use Baraja\Cms\MiddleWare\TemplateRenderer;
+use Baraja\PathResolvers\Resolvers\TempDirResolver;
 use Baraja\Plugin\CmsPluginPanel;
 use Nette\Application\Responses\VoidResponse;
 use Nette\Http\IResponse;
+use Nette\Utils\FileSystem;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
@@ -31,12 +33,13 @@ final class Admin
 
 
 	public function __construct(
-		string $cacheDir,
+		TempDirResolver $tempDirResolver,
 		Context $context,
 		LinkGenerator $linkGenerator,
 		MenuManager $menuManager,
 		CmsPluginPanel $panel
 	) {
+		FileSystem::createDir($cacheDir = $tempDirResolver->get('cache/baraja.cms'));
 		$this->cacheDir = $cacheDir;
 		$this->context = $context;
 		$this->linkGenerator = $linkGenerator;

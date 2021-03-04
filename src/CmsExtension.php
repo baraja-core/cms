@@ -59,13 +59,6 @@ final class CmsExtension extends CompilerExtension
 		OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\Cms\User\Entity', __DIR__ . '/User/Entity');
 		OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\DoctrineConfiguration', __DIR__ . '/Settings/Entity');
 
-		if ($builder->parameters === []) {
-			throw new \RuntimeException(
-				'DI parameters are not available. Did you export parameters to DI? '
-				. 'Did you not to use a "di > export > parameters: no"?',
-			);
-		}
-
 		// linkGenerator
 		$builder->addDefinition($this->prefix('linkGenerator'))
 			->setFactory(LinkGenerator::class);
@@ -80,9 +73,7 @@ final class CmsExtension extends CompilerExtension
 
 		// admin
 		$builder->addDefinition($this->prefix('admin'))
-			->setFactory(Admin::class)
-			->setArgument('cacheDir', $cacheDir = $builder->parameters['tempDir'] . '/cache/baraja.cms');
-		FileSystem::createDir($cacheDir);
+			->setFactory(Admin::class);
 
 		// context
 		$context = $builder->addDefinition($this->prefix('context'))
