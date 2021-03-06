@@ -130,8 +130,8 @@ final class UserEndpoint extends BaseEndpoint
 			'currentUserId' => $currentUserId,
 			'statusCount' => [
 				'all' => \count($allUsers = $this->getAllUsers()),
-				'active' => \count(array_filter($allUsers, static fn (array $item): bool => $item['active'] === true)),
-				'deleted' => \count(array_filter($allUsers, static fn (array $item): bool => $item['active'] === false)),
+				'active' => \count(array_filter($allUsers, static fn(array $item): bool => $item['active'] === true)),
+				'deleted' => \count(array_filter($allUsers, static fn(array $item): bool => $item['active'] === false)),
 			],
 			'paginator' => (new Paginator)
 				->setItemCount(\count($allUsers))
@@ -522,7 +522,7 @@ final class UserEndpoint extends BaseEndpoint
 
 			return;
 		}
-		$roles = array_map(fn (string $role): string => strtolower($role), $roles);
+		$roles = array_map(fn(string $role): string => strtolower($role), $roles);
 		if ($user->isAdmin() === false && \in_array('admin', $roles, true) === true) {
 			$this->sendError('You cannot set the administrator role manually. To maintain security, use the "Set as admin" button.');
 		}
