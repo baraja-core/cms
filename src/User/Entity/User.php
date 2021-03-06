@@ -328,7 +328,7 @@ class User implements CmsUser
 	 */
 	public function getPrivileges(): array
 	{
-		return array_filter($this->privileges ?? [], fn (string $item): bool => trim($item) !== '');
+		return array_filter($this->privileges ?? [], fn(string $item): bool => trim($item) !== '');
 	}
 
 

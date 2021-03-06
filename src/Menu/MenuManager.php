@@ -59,7 +59,7 @@ final class MenuManager
 			}
 		}
 
-		usort($return, fn (array $a, array $b): int => $a['priority'] < $b['priority'] ? 1 : -1);
+		usort($return, fn(array $a, array $b): int => $a['priority'] < $b['priority'] ? 1 : -1);
 
 		return $return;
 	}
