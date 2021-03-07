@@ -318,6 +318,13 @@ Vue.component('cms-quick-edit', {
 			newValue: ''
 		}
 	},
+	watch: {
+		value: function(newVal) {
+			this.originalValue = newVal;
+			this.newValue = newVal;
+			this.editable = false;
+		}
+	},
 	methods: {
 		save() {
 			if (this.newValue === this.originalValue) {
