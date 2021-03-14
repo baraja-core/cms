@@ -260,9 +260,15 @@ final class TemplateRenderer
 			Debugger::log($e, ILogger::CRITICAL);
 
 			return '<!-- can not render component! -->'
-				. '<p>Can not render component <b>'
+				. '<div class="alert alert-danger">'
+				. '<p class="mb-0">Can not render component <b>'
 				. htmlspecialchars($component->getTab(), ENT_QUOTES)
-				. '</b></p>';
+				. '</b>.'
+				. ($e instanceof \InvalidArgumentException
+					? '<br>' . htmlspecialchars($e->getMessage(), ENT_QUOTES)
+					: '')
+				. '</p>'
+				. '</div>';
 		}
 	}
 
