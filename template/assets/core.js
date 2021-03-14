@@ -224,7 +224,7 @@ Vue.component('cms-buttons', {
 	props: ['buttons', 'linkBack', 'contextMenu'],
 	template: `<div>
 		<template v-if="linkBack">
-			<b-btn variant="white" class="mb-2 mb-lg-0">Back</b-btn>
+			<b-btn variant="white" class="mb-2 mb-lg-0" :href="linkBack">Back</b-btn>
 		</template>
 		<template v-for="button in buttons">
 			<b-btn :variant="button.variant ? button.variant : 'secondary'" href="#" class="mr-1" @click.prevent="handleMenu(button)">
