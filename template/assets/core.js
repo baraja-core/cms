@@ -308,12 +308,17 @@ Vue.component('cms-quick-edit', {
 		<b-spinner small></b-spinner>
 	</template>
 	<template v-else>
-		<template v-if="editable">
-			<cms-quick-edit-text :value="newValue" :element-key="key"></cms-quick-edit-text>
+		<template v-if="type === 'bool'">
+			<component is="cms-quick-edit-bool" :value="newValue" :element-key="key"></component>
 		</template>
-		<span v-else @click="startEditable()" style="border-bottom:1px dotted #000;cursor:pointer">
-			{{ newValue }}
-		</span>
+		<template v-else>
+			<template v-if="editable">
+				<component :is="'cms-quick-edit-' + (type ? type : 'text')" :value="newValue" :element-key="key"></component>
+			</template>
+			<span v-else @click="startEditable()" style="border-bottom:1px dotted #000;cursor:pointer">
+				{{ newValue }}
+			</span>
+		</template>
 	</template>
 </div>`,
 	mounted() {
@@ -338,7 +343,8 @@ Vue.component('cms-quick-edit', {
 					entity: this.entity,
 					property: this.property,
 					id: this.id,
-					value: value
+					value: value,
+					type: this.type ? this.type : 'text'
 				})).then(req => {
 					this.editable = false;
 					this.loading = false;
@@ -393,6 +399,28 @@ Vue.component('cms-quick-edit-text', {
 	methods: {
 		save() {
 			eventBus.$emit('cms-quick-edit-save', this.elementKey, this.newValue);
+		}
+	}
+});
+
+Vue.component('cms-quick-edit-bool', {
+	props: ['value', 'elementKey'],
+	template: `<b-form-checkbox v-model="newValue" :id="elementKey" switch @change="save()"></b-form-checkbox>`,
+	data() {
+		return {
+			newValue: false
+		}
+	},
+	mounted() {
+		this.$nextTick(() => {
+			this.newValue = this.value;
+		});
+	},
+	methods: {
+		save() {
+			this.$nextTick(() => {
+				eventBus.$emit('cms-quick-edit-save', this.elementKey, this.newValue ? 'true' : 'false');
+			});
 		}
 	}
 });
