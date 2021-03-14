@@ -301,6 +301,16 @@ Vue.component('cms-quick-edit', {
 		type: {
 			type: String,
 			required: false
+		},
+		options: {
+			required: false,
+			default: function () {
+				return {};
+			}
+		},
+		truncate: {
+			type: Number,
+			required: false
 		}
 	},
 	template: `<div>
@@ -313,11 +323,20 @@ Vue.component('cms-quick-edit', {
 		</template>
 		<template v-else>
 			<template v-if="editable">
-				<component :is="'cms-quick-edit-' + (type ? type : 'text')" :value="newValue" :element-key="key"></component>
+				<component
+					:is="'cms-quick-edit-' + (type ? type : 'text')"
+					:value="newValue"
+					:element-key="key"
+					:options="options"></component>
 			</template>
-			<span v-else @click="startEditable()" style="border-bottom:1px dotted #000;cursor:pointer">
-				{{ newValue }}
-			</span>
+			<div v-else @click="startEditable()" style="border-bottom:1px dotted #000;cursor:pointer;min-width:5em !important;display:inline-block">
+				<template v-if="truncate">
+					<div :style="'max-width:' + truncate + 'px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis'">{{ newValue }}</div>
+				</template>
+				<template v-else>
+					{{ newValue }}
+				</template>
+			</div>
 		</template>
 	</template>
 </div>`,
@@ -380,7 +399,7 @@ Vue.component('cms-quick-edit', {
 Vue.component('cms-quick-edit-text', {
 	props: ['value', 'elementKey'],
 	template: `<b-input-group>
-		<b-form-input v-model="newValue" :id="elementKey" size="sm" @keyup.enter.native="save()"></b-form-input>
+		<b-form-input v-model="newValue" :id="elementKey" size="sm" @keyup.enter.native="save()" @blur="save()"></b-form-input>
 		<b-input-group-append>
 			<b-button size="sm" type="submit" variant="success" @click="save()">Save</b-button>
 		</b-input-group-append>
@@ -420,6 +439,50 @@ Vue.component('cms-quick-edit-bool', {
 		save() {
 			this.$nextTick(() => {
 				eventBus.$emit('cms-quick-edit-save', this.elementKey, this.newValue ? 'true' : 'false');
+			});
+		}
+	}
+});
+
+Vue.component('cms-quick-edit-select', {
+	props: ['value', 'elementKey', 'options'],
+	template: `<b-form-select v-model="newValue" :id="elementKey" :options="options" size="sm" style="min-width:64px" @change="save()"></b-form-select>`,
+	data() {
+		return {
+			newValue: null
+		}
+	},
+	mounted() {
+		this.$nextTick(() => {
+			this.newValue = this.value;
+		});
+	},
+	methods: {
+		save() {
+			this.$nextTick(() => {
+				eventBus.$emit('cms-quick-edit-save', this.elementKey, this.newValue);
+			});
+		}
+	}
+});
+
+Vue.component('cms-quick-edit-datetime', {
+	props: ['value', 'elementKey'],
+	template: `<b-form-datepicker v-model="newValue" :id="elementKey" size="sm" :startWeekday="1" style="font-size:10pt" @input="save()"></b-form-datepicker>`,
+	data() {
+		return {
+			newValue: ''
+		}
+	},
+	mounted() {
+		this.$nextTick(() => {
+			this.newValue = this.value;
+		});
+	},
+	methods: {
+		save() {
+			this.$nextTick(() => {
+				eventBus.$emit('cms-quick-edit-save', this.elementKey, this.newValue);
 			});
 		}
 	}
