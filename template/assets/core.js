@@ -280,19 +280,34 @@ Vue.component('cms-buttons', {
 });
 
 Vue.component('cms-quick-edit', {
-	props: ['entity', 'property', 'id', 'value'],
+	props: {
+		entity: {
+			type: String,
+			required: true
+		},
+		property: {
+			type: String,
+			required: true
+		},
+		id: {
+			type: [String, Number],
+			required: true
+		},
+		value: {
+			required: true
+		},
+		type: {
+			type: String,
+			required: false
+		}
+	},
 	template: `<div>
 	<template v-if="loading">
 		<b-spinner small></b-spinner>
 	</template>
 	<template v-else>
 		<template v-if="editable">
-			<b-input-group>
-				<b-form-input v-model="newValue" size="sm" :id="key" @keyup.enter.native="save()"></b-form-input>
-				<b-input-group-append>
-					<b-button size="sm" type="submit" variant="success" @click="save()">Save</b-button>
-				</b-input-group-append>
-			</b-input-group>
+			<cms-quick-edit-text :value="newValue" :element-key="key"></cms-quick-edit-text>
 		</template>
 		<span v-else @click="startEditable()" style="border-bottom:1px dotted #000;cursor:pointer">
 			{{ newValue }}
@@ -308,6 +323,27 @@ Vue.component('cms-quick-edit', {
 				this.editable = false;
 			}
 		});
+		eventBus.$on('cms-quick-edit-save', (key, value) => {
+			if (key === this.key) {
+				this.newValue = value;
+				if (value === this.originalValue) {
+					this.editable = false;
+					this.loading = false;
+					return;
+				}
+				this.loading = true;
+				axiosApi.get('quick-edit?' + httpBuildQuery({
+					entity: this.entity,
+					property: this.property,
+					id: this.id,
+					value: value
+				})).then(req => {
+					this.editable = false;
+					this.loading = false;
+					this.originalValue = value;
+				});
+			}
+		});
 	},
 	data() {
 		return {
@@ -319,37 +355,42 @@ Vue.component('cms-quick-edit', {
 		}
 	},
 	watch: {
-		value: function(newVal) {
+		value: function (newVal) {
 			this.originalValue = newVal;
 			this.newValue = newVal;
 			this.editable = false;
 		}
 	},
 	methods: {
-		save() {
-			if (this.newValue === this.originalValue) {
-				this.editable = false;
-				this.loading = false;
-				return;
-			}
-			this.loading = true;
-			axiosApi.get('quick-edit?' + httpBuildQuery({
-				entity: this.entity,
-				property: this.property,
-				id: this.id,
-				value: this.newValue
-			})).then(req => {
-				this.editable = false;
-				this.loading = false;
-				this.originalValue = this.newValue;
-			});
-		},
 		startEditable() {
 			eventBus.$emit('cms-quick-edit-open', this.key);
 			this.editable = true;
-			this.nextTick(function () {
-				document.getElementById(this.key).focus();
-			});
+		}
+	}
+});
+
+Vue.component('cms-quick-edit-text', {
+	props: ['value', 'elementKey'],
+	template: `<b-input-group>
+		<b-form-input v-model="newValue" :id="elementKey" size="sm" @keyup.enter.native="save()"></b-form-input>
+		<b-input-group-append>
+			<b-button size="sm" type="submit" variant="success" @click="save()">Save</b-button>
+		</b-input-group-append>
+	</b-input-group>`,
+	data() {
+		return {
+			newValue: ''
+		}
+	},
+	mounted() {
+		this.newValue = this.value;
+		this.$nextTick(() => {
+			document.getElementById(this.elementKey).focus();
+		});
+	},
+	methods: {
+		save() {
+			eventBus.$emit('cms-quick-edit-save', this.elementKey, this.newValue);
 		}
 	}
 });
