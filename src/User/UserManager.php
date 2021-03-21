@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Baraja\Cms\User;
 
 
-use Baraja\AdminBar\AdminIdentity;
+use Baraja\AdminBar\User\AdminIdentity;
 use Baraja\Cms\Helpers;
 use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\User;

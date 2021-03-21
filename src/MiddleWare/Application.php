@@ -57,7 +57,7 @@ final class Application
 
 		$this->trySystemWorkflow($plugin, $path, $locale);
 		$this->processLoginPage($path, $locale);
-		$this->setupAdminBar();
+		AdminBar::enable(AdminBar::MODE_ENABLED);
 
 		try {
 			$pluginService = $this->context->getPluginByName($plugin);
@@ -165,27 +165,5 @@ final class Application
 	{
 		$this->context->getResponse()->redirect($url, $httpCode);
 		$this->terminate();
-	}
-
-
-	private function setupAdminBar(): void
-	{
-		AdminBar::enable(true);
-		AdminBar::addPanel($this->context->getBasicInformation());
-		AdminBar::setUser(new AdminBarUser($this->context->getUser()->getIdentity()));
-
-		// Show link only in case of user can edit profile
-		if ($this->context->checkPermission('user', 'user-overview') === true) {
-			AdminBar::addLink(
-				'My Profile',
-				$this->linkGenerator->link('User:detail', [
-					'id' => $this->context->getUser()->getId(),
-				]),
-			);
-			AdminBar::addSeparator();
-		}
-
-		AdminBar::addLink('Settings', $this->linkGenerator->link('Settings:default'));
-		AdminBar::addLink('Sign out', $this->linkGenerator->link('Cms:signOut'));
 	}
 }

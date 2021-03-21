@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Baraja\Cms;
 
 
+use Baraja\AdminBar\AdminBar;
 use Baraja\Cms\Component\ErrorComponent;
+use Baraja\Cms\MiddleWare\Bridge\AdminBarBridge;
 use Baraja\Cms\Plugin\CommonSettingsPlugin;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Plugin\HomepagePlugin;
@@ -14,6 +16,7 @@ use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManager;
 use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManagerAccessor;
 use Baraja\Cms\Support\Support;
 use Baraja\Cms\Translator\TranslatorFilter;
+use Baraja\Cms\User\AdminBarUser;
 use Baraja\Cms\User\UserManager;
 use Baraja\Cms\User\UserManagerAccessor;
 use Baraja\Doctrine\ORM\DI\OrmAnnotationsExtension;
@@ -30,7 +33,7 @@ use Nette\DI\MissingServiceException;
 use Nette\PhpGenerator\ClassType;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
-use Nette\Utils\FileSystem;
+use Nette\Security\User;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
@@ -93,6 +96,10 @@ final class CmsExtension extends CompilerExtension
 
 		$builder->addDefinition($this->prefix('support'))
 			->setFactory(Support::class);
+
+		// bridge
+		$builder->addDefinition($this->prefix('adminBarBridge'))
+			->setFactory(AdminBarBridge::class);
 
 		// translator
 		$builder->addDefinition($this->prefix('translatorFilter'))
@@ -234,6 +241,12 @@ final class CmsExtension extends CompilerExtension
 		/** @var ServiceDefinition $admin */
 		$admin = $builder->getDefinitionByType(Admin::class);
 
+		/** @var ServiceDefinition $netteUser */
+		$netteUser = $builder->getDefinitionByType(User::class);
+
+		/** @var ServiceDefinition $adminBarBridge */
+		$adminBarBridge = $builder->getDefinitionByType(AdminBarBridge::class);
+
 		/** @var FactoryDefinition $latte */
 		$latte = $builder->getDefinitionByType(ILatteFactory::class);
 		$latte->getResultDefinition()->addSetup('addFilter(?, ?)', [
@@ -255,11 +268,15 @@ final class CmsExtension extends CompilerExtension
 			. "\t\t\t" . '}' . "\n"
 			. "\t\t" . '};' . "\n"
 			. "\t" . '}' . "\n"
+			. "\t" . AdminBar::class . '::getBar()->setUser(new ' . AdminBarUser::class . '($this->getService(?)));' . "\n"
+			. "\t" . '$this->getService(?)->setup();' . "\n"
 			. '})();',
 			[
 				'/^admin(?:\/+(?<locale>' . implode('|', Admin::SUPPORTED_LOCALES) . '))?(?<path>\/.*|\?.*|)$/',
 				$application->getName(),
 				$admin->getName(),
+				$netteUser->getName(),
+				$adminBarBridge->getName(),
 			],
 		);
 	}
