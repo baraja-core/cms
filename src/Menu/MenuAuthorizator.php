@@ -22,8 +22,11 @@ final class MenuAuthorizator
 	private array $privileges;
 
 
-	public function __construct(EntityManager $entityManager, NetteUser $userService, UserManagerAccessor $userManager)
-	{
+	public function __construct(
+		EntityManager $entityManager,
+		NetteUser $userService,
+		UserManagerAccessor $userManager,
+	) {
 		if ($userService->isLoggedIn() === false) {
 			$this->id = null;
 			$this->roles = [];
