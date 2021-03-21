@@ -336,29 +336,34 @@ Vue.component('cms-quick-edit', {
 			<component is="cms-quick-edit-bool" :value="newValue" :element-key="key"></component>
 		</template>
 		<template v-else>
-			<template v-if="editable === false && isUrl === true">
-				<a :href="newValue" target="_blank" ref="nofollow noreferrer noopener">
-					<b-icon icon="link45deg"></b-icon>
-				</a>
+			<template v-if="type === 'datetime'">
+				<component is="cms-quick-edit-datetime" :value="newValue" :element-key="key"></component>
 			</template>
-			<template v-if="editable">
-				<component
-					:is="'cms-quick-edit-' + (type ? type : 'text')"
-					:value="newValue"
-					:element-key="key"
-					:options="options"></component>
-			</template>
-			<div v-else @click="startEditable()" style="border-bottom:1px dotted #000;cursor:pointer;min-width:2.5em !important;display:inline-block">
-				<template v-if="newValue === '' || newValue === null">&nbsp;</template>
-				<template v-else>
-					<template v-if="truncate">
-						<span :style="'max-width:' + truncate + 'px;white-space:nowrap;overflow:hidden;display:inline-block;text-overflow:ellipsis'">{{ newValue }}</span>
-					</template>
-					<template v-else>
-						{{ newValue }}
-					</template>
+			<template v-else>
+				<template v-if="editable === false && isUrl === true">
+					<a :href="newValue" target="_blank" ref="nofollow noreferrer noopener">
+						<b-icon icon="link45deg"></b-icon>
+					</a>
 				</template>
-			</div>
+				<template v-if="editable">
+					<component
+						:is="'cms-quick-edit-' + (type ? type : 'text')"
+						:value="newValue"
+						:element-key="key"
+						:options="options"></component>
+				</template>
+				<div v-else @click="startEditable()" style="border-bottom:1px dotted #000;cursor:pointer;min-width:2.5em !important;display:inline-block">
+					<template v-if="newValue === '' || newValue === null">&nbsp;</template>
+					<template v-else>
+						<template v-if="truncate">
+							<span :style="'max-width:' + truncate + 'px;white-space:nowrap;overflow:hidden;display:inline-block;text-overflow:ellipsis'">{{ newValue }}</span>
+						</template>
+						<template v-else>
+							{{ newValue }}
+						</template>
+					</template>
+				</div>
+			</template>
 		</template>
 	</div>
 </div>`,
