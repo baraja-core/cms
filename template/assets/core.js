@@ -352,7 +352,7 @@ Vue.component('cms-quick-edit', {
 				<template v-if="newValue === '' || newValue === null">&nbsp;</template>
 				<template v-else>
 					<template v-if="truncate">
-						<span :style="'max-width:' + truncate + 'px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis'">{{ newValue }}</span>
+						<span :style="'max-width:' + truncate + 'px;white-space:nowrap;overflow:hidden;display:inline-block;text-overflow:ellipsis'">{{ newValue }}</span>
 					</template>
 					<template v-else>
 						{{ newValue }}
