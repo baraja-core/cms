@@ -311,17 +311,36 @@ Vue.component('cms-quick-edit', {
 		truncate: {
 			type: Number,
 			required: false
+		},
+		confirm: {
+			type: [String, Boolean],
+			required: false,
+			default: function () {
+				return false;
+			}
+		},
+		endpointUri: {
+			type: [String, null],
+			required: false,
+			default: function () {
+				return null;
+			}
 		}
 	},
 	template: `<div>
 	<template v-if="loading">
 		<b-spinner small></b-spinner>
 	</template>
-	<template v-else>
+	<div v-else>
 		<template v-if="type === 'bool'">
 			<component is="cms-quick-edit-bool" :value="newValue" :element-key="key"></component>
 		</template>
 		<template v-else>
+			<template v-if="editable === false && isUrl === true">
+				<a :href="newValue" target="_blank" ref="nofollow noreferrer noopener">
+					<b-icon icon="link45deg"></b-icon>
+				</a>
+			</template>
 			<template v-if="editable">
 				<component
 					:is="'cms-quick-edit-' + (type ? type : 'text')"
@@ -329,16 +348,19 @@ Vue.component('cms-quick-edit', {
 					:element-key="key"
 					:options="options"></component>
 			</template>
-			<div v-else @click="startEditable()" style="border-bottom:1px dotted #000;cursor:pointer;min-width:5em !important;display:inline-block">
-				<template v-if="truncate">
-					<div :style="'max-width:' + truncate + 'px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis'">{{ newValue }}</div>
-				</template>
+			<div v-else @click="startEditable()" style="border-bottom:1px dotted #000;cursor:pointer;min-width:2.5em !important;display:inline-block">
+				<template v-if="newValue === '' || newValue === null">&nbsp;</template>
 				<template v-else>
-					{{ newValue }}
+					<template v-if="truncate">
+						<span :style="'max-width:' + truncate + 'px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis'">{{ newValue }}</span>
+					</template>
+					<template v-else>
+						{{ newValue }}
+					</template>
 				</template>
 			</div>
 		</template>
-	</template>
+	</div>
 </div>`,
 	mounted() {
 		this.originalValue = this.value;
@@ -351,14 +373,27 @@ Vue.component('cms-quick-edit', {
 		});
 		eventBus.$on('cms-quick-edit-save', (key, value) => {
 			if (key === this.key) {
-				this.newValue = value;
 				if (value === this.originalValue) {
 					this.editable = false;
 					this.loading = false;
 					return;
 				}
+				if (this.confirm !== false) {
+					if (
+						(this.confirm === true && !confirm('Do you really want change ' + this.property + '?'))
+						|| (this.confirm !== true && !confirm(this.confirm))
+					) {
+						this.loading = true;
+						this.syncValue(this.originalValue);
+						this.$nextTick(() => {
+							this.loading = false;
+						});
+						return;
+					}
+				}
+				this.newValue = value;
 				this.loading = true;
-				axiosApi.get('quick-edit?' + httpBuildQuery({
+				axiosApi.get((this.endpointUri ? this.endpointUri : 'quick-edit') + '?' + httpBuildQuery({
 					entity: this.entity,
 					property: this.property,
 					id: this.id,
@@ -383,15 +418,33 @@ Vue.component('cms-quick-edit', {
 	},
 	watch: {
 		value: function (newVal) {
-			this.originalValue = newVal;
-			this.newValue = newVal;
-			this.editable = false;
+			this.syncValue(newVal);
 		}
 	},
 	methods: {
 		startEditable() {
 			eventBus.$emit('cms-quick-edit-open', this.key);
 			this.editable = true;
+		},
+		syncValue(newVal) {
+			this.originalValue = newVal;
+			this.newValue = newVal;
+			this.editable = false;
+		}
+	},
+	computed: {
+		isUrl: function() {
+			if (typeof this.newValue === 'string' || this.newValue instanceof String) {
+				let pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+					'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+					'((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+					'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+					'(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+					'(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+				return !!pattern.test(this.newValue);
+			}
+
+			return false;
 		}
 	}
 });
@@ -435,6 +488,11 @@ Vue.component('cms-quick-edit-bool', {
 			this.newValue = this.value;
 		});
 	},
+	watch: {
+		value: function() {
+			this.newValue = this.value;
+		}
+	},
 	methods: {
 		save() {
 			this.$nextTick(() => {
@@ -468,7 +526,7 @@ Vue.component('cms-quick-edit-select', {
 
 Vue.component('cms-quick-edit-datetime', {
 	props: ['value', 'elementKey'],
-	template: `<b-form-datepicker v-model="newValue" :id="elementKey" size="sm" :startWeekday="1" style="font-size:10pt" @input="save()"></b-form-datepicker>`,
+	template: `<b-form-datepicker v-model="newValue" :id="elementKey" size="sm" :startWeekday="1" :reset-button="true" :today-button="true" :date-format-options="{ 'year': 'numeric', 'month': 'short', 'day': 'numeric', 'weekday': 'short' }" style="font-size:10pt" @input="save()"></b-form-datepicker>`,
 	data() {
 		return {
 			newValue: ''
