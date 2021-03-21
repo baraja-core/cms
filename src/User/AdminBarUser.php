@@ -5,32 +5,32 @@ declare(strict_types=1);
 namespace Baraja\Cms\User;
 
 
-use Baraja\AdminBar\AdminIdentity;
 use Baraja\AdminBar\Shorts;
-use Baraja\AdminBar\User;
+use Baraja\AdminBar\User\AdminIdentity;
+use Baraja\AdminBar\User\User;
 use Nette\Security\IIdentity;
 
 final class AdminBarUser implements User
 {
 	public function __construct(
-		private ?IIdentity $identity,
+		private \Nette\Security\User $user,
 	) {
 	}
 
 
 	public function getName(): ?string
 	{
-		if ($this->identity === null) {
+		if ($this->getIdentity() === null) {
 			return null;
 		}
 		$name = null;
-		if ($this->identity instanceof AdminIdentity) {
-			$name = $this->identity->getName();
+		if ($this->getIdentity() instanceof AdminIdentity) {
+			$name = $this->getIdentity()->getName();
 			if ($name === null) {
 				$name = 'Admin';
 			}
-		} elseif (method_exists($this->identity, 'getName')) {
-			$name = (string) $this->identity->getName() ?: null;
+		} elseif (method_exists($this->getIdentity(), 'getName')) {
+			$name = (string) $this->getIdentity()->getName() ?: null;
 		}
 
 		return $name ? Shorts::process($name, 16) : null;
@@ -45,11 +45,11 @@ final class AdminBarUser implements User
 
 	public function getAvatarUrl(): ?string
 	{
-		if ($this->identity === null) {
+		if ($this->getIdentity() === null) {
 			return null;
 		}
-		if ($this->identity instanceof AdminIdentity) {
-			return $this->identity->getAvatarUrl();
+		if ($this->getIdentity() instanceof AdminIdentity) {
+			return $this->getIdentity()->getAvatarUrl();
 		}
 
 		return null;
@@ -58,6 +58,12 @@ final class AdminBarUser implements User
 
 	public function isLoggedIn(): bool
 	{
-		return $this->identity !== null;
+		return $this->user->isLoggedIn();
+	}
+
+
+	private function getIdentity(): ?IIdentity
+	{
+		return $this->user->getIdentity();
 	}
 }

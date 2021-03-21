@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Baraja\Cms;
 
 
-use Baraja\AdminBar\BasicPanel;
+use Baraja\AdminBar\Panel\BasicPanel;
 use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManagerAccessor;
 use Baraja\Cms\Translator\TranslatorFilter;
 use Baraja\Cms\User\UserManagerAccessor;
