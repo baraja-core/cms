@@ -22,6 +22,8 @@ use Baraja\Url\Url;
 use Nette\Application\Responses\TextResponse;
 use Nette\Application\Responses\VoidResponse;
 use Nette\Http\IResponse;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 final class Application
 {
@@ -59,10 +61,13 @@ final class Application
 
 		try {
 			$pluginService = $this->context->getPluginByName($plugin);
-			if ($this->context->checkPermission($plugin, null) === false) {
+			if ($this->context->checkPermission($plugin) === false) {
 				$this->terminate($this->templateRenderer->renderPermissionDenied());
 			}
-		} catch (\RuntimeException) {
+		} catch (\RuntimeException $e) {
+			if (class_exists(Debugger::class)) {
+				Debugger::log($e, ILogger::EXCEPTION);
+			}
 			$pluginService = $this->context->getPluginByType(ErrorPlugin::class);
 		}
 
