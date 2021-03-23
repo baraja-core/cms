@@ -52,7 +52,7 @@ final class MenuAuthorizator
 		} else {
 			throw new \RuntimeException(
 				'User (type of "' . $userManager->get()->getDefaultEntity() . '", id "' . $userService->getId() . '") '
-				. 'does not exist or is not logged in.'
+				. 'does not exist or is not logged in.',
 			);
 		}
 	}
