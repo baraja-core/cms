@@ -25,7 +25,12 @@ final class AdminBarBridge
 		$menu = AdminBar::getBar()->getMenu();
 
 		// Show link only in case of user can edit profile
-		if ($this->menuAuthorizator->get()->isAllowedComponent('user', 'user-overview') === true) {
+		try {
+			$allowUserOverview = $this->menuAuthorizator->get()->isAllowedComponent('user', 'user-overview');
+		} catch (\RuntimeException) {
+			$allowUserOverview = false;
+		}
+		if ($allowUserOverview === true) {
 			$menu->addLink(
 				'My Profile',
 				$this->linkGenerator->link('User:detail', [
