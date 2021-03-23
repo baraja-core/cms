@@ -50,7 +50,10 @@ final class MenuAuthorizator
 			$this->roles = array_flip($user[0]['roles'] ?? []);
 			$this->privileges = array_flip($user[0]['privileges'] ?? []);
 		} else {
-			throw new \InvalidArgumentException('User does not exist or is not logged in.');
+			throw new \RuntimeException(
+				'User (type of "' . $userManager->get()->getDefaultEntity() . '", id "' . $userService->getId() . '") '
+				. 'does not exist or is not logged in.'
+			);
 		}
 	}
 
