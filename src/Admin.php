@@ -19,8 +19,6 @@ final class Admin
 {
 	public const SUPPORTED_LOCALES = ['cs', 'en'];
 
-	private string $cacheDir;
-
 	private Application $application;
 
 
@@ -32,7 +30,6 @@ final class Admin
 		CmsPluginPanel $panel,
 	) {
 		FileSystem::createDir($cacheDir = $tempDirResolver->get('cache/baraja.cms'));
-		$this->cacheDir = $cacheDir;
 		$this->application = new Application(
 			$context,
 			$panel,
@@ -74,10 +71,14 @@ final class Admin
 		} catch (AdminRedirect $redirect) {
 			$this->context->getResponse()->redirect($redirect->getUrl(), IResponse::S302_FOUND);
 			(new VoidResponse)->send($this->context->getRequest(), $this->context->getResponse());
-			die;
 		} catch (\Throwable $e) {
-			Debugger::log($e, ILogger::EXCEPTION);
-			throw $e;
+			try {
+				Debugger::log($e, ILogger::CRITICAL);
+			} catch (\Throwable $e) {
+				// Silence is golden.
+			}
+			Helpers::brokenAdmin($e);
 		}
+		die;
 	}
 }

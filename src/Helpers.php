@@ -245,18 +245,24 @@ final class Helpers
 	{
 		$return = (string) preg_replace_callback(
 			'#[ \t\r\n]+|<(/)?(textarea|pre)(?=\W)#i',
-			fn(array $match): string => empty($match[2]) ? ' ' : $match[0],
+			static fn(array $match): string => empty($match[2]) ? ' ' : $match[0],
 			$haystack,
 		);
 		$return = (string) preg_replace('/(\w|;)\s+({|})\s+(\w|\.|#)/', '$1$2$3', $return);
 		$return = str_replace(';}', '}', $return);
 		$return = (string) preg_replace('/(\w)\s*:\s+(\w|#|-|.)/', '$1:$2', $return);
+
 		return (string) preg_replace('/\s*\/\*+[^\*]+\*+\/\s*/', '', $return);
 	}
 
 
 	public static function brokenAdmin(\Throwable $e): void
 	{
+		for ($ttl = 10; $ttl > 0; $ttl--) {
+			if (ob_end_clean() === true) {
+				break;
+			}
+		}
 		echo self::minifyHtml((new Engine)
 			->renderToString(__DIR__ . '/../template/broken-admin.latte', [
 				'basePath' => Url::get()->getBaseUrl(),
