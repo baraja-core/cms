@@ -12,6 +12,7 @@ use Baraja\Cms\Plugin\CommonSettingsPlugin;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Plugin\HomepagePlugin;
 use Baraja\Cms\Plugin\UserPlugin;
+use Baraja\Cms\Proxy\GlobalAsset\CmsSimpleStaticAsset;
 use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManager;
 use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManagerAccessor;
 use Baraja\Cms\Support\Support;
@@ -52,6 +53,13 @@ final class CmsExtension extends CompilerExtension
 	{
 		return Expect::structure([
 			'assets' => Expect::arrayOf(Expect::string()),
+			'globalAssets' => Expect::arrayOf(Expect::anyOf(
+				Expect::string()->required(),
+				[
+					'format' => Expect::anyOf('css', 'js')->required(),
+					'url' => Expect::string()->required(),
+				]
+			)),
 		]);
 	}
 
@@ -123,8 +131,12 @@ final class CmsExtension extends CompilerExtension
 			->setImplement(MenuAuthorizatorAccessor::class);
 
 		// global asset manager
-		$builder->addDefinition($this->prefix('customGlobalAssetManager'))
+		$globalAssetManager = $builder->addDefinition($this->prefix('customGlobalAssetManager'))
 			->setFactory(CustomGlobalAssetManager::class);
+
+		if (isset($this->config->globalAssets)) {
+			$this->registerGlobalAssets($globalAssetManager, $this->config->globalAssets);
+		}
 
 		$builder->addAccessorDefinition($this->prefix('customGlobalAssetManagerAccessor'))
 			->setImplement(CustomGlobalAssetManagerAccessor::class);
@@ -279,5 +291,39 @@ final class CmsExtension extends CompilerExtension
 				$adminBarBridge->getName(),
 			],
 		);
+	}
+
+
+	/**
+	 * @param array<int, string|array<string, string>> $assets
+	 */
+	private function registerGlobalAssets(ServiceDefinition $globalAssetManager, array $assets): void
+	{
+		foreach ($assets as $asset) {
+			$url = null;
+			$format = null;
+			if (is_string($asset)) {
+				if (preg_match('/^(?<name>.+)\.(?<format>[a-zA-Z0-9]+)(?:\?.*)?$/', $asset, $formatParser)) {
+					$format = $formatParser['format'] ?? null;
+				} else {
+					throw new \RuntimeException('Invalid asset filename "' . $asset . '". Did you mean "' . $asset . '.js"?');
+				}
+				$url = $asset;
+			} elseif (is_array($asset)) {
+				$url = $asset['url'] ?? null;
+				$format = $asset['format'] ?? null;
+			}
+			if ($url === null || $format === null) {
+				throw new \RuntimeException(
+					'Custom asset is invalid, because URL "' . $url . '" and format "' . $format . '" given. '
+					. 'Did you set "url" and "format"?',
+				);
+			}
+			$globalAssetManager->addSetup('?->addAsset(new ' . CmsSimpleStaticAsset::class . '(?, ?))', [
+				'@self',
+				$format,
+				$url,
+			]);
+		}
 	}
 }
