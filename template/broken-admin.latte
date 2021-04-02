@@ -40,7 +40,7 @@
 </html>
 
 {define content}
-<b-container>
+<b-container class="mt-5">
 	<b-row align-h="center">
 		<b-col class="py-5" cols="8">
 			<b-card title="Administrace je poškozena">
@@ -63,6 +63,9 @@
 					<p>Chyba v souboru: <b>{$exception->getFile()}</b> (řádek <b>{$exception->getLine()}</b>).</p>
 				</div>
 			</b-card>
+			<p class="text-right text-secondary">
+				Error was logged to Tracy, please check the <b>log</b> directory.
+			</p>
 		</b-col>
 	</b-row>
 </b-container>
