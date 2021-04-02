@@ -12,8 +12,7 @@ final class CmsSimpleStaticAsset implements CmsAsset
 	public function __construct(
 		private string $format,
 		private string $url
-	)
-	{
+	) {
 		if (in_array($format, $supported = ['js', 'css'], true) === false) {
 			throw new \InvalidArgumentException(
 				'Format "' . $format . '" is not supported. '
