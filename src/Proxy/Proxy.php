@@ -124,7 +124,7 @@ final class Proxy
 				. 'Did you mean "' . implode('", "', array_keys(self::CONTENT_TYPES)) . '"?',
 			);
 		}
-		$return = file_get_contents($assetPath);
+		$return = (string) file_get_contents($assetPath);
 		if ($fileName === 'core.css' || $fileName === 'core.js') {
 			$customAssetPath = $this->context->getCustomAssetPath($extension);
 			if ($customAssetPath !== null) {
