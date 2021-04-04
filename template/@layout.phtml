@@ -22,11 +22,12 @@ namespace Baraja\Cms;
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<meta name="description" content="Baraja administration">
 	<meta name="author" content="Baraja.cz">
-	<meta name="robots" content="noindex, nofollow">
+	<meta name="robots" content="noindex, nofollow, noarchive">
 	<title>Admin</title>
 	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css">
 	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css">
 	<link type="text/css" rel="stylesheet" href="<?= Helpers::escapeHtmlAttr($basePath . '/admin/assets/core.css') ?>">
+	<link rel="shortcut icon" type="image/x-icon" href="<?= Helpers::escapeHtmlAttr($basePath . '/admin/assets/favicon.ico') ?>">
 	<?php
 	foreach ($customAssetPaths as $customAssetPath => $customAssetPathFormat) {
 		if ($customAssetPathFormat === 'css') {
