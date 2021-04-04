@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Baraja\Cms\MiddleWare;
 
 
+use Baraja\AdminBar\AdminBar;
 use Baraja\Cms\Admin;
 use Baraja\Cms\Context;
 use Baraja\Cms\Helpers;
@@ -44,7 +45,7 @@ final class TemplateRenderer
 		});
 
 		$args = [
-			'isDebug' => (string) ($_GET['debugMode'] ?? '') === '1',
+			'isDebug' => AdminBar::getBar()->isDebugMode(),
 			'basePath' => $baseUrl = Url::get()->getBaseUrl(),
 			'assetsPath' => 'admin/cms-web-loader/' . $this->context->getPluginNameByType($plugin) . '.js',
 			'customAssetPaths' => $this->context->getCustomGlobalAssetPaths(),
