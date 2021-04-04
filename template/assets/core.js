@@ -3,9 +3,9 @@ console.log('%c Welcome to Baraja CMS. All components has been loaded successful
 Vue.component('cms-menu', {
 	props: ['structure', 'activeKey', 'dashboardLink', 'isDashboard', 'debugMode'],
 	template: `<div class="cms-menu-container">
-		<div :class="{'cms-menu-item': true, 'cms-menu-item-selected': isDashboard}" @click="window.location.href=dashboardLink">
+		<a :class="{'cms-menu-item': true, 'cms-menu-item-selected': isDashboard}" :href="dashboardLink">
 			<b-icon icon="compass" class="mr-2"></b-icon>Dashboard
-		</div>
+		</a>
 		<template v-for="item in structure">
 			<cms-menu-item :item-key="item.key" :title="item.title" :link="item.link" :icon="item.icon" :child="item.child" :priority="item.priority" :active-key="activeKey" :debug-mode="debugMode"></cms-menu-item>
 		</template>
@@ -14,19 +14,22 @@ Vue.component('cms-menu', {
 
 Vue.component('cms-menu-item', {
 	props: ['itemKey', 'title', 'link', 'icon', 'child', 'priority', 'activeKey', 'debugMode'],
-	template: `<div :class="{'cms-menu-item': true, 'cms-menu-item-selected': itemKey === activeKey}" @click="processLink(link)">
-	<template v-if="debugMode">({{ priority }})</template>
+	template: `<a :class="{'cms-menu-item': true, 'cms-menu-item-selected': itemKey === activeKey}" :href="basePath + '/' + link">
+	<span v-if="debugMode" class="text-secondary" style="font-size:10pt">[{{ priority }}]</span>
 	<b-icon :icon="icon ? icon : 'hash'" class="mr-2"></b-icon>{{ title }}
 	<div class="cms-menu-item" v-if="child.length > 0">
 		<template v-for="item in child">
 			<cms-menu-item :item-key="item.key" :title="item.title" :link="item.link" :icon="item.icon" :child="item.child" :priority="item.priority" :debug-mode="debugMode"></cms-menu-item>
 		</template>
 	</div>
-</div>`,
-	methods: {
-		processLink(link) {
-			window.location.href = basePath + '/' + link;
+</a>`,
+	data() {
+		return {
+			basePath: ''
 		}
+	},
+	mounted() {
+		this.basePath = basePath;
 	}
 });
 
