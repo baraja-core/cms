@@ -6,13 +6,11 @@ namespace Baraja\Cms\MiddleWare;
 
 
 use Baraja\AdminBar\AdminBar;
-use Baraja\AssetsLoader\Minifier\DefaultJsMinifier;
 use Baraja\Cms\Context;
 use Baraja\Cms\Helpers;
 use Baraja\Cms\LinkGenerator;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Proxy\Proxy;
-use Baraja\Cms\User\AdminBarUser;
 use Baraja\Plugin\CmsPluginPanel;
 use Baraja\Plugin\Exception\PluginRedirectException;
 use Baraja\Plugin\Exception\PluginTerminateException;
@@ -111,26 +109,8 @@ final class Application
 		if ($plugin === 'SetUserPassword') { // route reset password form
 			$this->terminate($this->templateRenderer->renderSetUserPasswordTemplate($_GET['userId'] ?? '', $locale));
 		}
-		if ($plugin === 'CmsWebLoader') { // route dynamic assets
-			(new Proxy($this->context->getPluginManager()))->run($path);
-		}
-		if (
-			($assetType = $path === 'assets/core.js' ? 'js' : null)
-			|| ($assetType = $path === 'assets/core.css' ? 'css' : null)
-		) { // route static assets from template directory
-			header('Content-Type: ' . Proxy::CONTENT_TYPES[$assetType]);
-			$assetContent = file_get_contents(__DIR__ . '/../../template/assets/core.' . $assetType)
-				. (($customAssetPath = $this->context->getCustomAssetPath($assetType)) !== null ? "\n\n" . file_get_contents($customAssetPath) : '');
-			if ($assetType === 'css') {
-				$assetContent = Helpers::minifyHtml($assetContent);
-			} elseif ($assetType === 'js' && \class_exists(DefaultJsMinifier::class)) {
-				$assetContent = (new DefaultJsMinifier)->minify($assetContent);
-			}
-			echo '/*' . "\n"
-				. ' * This file is part of Baraja CMS.' . "\n"
-				. ' */' . "\n\n"
-				. $assetContent;
-			die;
+		if ($plugin === 'CmsWebLoader' || str_starts_with($path, 'assets/')) { // route static file from internal storage or dynamic assets
+			(new Proxy($this->context))->run($path);
 		}
 	}
 
@@ -138,7 +118,7 @@ final class Application
 	private function processLoginPage(string $path, string $locale): void
 	{
 		if (
-			strncmp($path, 'cms/', 4) !== 0
+			str_starts_with($path, 'cms/')
 			&& $this->context->getUser()->isLoggedIn() === false
 		) { // route login form
 			if ($this->context->getUser()->getId() !== null) {
