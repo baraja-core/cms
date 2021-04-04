@@ -109,7 +109,10 @@ final class Application
 		if ($plugin === 'SetUserPassword') { // route reset password form
 			$this->terminate($this->templateRenderer->renderSetUserPasswordTemplate($_GET['userId'] ?? '', $locale));
 		}
-		if ($plugin === 'CmsWebLoader' || str_starts_with($path, 'assets/')) { // route static file from internal storage or dynamic assets
+		if (
+			$plugin === 'CmsWebLoader'
+			|| str_starts_with($path, 'assets/')
+		) { // route static file from internal storage or dynamic assets
 			(new Proxy($this->context))->run($path);
 		}
 	}
