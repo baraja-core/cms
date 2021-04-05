@@ -34,8 +34,8 @@ final class UserManager implements Authenticator
 		private UserStorage $userStorage,
 		?string $userEntity = null,
 	) {
-		/** @phpstan-ignore-next-line */
-		if ((class_implements($userEntity = $userEntity ?? User::class)[CmsUser::class] ?? false) === false) {
+		$userEntity = $userEntity ?? User::class;
+		if (is_subclass_of($userEntity, CmsUser::class) === false) {
 			throw new \InvalidArgumentException('User entity "' . $userEntity . '" must implements "' . CmsUser::class . '" interface.');
 		}
 		$this->defaultEntity = $userEntity;
