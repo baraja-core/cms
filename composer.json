@@ -13,7 +13,7 @@
 		"baraja-core/dynamic-configuration": "^2.0",
 		"baraja-core/doctrine": "^3.0",
 		"baraja-core/structured-api": "^3.0",
-		"baraja-core/admin-bar": "^2.1",
+		"baraja-core/admin-bar": "^2.2",
 		"baraja-core/plugin-system": "^2.0",
 		"baraja-core/localization": "^2.0",
 		"baraja-core/baraja-cloud": "^2.0",
@@ -28,6 +28,7 @@
 	},
 	"require-dev": {
 		"baraja-core/assets-loader": "^2.0",
+		"baraja-core/doctrine-fulltext-search": "^3.0",
 		"phpstan/phpstan": "^0.12.74",
 		"tracy/tracy": "^2.8",
 		"phpstan/phpstan-nette": "^0.12.14",

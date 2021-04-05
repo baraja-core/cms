@@ -171,6 +171,48 @@ h1 {
 	border-top: hidden;
 }
 
+#admin-bar-container .global-search {
+	transition: all .3s ease-in-out;
+}
+
+#admin-bar-container .global-search .autocomplete {
+	position: absolute;
+	background: white;
+	width: 384px;
+	border: 1px solid #aaa;
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+	transition: all 0.3s ease-in-out;
+}
+
+#admin-bar-container .global-search .autocomplete-spinner {
+	text-align: center !important;
+	margin: 32px 0 !important;
+}
+
+#admin-bar-container .global-search .autocomplete-body .search-result-item {
+	padding: 8px !important;
+	border-top: 1px solid #aaa;
+}
+
+#admin-bar-container .global-search .autocomplete-body .search-result-item:hover {
+	background: #eee !important;
+}
+
+#admin-bar-container .global-search .autocomplete-body .search-result-item .search-result-snippet {
+	font-size: 11pt;
+	color: #555;
+	margin-top: .5em;
+}
+
+#admin-bar-container .global-search .autocomplete-body .search-result-item:first-child {
+	border-top: 0 !important;
+}
+
+#admin-bar-container .global-search .autocomplete-body .search-result-item .highlight {
+	font-weight: bold;
+}
+
 .flag__red {
 	background: #f44336
 }

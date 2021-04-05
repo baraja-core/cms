@@ -11,10 +11,12 @@ use Baraja\Cms\Helpers;
 use Baraja\Cms\LinkGenerator;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Proxy\Proxy;
+use Baraja\Cms\Search\SearchAdminBarPlugin;
 use Baraja\Plugin\CmsPluginPanel;
 use Baraja\Plugin\Exception\PluginRedirectException;
 use Baraja\Plugin\Exception\PluginTerminateException;
 use Baraja\Plugin\Exception\PluginUserErrorException;
+use Baraja\Search\Search;
 use Baraja\ServiceMethodInvoker;
 use Baraja\Url\Url;
 use Nette\Application\Responses\TextResponse;
@@ -56,6 +58,10 @@ final class Application
 		$this->trySystemWorkflow($plugin, $path, $locale);
 		$this->processLoginPage($path, $locale);
 		AdminBar::enable(AdminBar::MODE_ENABLED);
+		AdminBar::getBar()->setEnableVue();
+		if (class_exists(Search::class)) {
+			AdminBar::getBar()->addPlugin(new SearchAdminBarPlugin);
+		}
 
 		try {
 			$pluginService = $this->context->getPluginByName($plugin);
