@@ -38,7 +38,7 @@ final class CmsGlobalSearchEndpoint extends BaseEndpoint
 		$searchResult = $this->searchAccessor->get()->search(
 			query: $query,
 			entityMap: $entityMap,
-			useAnalytics: false
+			useAnalytics: false,
 		);
 
 		$results = [];
