@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Baraja\Cms\Plugin;
 
 
+use Baraja\Cms\Search\SearchablePlugin;
 use Baraja\Cms\User\UserManager;
 use Baraja\Plugin\BasePlugin;
 use Baraja\Plugin\SimpleComponent\Breadcrumb;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 
-final class UserPlugin extends BasePlugin
+final class UserPlugin extends BasePlugin implements SearchablePlugin
 {
 	public function __construct(
 		private UserManager $userManager,
@@ -31,7 +32,7 @@ final class UserPlugin extends BasePlugin
 	}
 
 
-	public function getBaseEntity(): ?string
+	public function getBaseEntity(): string
 	{
 		return $this->userManager->getDefaultEntity();
 	}
@@ -59,5 +60,12 @@ final class UserPlugin extends BasePlugin
 		$this->addBreadcrumb(new Breadcrumb('Dashboard', $this->link('Homepage:default')));
 		$this->addBreadcrumb(new Breadcrumb('User', $this->link('User:default')));
 		$this->addBreadcrumb(new Breadcrumb($user->getName()));
+	}
+
+
+	/** @return string[] */
+	public function getSearchColumns(): array
+	{
+		return [':username(name)', '!firstName', '!lastName', 'nick', 'email'];
 	}
 }

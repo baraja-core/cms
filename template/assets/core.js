@@ -152,6 +152,48 @@ Vue.component('cms-select', {
 	}
 });
 
+Vue.component('cms-global-search', {
+	template: `<table class="global-search" :style="'width:' + (query === '' ? 180 : 400) + 'px !important'">
+	<tr>
+		<td style="padding:0 8px !important">
+			<input type="search" v-model="query" placeholder="Search...">
+			<div v-if="query" class="autocomplete">
+				<div v-if="autocomplete === null" class="autocomplete-spinner">
+					<b-spinner small></b-spinner>
+				</div>
+				<div v-else class="autocomplete-body">
+					<div v-for="autocompleteItem in autocomplete" class="search-result-item">
+						<a :href="autocompleteItem.link" v-html="autocompleteItem.title"></a>
+						<div v-if="autocompleteItem.snippet" v-html="autocompleteItem.snippet" class="search-result-snippet"></div>
+					</div>
+				</div>
+			</div>
+		</td>
+	</tr>
+</table>`,
+	data() {
+		return {
+			query: '',
+			autocomplete: null
+		}
+	},
+	watch: {
+		query: function() {
+			if (this.query === '') {
+				this.autocomplete = null;
+				return;
+			}
+			axiosApi.get('cms-global-search?' + httpBuildQuery({
+				query: this.query
+			})).then(req => {
+				if (req.data.query === this.query) {
+					this.autocomplete = req.data.results;
+				}
+			});
+		}
+	}
+});
+
 Vue.component('cms-search', {
 	props: ['placeholder'],
 	template: `<div :class="{'cms-search': true, 'cms-search-focus': focus}">
