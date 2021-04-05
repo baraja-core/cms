@@ -34,7 +34,7 @@ final class UserManager implements Authenticator
 		private UserStorage $userStorage,
 		?string $userEntity = null,
 	) {
-		$userEntity = $userEntity ?? User::class;
+		$userEntity ??= User::class;
 		if (is_subclass_of($userEntity, CmsUser::class) === false) {
 			throw new \InvalidArgumentException('User entity "' . $userEntity . '" must implements "' . CmsUser::class . '" interface.');
 		}
