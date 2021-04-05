@@ -26,7 +26,7 @@ use Baraja\Plugin\PluginComponentExtension;
 use Baraja\Plugin\PluginLinkGenerator;
 use Baraja\Plugin\PluginManager;
 use Nette\Application\Application;
-use Nette\Bridges\ApplicationLatte\ILatteFactory;
+use Nette\Bridges\ApplicationLatte\LatteFactory;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Definitions\FactoryDefinition;
 use Nette\DI\Definitions\ServiceDefinition;
@@ -260,7 +260,7 @@ final class CmsExtension extends CompilerExtension
 		$adminBarBridge = $builder->getDefinitionByType(AdminBarBridge::class);
 
 		/** @var FactoryDefinition $latte */
-		$latte = $builder->getDefinitionByType(ILatteFactory::class);
+		$latte = $builder->getDefinitionByType(LatteFactory::class);
 		$latte->getResultDefinition()->addSetup('addFilter(?, ?)', [
 			'translate', '@' . TranslatorFilter::class,
 		]);
