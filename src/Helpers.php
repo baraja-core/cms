@@ -133,6 +133,7 @@ final class Helpers
 	public static function fixPhone(string $phone, int $region = 420): string
 	{
 		$phone = (string) preg_replace('/\s+/', '', $phone); // remove spaces
+		$phone = (string) preg_replace('/^00' . $region . '/', '+' . $region, $phone);
 
 		if (preg_match('/^([\+0-9]+)/', $phone, $trimUnexpected)) { // remove user notice and unexpected characters
 			$phone = (string) $trimUnexpected[1];
