@@ -132,8 +132,11 @@ final class Helpers
 	 */
 	public static function fixPhone(string $phone, int $region = 420): string
 	{
-		$phone = (string) preg_replace('/\s+/', '', $phone); // remove spaces
-		$phone = (string) preg_replace('/^00' . $region . '/', '+' . $region, $phone);
+		$phone = (string) preg_replace('/[^\d+]/', '', $phone); // remove spaces
+		if (preg_match('/^(?:0{2,}|\+)\s*([1-9]\d{2})\s*(.+)$/', $phone, $phoneRegionParser)) {
+			$region = (int) ($phoneRegionParser[1] ?? throw new \LogicException('Invalid phone prefix.'));
+			$phone = '+' . $region . ($phoneRegionParser[2] ?? '');
+		}
 
 		if (preg_match('/^([\+0-9]+)/', $phone, $trimUnexpected)) { // remove user notice and unexpected characters
 			$phone = (string) $trimUnexpected[1];
