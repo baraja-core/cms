@@ -127,7 +127,7 @@ final class Application
 	private function processLoginPage(string $path, string $locale): void
 	{
 		if (
-			str_starts_with($path, 'cms/')
+			str_starts_with($path, 'cms/') === false
 			&& $this->context->getUser()->isLoggedIn() === false
 		) { // route login form
 			if ($this->context->getUser()->getId() !== null) {
