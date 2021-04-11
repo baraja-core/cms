@@ -1,5 +1,6 @@
 console.log('%c Welcome to Baraja CMS. All components has been loaded successfully.', 'background:#3c3c3c;color:#bada55');
 
+
 Vue.component('cms-menu', {
 	props: ['structure', 'activeKey', 'dashboardLink', 'isDashboard', 'debugMode'],
 	template: `<div class="cms-menu-container">
