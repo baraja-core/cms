@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Baraja\Cms\Plugin;
 
 
+use Baraja\AdminBar\AdminBar;
 use Baraja\Cms\Search\SearchablePlugin;
+use Baraja\Cms\User\AdminBar\LoginAsUserPanel;
 use Baraja\Cms\User\UserManager;
 use Baraja\Plugin\BasePlugin;
 use Baraja\Plugin\SimpleComponent\Breadcrumb;
+use Baraja\Url\Url;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 
@@ -54,12 +57,26 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 			return;
 		}
 
+		AdminBar::getBar()->addPanel(new LoginAsUserPanel($user->getId()));
+
 		$this->setTitle($user->getName());
 		$this->setLinkBack($this->link('Article:default'));
 
 		$this->addBreadcrumb(new Breadcrumb('Dashboard', $this->link('Homepage:default')));
 		$this->addBreadcrumb(new Breadcrumb('User', $this->link('User:default')));
 		$this->addBreadcrumb(new Breadcrumb($user->getName()));
+	}
+
+
+	public function actionLoginAs(string $id): void
+	{
+		try {
+			$this->userManager->loginAs($id);
+		} catch (\Throwable $e) {
+			$this->error($e->getMessage());
+		}
+
+		$this->redirect(Url::get()->getBaseUrl());
 	}
 
 

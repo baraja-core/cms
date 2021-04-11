@@ -650,27 +650,6 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function actionLoginAs(string $id): void
-	{
-		try {
-			$user = $this->userManager->getUserById($id);
-		} catch (NoResultException | NonUniqueResultException) {
-			$this->sendError('User "' . $id . '" does not exist.');
-
-			return;
-		}
-		try {
-			$this->userManager->createIdentity($user);
-		} catch (\Throwable $e) {
-			$this->sendError($e->getMessage());
-		}
-
-		$this->sendOk([
-			'redirectUrl' => Url::get()->getBaseUrl(),
-		]);
-	}
-
-
 	public function actionSaveMeta(string $id, string $key, ?string $value = null): void
 	{
 		$this->userManager->setMeta($id, $key, $value);
