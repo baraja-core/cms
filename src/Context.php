@@ -156,13 +156,18 @@ final class Context
 	public function checkPermission(string $plugin, ?string $view = null): bool
 	{
 		$pluginName = Helpers::formatPresenterNameToUri($plugin);
+		if ($pluginName === 'cms') {
+			return true;
+		}
 		try {
 			return $view === null
 				? $this->authorizator->get()->isAllowedPlugin($pluginName)
 				: $this->authorizator->get()->isAllowedComponent($pluginName, $view);
-		} catch (\InvalidArgumentException) {
-			return $pluginName === 'cms';
+		} catch (\Throwable $e) {
+			trigger_error('Can not check permissions: ' . $e->getMessage());
 		}
+
+		return false;
 	}
 
 
