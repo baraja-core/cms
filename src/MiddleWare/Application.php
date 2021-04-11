@@ -86,8 +86,12 @@ final class Application
 			}
 
 			$pluginService->afterRender();
-		} catch (PluginRedirectException $e) {
-			$this->redirect(Url::get()->getBaseUrl() . '/admin' . (($path = $e->getPath()) === '' ? '' : '/' . $path));
+		} catch (PluginRedirectException $redirectException) {
+			$redirectPath = $redirectException->getPath();
+			if (str_starts_with($redirectPath, 'http')) {
+				$this->redirect($redirectPath);
+			}
+			$this->redirect(Url::get()->getBaseUrl() . '/admin' . ($redirectPath === '' ? '' : '/' . $redirectPath));
 		} catch (PluginTerminateException) {
 			$this->terminate();
 		} catch (PluginUserErrorException $e) {
