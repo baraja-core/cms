@@ -141,7 +141,7 @@ Vue.component('user-default', {
 						<b-button :href="link('User:detail', {id: item.id})" variant="warning" size="sm" title="Edit">
 							<b-icon icon="pencil"></b-icon>
 						</b-button>
-						<b-button @click="loginAs(item.id)" variant="primary" size="sm" v-b-tooltip.hover title="Log in as this user.">
+						<b-button :href="link('User:loginAs', {id: item.id})" variant="primary" size="sm" v-b-tooltip.hover title="Log in as this user.">
 							<b-icon icon="box-arrow-in-right"></b-icon>
 						</b-button>
 						<b-button @click="deleteUser(item.id)" variant="danger" size="sm" v-b-tooltip.hover title="Hide this user.">
@@ -219,12 +219,6 @@ Vue.component('user-default', {
 		setInterval(this.sync, 15000);
 	},
 	methods: {
-		loginAs(id) {
-			axiosApi.get(`user/login-as?id=${id}`)
-				.then(req => {
-					window.location.href = req.data.data.redirectUrl;
-				})
-		},
 		checkMailDuplication() {
 			axiosApi.get(`user/validate-user?email=${this.user.form.email}`)
 				.then(req => {

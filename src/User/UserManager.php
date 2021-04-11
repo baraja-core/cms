@@ -249,6 +249,17 @@ final class UserManager implements Authenticator
 	}
 
 
+	public function loginAs(string $id): void
+	{
+		try {
+			$user = $this->getUserById($id);
+		} catch (NoResultException | NonUniqueResultException) {
+			throw new \InvalidArgumentException('User "' . $id . '" does not exist.');
+		}
+		$this->createIdentity($user);
+	}
+
+
 	private function logLoginAttempt(UserLoginAttempt $attempt, IIdentity $identity): void
 	{
 		$attempt->setOkPassword();
