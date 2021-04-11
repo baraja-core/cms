@@ -163,8 +163,10 @@ Vue.component('cms-global-search', {
 				</div>
 				<div v-else class="autocomplete-body">
 					<div v-for="autocompleteItem in autocomplete" class="search-result-item">
-						<a :href="autocompleteItem.link" v-html="autocompleteItem.title"></a>
-						<div v-if="autocompleteItem.snippet" v-html="autocompleteItem.snippet" class="search-result-snippet"></div>
+						<a :href="autocompleteItem.link">
+							<span v-html="autocompleteItem.title"></span>
+							<span v-if="autocompleteItem.snippet" v-html="autocompleteItem.snippet" class="search-result-snippet"></span>
+						</a>
 					</div>
 				</div>
 			</div>
