@@ -443,8 +443,12 @@ Vue.component('cms-quick-edit', {
 						return;
 					}
 				}
+				if (this.type === 'bool') {
+					value = value === true || value === 'true';
+				}
 				this.newValue = value;
 				this.loading = true;
+				this.$emit('click');
 				axiosApi.get((this.endpointUri ? this.endpointUri : 'quick-edit') + '?' + httpBuildQuery({
 					entity: this.entity,
 					property: this.property,
@@ -455,6 +459,8 @@ Vue.component('cms-quick-edit', {
 					this.editable = false;
 					this.loading = false;
 					this.originalValue = value;
+					this.$emit('input', value);
+					this.$emit('changed');
 				});
 			}
 		});
@@ -542,7 +548,7 @@ Vue.component('cms-quick-edit-bool', {
 	},
 	watch: {
 		value: function() {
-			this.newValue = this.value;
+			this.newValue = this.value === true || this.value === 'true';
 		}
 	},
 	methods: {
