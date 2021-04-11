@@ -12,8 +12,6 @@ use Baraja\Cms\LinkGenerator;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Proxy\Proxy;
 use Baraja\Cms\Search\SearchAdminBarPlugin;
-use Baraja\Cms\User\AdminBar\BackToLastIdentityPanel;
-use Baraja\Cms\User\UserManager;
 use Baraja\Plugin\CmsPluginPanel;
 use Baraja\Plugin\Exception\PluginRedirectException;
 use Baraja\Plugin\Exception\PluginTerminateException;
@@ -126,9 +124,6 @@ final class Application
 			|| str_starts_with($path, 'assets/')
 		) { // route static file from internal storage or dynamic assets
 			(new Proxy($this->context))->run($path);
-		}
-		if (isset($_SESSION[UserManager::LAST_IDENTITY_ID__SESSION_KEY])) {
-			AdminBar::getBar()->addPanel(new BackToLastIdentityPanel($this->context->getUserManager()));
 		}
 	}
 
