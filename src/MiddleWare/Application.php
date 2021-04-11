@@ -68,8 +68,8 @@ final class Application
 			if ($this->context->checkPermission($plugin) === false) {
 				$this->terminate($this->templateRenderer->renderPermissionDenied());
 			}
-		} catch (\RuntimeException $e) {
-			if (class_exists(Debugger::class)) {
+		} catch (\RuntimeException | \InvalidArgumentException $e) {
+			if ($e->getCode() !== 404 && class_exists(Debugger::class)) {
 				Debugger::log($e, ILogger::EXCEPTION);
 			}
 			$pluginService = $this->context->getPluginByType(ErrorPlugin::class);
