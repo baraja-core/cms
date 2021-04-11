@@ -179,7 +179,8 @@ h1 {
 	position: absolute;
 	background: white;
 	width: 384px;
-	border: 1px solid #aaa;
+	-webkit-box-shadow: 0 5px 16px 0 rgba(214, 206, 194, 0.5);
+	box-shadow: 0 5px 16px 0 rgba(214, 206, 194, 0.5);
 	border-bottom-left-radius: 8px;
 	border-bottom-right-radius: 8px;
 	transition: all 0.3s ease-in-out;
@@ -192,7 +193,7 @@ h1 {
 
 #admin-bar-container .global-search .autocomplete-body .search-result-item {
 	padding: 8px !important;
-	border-top: 1px solid #aaa;
+	border-top: 1px solid #eee;
 }
 
 #admin-bar-container .global-search .autocomplete-body .search-result-item:hover {
@@ -201,7 +202,7 @@ h1 {
 
 #admin-bar-container .global-search .autocomplete-body .search-result-item .search-result-snippet {
 	font-size: 11pt;
-	color: #555;
+	color: #555 !important;
 	margin-top: .5em;
 }
 
