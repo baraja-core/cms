@@ -34,8 +34,8 @@ final class BackToLastIdentityPanel implements Panel
 
 		$url = LinkGenerator::generateInternalLink('User:loginAs', ['id' => $user->getId()]);
 
-		return '<a href="' . $url . '" class="btn btn-primary">'
-			. 'Go back to <b style="color:#aaa !important">' . htmlspecialchars($user->getName()) . '</b>'
+		return '<a href="' . $url . '" class="btn btn-primary" style="background:#17a2b8 !important" title="Switch the current login session back to the last user\'s profile.">'
+			. 'Back to <b style="color:#000 !important">' . htmlspecialchars($user->getName()) . '</b>'
 			. '</a>';
 	}
 
