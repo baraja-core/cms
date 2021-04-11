@@ -50,7 +50,7 @@ final class CmsGlobalSearchEndpoint extends BaseEndpoint
 			$pluginName = $pluginClassToPluginName[$pluginClass] ?? null;
 			$results[] = [
 				'title' => $searchItem->getTitleHighlighted(),
-				'snippet' => $searchItem->getSnippet(),
+				'snippet' => $searchItem->getSnippetHighlighted(),
 				'link' => LinkGenerator::generateInternalLink($pluginName . ':detail', [
 					'id' => $searchItem->getId(),
 				]),
