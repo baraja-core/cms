@@ -32,10 +32,14 @@ final class BackToLastIdentityPanel implements Panel
 			return '';
 		}
 
-		$url = LinkGenerator::generateInternalLink('User:loginAs', ['id' => $user->getId()]);
+		$linkBack = LinkGenerator::generateInternalLink('User:loginAs', ['id' => $user->getId()]);
+		$linkForgot = LinkGenerator::generateInternalLink('User:forgotLastIdentity', ['id' => $user->getId()]);
 
-		return '<a href="' . $url . '" class="btn btn-primary" style="background:#17a2b8 !important" title="Switch the current login session back to the last user\'s profile.">'
+		return '<a href="' . $linkBack . '" class="btn btn-primary" style="background:#17a2b8 !important" title="Switch the current login session back to the last user\'s profile.">'
 			. 'Back to <b style="color:#000 !important">' . htmlspecialchars($user->getName()) . '</b>'
+			. '</a>&nbsp;&nbsp;&nbsp;'
+			. '<a href="' . $linkForgot . '" class="btn btn-primary" style="background:#17a2b8 !important" title="Forget information about previous identity. You will no longer be able to return to the user.">'
+			. 'Forgot last identity'
 			. '</a>';
 	}
 
