@@ -1,9 +1,11 @@
-console.log('%c Welcome to Baraja CMS. All components has been loaded successfully.', 'background:#3c3c3c;color:#bada55');
-
+console.log(
+    '%c Welcome to Baraja CMS. All components has been loaded successfully.',
+    'background:#3c3c3c;color:#bada55');
 
 Vue.component('cms-menu', {
-	props: ['structure', 'activeKey', 'dashboardLink', 'isDashboard', 'debugMode'],
-	template: `<div class="cms-menu-container">
+  props :
+      [ 'structure', 'activeKey', 'dashboardLink', 'isDashboard', 'debugMode' ],
+  template : `<div class="cms-menu-container">
 		<a :class="{'cms-menu-item': true, 'cms-menu-item-selected': isDashboard}" :href="dashboardLink">
 			<b-icon icon="compass" class="mr-2"></b-icon>Dashboard
 		</a>
@@ -14,8 +16,12 @@ Vue.component('cms-menu', {
 });
 
 Vue.component('cms-menu-item', {
-	props: ['itemKey', 'title', 'link', 'icon', 'child', 'priority', 'activeKey', 'debugMode'],
-	template: `<a :class="{'cms-menu-item': true, 'cms-menu-item-selected': itemKey === activeKey}" :href="basePath + '/' + link">
+  props : [
+    'itemKey', 'title', 'link', 'icon', 'child', 'priority', 'activeKey',
+    'debugMode'
+  ],
+  template :
+      `<a :class="{'cms-menu-item': true, 'cms-menu-item-selected': itemKey === activeKey}" :href="basePath + '/' + link">
 	<span v-if="debugMode" class="text-secondary" style="font-size:10pt">[{{ priority }}]</span>
 	<b-icon :icon="icon ? icon : 'hash'" class="mr-2"></b-icon>{{ title }}
 	<div class="cms-menu-item" v-if="child.length > 0">
@@ -24,19 +30,15 @@ Vue.component('cms-menu-item', {
 		</template>
 	</div>
 </a>`,
-	data() {
-		return {
-			basePath: ''
-		}
-	},
-	mounted() {
-		this.basePath = basePath;
-	}
+  data() {
+    return { basePath: '' }
+  },
+  mounted() { this.basePath = basePath; }
 });
 
 Vue.component('cms-footer', {
-	props: ['year'],
-	template: `<footer role="contentinfo">
+  props : [ 'year' ],
+  template : `<footer role="contentinfo">
 	<div class="cms-footer">
 		<div class="container" role="contentinfo">
 			<div class="row">
@@ -71,7 +73,7 @@ Vue.component('cms-footer', {
 });
 
 Vue.component('cms-filter', {
-	template: `<div class="card" style="border-bottom:0 !important">
+  template : `<div class="card" style="border-bottom:0 !important">
 	<div class="card-header py-2">
 		<slot></slot>
 	</div>
@@ -79,8 +81,8 @@ Vue.component('cms-filter', {
 });
 
 Vue.component('breadcrumb', {
-	props: ['items'],
-	template: `<b-breadcrumb>
+  props : [ 'items' ],
+  template : `<b-breadcrumb>
 		<template v-for="(item, key) in items">
 			<b-breadcrumb-item :href="item.href" :active="key === items.length - 1">
 				<i v-if="key === 0" class="fa fa-home"></i>
@@ -91,8 +93,9 @@ Vue.component('breadcrumb', {
 });
 
 Vue.component('cms-select', {
-	props: ['label', 'values'],
-	template: `<div :class="{'cms-select': true, 'cms-select-active': value !== null}">
+  props : [ 'label', 'values' ],
+  template :
+      `<div :class="{'cms-select': true, 'cms-select-active': value !== null}">
 		<table @click="changeOpenState(true)" class="w-100 p-0 m-0">
 			<tr>
 				<td>
@@ -114,47 +117,40 @@ Vue.component('cms-select', {
 			</template>
 		</div>
 	</div>`,
-	data() {
-		return {
-			value: null,
-			selectedText: null,
-			open: false
-		}
-	},
-	mounted() {
-		eventBus.$on('cms-select-open', () => {
-			this.open = false;
-		});
-	},
-	created() {
-		this.$nextTick(() => {
-			if (this.label) {
-				this.value = null;
-				this.selectedText = this.label;
-			} else if (this.values.length > 0) {
-				this.value = this.values[0].value;
-				this.selectedText = this.values[0].text;
-			}
-		});
-	},
-	methods: {
-		changeOpenState(open) {
-			if (open === true) {
-				eventBus.$emit('cms-select-open');
-			}
-			this.open = open;
-		},
-		selectValue(value, label) {
-			this.value = value;
-			this.selectedText = label;
-			this.changeOpenState(false);
-			this.$emit('value', value);
-		}
-	}
+  data() {
+    return { value: null, selectedText: null, open: false }
+  },
+  mounted() { eventBus.$on('cms-select-open', () => { this.open = false; }); },
+  created() {
+    this.$nextTick(() => {
+      if (this.label) {
+        this.value = null;
+        this.selectedText = this.label;
+      } else if (this.values.length > 0) {
+        this.value = this.values[0].value;
+        this.selectedText = this.values[0].text;
+      }
+    });
+  },
+  methods : {
+    changeOpenState(open) {
+      if (open === true) {
+        eventBus.$emit('cms-select-open');
+      }
+      this.open = open;
+    },
+    selectValue(value, label) {
+      this.value = value;
+      this.selectedText = label;
+      this.changeOpenState(false);
+      this.$emit('value', value);
+    }
+  }
 });
 
 Vue.component('cms-global-search', {
-	template: `<table class="global-search" :style="'width:' + (query === '' ? 180 : 400) + 'px !important'">
+  template :
+      `<table class="global-search" :style="'width:' + (query === '' ? 180 : 400) + 'px !important'">
 	<tr>
 		<td style="padding:0 8px !important">
 			<input type="search" v-model="query" placeholder="Search...">
@@ -174,32 +170,28 @@ Vue.component('cms-global-search', {
 		</td>
 	</tr>
 </table>`,
-	data() {
-		return {
-			query: '',
-			autocomplete: null
-		}
-	},
-	watch: {
-		query: function() {
-			if (this.query === '') {
-				this.autocomplete = null;
-				return;
-			}
-			axiosApi.get('cms-global-search?' + httpBuildQuery({
-				query: this.query
-			})).then(req => {
-				if (req.data.query === this.query) {
-					this.autocomplete = req.data.results;
-				}
-			});
-		}
-	}
+  data() {
+    return { query: '', autocomplete: null }
+  },
+  watch : {
+    query : function() {
+      if (this.query === '') {
+        this.autocomplete = null;
+        return;
+      }
+      axiosApi.get('cms-global-search?' + httpBuildQuery({query : this.query}))
+          .then(req => {
+            if (req.data.query === this.query) {
+              this.autocomplete = req.data.results;
+            }
+          });
+    }
+  }
 });
 
 Vue.component('cms-search', {
-	props: ['placeholder'],
-	template: `<div :class="{'cms-search': true, 'cms-search-focus': focus}">
+  props : [ 'placeholder' ],
+  template : `<div :class="{'cms-search': true, 'cms-search-focus': focus}">
 		<table class="w-100 p-0 m-0">
 			<tr>
 				<td class="text-left pr-1"><b-icon icon="search" style="color:#93a1a7"></b-icon></td>
@@ -207,22 +199,16 @@ Vue.component('cms-search', {
 			</tr>
 		</table>
 	</div>`,
-	data() {
-		return {
-			focus: false,
-			query: ''
-		}
-	},
-	methods: {
-		onInput() {
-			this.$emit('value', this.query);
-		}
-	}
+  data() {
+    return { focus: false, query: '' }
+  },
+  methods : {onInput() { this.$emit('value', this.query); }}
 });
 
 Vue.component('cms-default', {
-	props: ['card', 'title', 'subtitle', 'buttons', 'breadcrumb', 'contextMenu'],
-	template: `<div>
+  props :
+      [ 'card', 'title', 'subtitle', 'buttons', 'breadcrumb', 'contextMenu' ],
+  template : `<div>
 		<div v-if="breadcrumb" class="mb-2">
 			<breadcrumb :items="breadcrumb"></breadcrumb>
 		</div>
@@ -247,8 +233,11 @@ Vue.component('cms-default', {
 });
 
 Vue.component('cms-detail', {
-	props: ['title', 'subtitle', 'breadcrumb', 'buttons', 'linkBack', 'contextMenu', 'smartComponent', 'smartComponentParams'],
-	template: `<div>
+  props : [
+    'title', 'subtitle', 'breadcrumb', 'buttons', 'linkBack', 'contextMenu',
+    'smartComponent', 'smartComponentParams'
+  ],
+  template : `<div>
 		<div v-if="breadcrumb" class="mb-2">
 			<breadcrumb :items="breadcrumb"></breadcrumb>
 		</div>
@@ -269,8 +258,8 @@ Vue.component('cms-detail', {
 });
 
 Vue.component('cms-buttons', {
-	props: ['buttons', 'linkBack', 'contextMenu'],
-	template: `<div>
+  props : [ 'buttons', 'linkBack', 'contextMenu' ],
+  template : `<div>
 		<template v-if="linkBack">
 			<b-btn variant="white" class="mb-2 mb-lg-0" :href="linkBack">Back</b-btn>
 		</template>
@@ -298,84 +287,57 @@ Vue.component('cms-buttons', {
 			</template>
 		</b-dropdown>
 	</div>`,
-	data() {
-		return {
-			loading: []
-		}
-	},
-	methods: {
-		handleMenu(item) {
-			switch (item.action) {
-				case 'link':
-					location.href = item.target;
-					break;
-				case 'linkTarget':
-					window.open(item.target, '_blank');
-					break;
-				case 'linkTab':
-					window.open(item.target);
-					break;
-				case 'modal':
-					this.$bvModal.show(item.target);
-					break;
-				case 'method':
-					let target = item.target().finally(() => this.loading = this.loading.filter(i => i !== item.label));
-					if (target instanceof Promise) {
-						this.loading.push(item.label);
-					}
-					break;
-			}
-		}
-	}
+  data() {
+    return { loading: [] }
+  },
+  methods : {
+    handleMenu(item) {
+      switch (item.action) {
+      case 'link':
+        location.href = item.target;
+        break;
+      case 'linkTarget':
+        window.open(item.target, '_blank');
+        break;
+      case 'linkTab':
+        window.open(item.target);
+        break;
+      case 'modal':
+        this.$bvModal.show(item.target);
+        break;
+      case 'method':
+        let target = item.target().finally(
+            () => this.loading = this.loading.filter(i => i !== item.label));
+        if (target instanceof Promise) {
+          this.loading.push(item.label);
+        }
+        break;
+      }
+    }
+  }
 });
 
 Vue.component('cms-quick-edit', {
-	props: {
-		entity: {
-			type: String,
-			required: true
-		},
-		property: {
-			type: String,
-			required: true
-		},
-		id: {
-			type: [String, Number],
-			required: true
-		},
-		value: {
-			required: true
-		},
-		type: {
-			type: String,
-			required: false
-		},
-		options: {
-			required: false,
-			default: function () {
-				return {};
-			}
-		},
-		truncate: {
-			type: Number,
-			required: false
-		},
-		confirm: {
-			type: [String, Boolean],
-			required: false,
-			default: function () {
-				return false;
-			}
-		},
-		endpointUri: {
-			type: [String, null],
-			required: false,
-			default: function () {
-				return null;
-			}
-		}
-	},
-	template: `<div>
+  props : {
+    entity : {type : String, required : true},
+    property : {type : String, required : true},
+    id : {type : [ String, Number ], required : true},
+    value : {required : true},
+    type : {type : String, required : false},
+    options : {required : false, default : function() { return {}; }},
+    truncate : {type : Number, required : false},
+    confirm : {
+      type : [ String, Boolean ],
+      required : false,
+      default : function() { return false; }
+    },
+    endpointUri : {
+      type : [ String, null ],
+      required : false,
+      default : function() { return null; }
+    }
+  },
+  template : `<div>
 	<template v-if="loading">
 		<b-spinner small></b-spinner>
 	</template>
@@ -415,298 +377,265 @@ Vue.component('cms-quick-edit', {
 		</template>
 	</div>
 </div>`,
-	mounted() {
-		this.originalValue = this.value;
-		this.newValue = this.value;
-		this.key = 'quickEdit-' + this.entity + '-' + this.id + '-' + this.property;
-		eventBus.$on('cms-quick-edit-open', (key) => {
-			if (key !== this.key) {
-				this.editable = false;
-			}
-		});
-		eventBus.$on('cms-quick-edit-save', (key, value) => {
-			if (key === this.key) {
-				if (value === this.originalValue) {
-					this.editable = false;
-					this.loading = false;
-					return;
-				}
-				if (this.confirm !== false) {
-					if (
-						(this.confirm === true && !confirm('Do you really want change ' + this.property + '?'))
-						|| (this.confirm !== true && !confirm(this.confirm))
-					) {
-						this.loading = true;
-						this.syncValue(this.originalValue);
-						this.$nextTick(() => {
-							this.loading = false;
-						});
-						return;
-					}
-				}
-				this.newValue = value;
-				this.loading = true;
-				axiosApi.get((this.endpointUri ? this.endpointUri : 'quick-edit') + '?' + httpBuildQuery({
-					entity: this.entity,
-					property: this.property,
-					id: this.id,
-					value: value,
-					type: this.type ? this.type : 'text'
-				})).then(req => {
-					this.editable = false;
-					this.loading = false;
-					this.originalValue = value;
-				});
-			}
-		});
-	},
-	data() {
-		return {
-			editable: false,
-			loading: false,
-			key: '',
-			originalValue: '',
-			newValue: ''
-		}
-	},
-	watch: {
-		value: function (newVal) {
-			this.syncValue(newVal);
-		}
-	},
-	methods: {
-		startEditable() {
-			eventBus.$emit('cms-quick-edit-open', this.key);
-			this.editable = true;
-		},
-		syncValue(newVal) {
-			this.originalValue = newVal;
-			this.newValue = newVal;
-			this.editable = false;
-		}
-	},
-	computed: {
-		isUrl: function() {
-			if (typeof this.newValue === 'string' || this.newValue instanceof String) {
-				let pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
-					'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
-					'((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
-					'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
-					'(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-					'(\\#[-a-z\\d_]*)?$','i'); // fragment locator
-				return !!pattern.test(this.newValue);
-			}
+  mounted() {
+    this.originalValue = this.value;
+    this.newValue = this.value;
+    this.key = 'quickEdit-' + this.entity + '-' + this.id + '-' + this.property;
+    eventBus.$on('cms-quick-edit-open', (key) => {
+      if (key !== this.key) {
+        this.editable = false;
+      }
+    });
+    eventBus.$on('cms-quick-edit-save', (key, value) => {
+      if (key === this.key) {
+        if (value === this.originalValue) {
+          this.editable = false;
+          this.loading = false;
+          return;
+        }
+        if (this.confirm !== false) {
+          if ((this.confirm === true &&
+               !confirm('Do you really want change ' + this.property + '?')) ||
+              (this.confirm !== true && !confirm(this.confirm))) {
+            this.loading = true;
+            this.syncValue(this.originalValue);
+            this.$nextTick(() => { this.loading = false; });
+            return;
+          }
+        }
+        this.newValue = value;
+        this.loading = true;
+        axiosApi
+            .get((this.endpointUri ? this.endpointUri : 'quick-edit') + '?' +
+                 httpBuildQuery({
+                   entity : this.entity,
+                   property : this.property,
+                   id : this.id,
+                   value : value,
+                   type : this.type ? this.type : 'text'
+                 }))
+            .then(req => {
+              this.editable = false;
+              this.loading = false;
+              this.originalValue = value;
+            });
+      }
+    });
+  },
+  data() {
+    return {
+      editable: false, loading: false, key: '', originalValue: '', newValue: ''
+    }
+  },
+  watch : {value : function(newVal) { this.syncValue(newVal); }},
+  methods : {
+    startEditable() {
+      eventBus.$emit('cms-quick-edit-open', this.key);
+      this.editable = true;
+    },
+    syncValue(newVal) {
+      this.originalValue = newVal;
+      this.newValue = newVal;
+      this.editable = false;
+    }
+  },
+  computed : {
+    isUrl : function() {
+      if (typeof this.newValue === 'string' || this.newValue instanceof
+                                                   String) {
+        let pattern = new RegExp(
+            '^(https?:\\/\\/)?' +                                    // protocol
+                '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain
+                                                                     // name
+                '((\\d{1,3}\\.){3}\\d{1,3}))' +     // OR ip (v4) address
+                '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+                '(\\?[;&a-z\\d%_.~+=-]*)?' +        // query string
+                '(\\#[-a-z\\d_]*)?$',
+            'i'); // fragment locator
+        return !!pattern.test(this.newValue);
+      }
 
-			return false;
-		}
-	}
+      return false;
+    }
+  }
 });
 
 Vue.component('cms-quick-edit-text', {
-	props: ['value', 'elementKey'],
-	template: `<b-input-group>
+  props : [ 'value', 'elementKey' ],
+  template : `<b-input-group>
 		<b-form-input v-model="newValue" :id="elementKey" size="sm" @keyup.enter.native="save()" @blur="save()"></b-form-input>
 		<b-input-group-append>
 			<b-button size="sm" type="submit" variant="success" @click="save()">Save</b-button>
 		</b-input-group-append>
 	</b-input-group>`,
-	data() {
-		return {
-			newValue: ''
-		}
-	},
-	mounted() {
-		this.newValue = this.value;
-		this.$nextTick(() => {
-			document.getElementById(this.elementKey).focus();
-		});
-	},
-	methods: {
-		save() {
-			eventBus.$emit('cms-quick-edit-save', this.elementKey, this.newValue);
-		}
-	}
+  data() {
+    return { newValue: '' }
+  },
+  mounted() {
+    this.newValue = this.value;
+    this.$nextTick(() => { document.getElementById(this.elementKey).focus(); });
+  },
+  methods : {
+    save() {
+      eventBus.$emit('cms-quick-edit-save', this.elementKey, this.newValue);
+    }
+  }
 });
 
 Vue.component('cms-quick-edit-bool', {
-	props: ['value', 'elementKey'],
-	template: `<b-form-checkbox v-model="newValue" :id="elementKey" switch @change="save()"></b-form-checkbox>`,
-	data() {
-		return {
-			newValue: false
-		}
-	},
-	mounted() {
-		this.$nextTick(() => {
-			this.newValue = this.value;
-		});
-	},
-	watch: {
-		value: function() {
-			this.newValue = this.value;
-		}
-	},
-	methods: {
-		save() {
-			this.$nextTick(() => {
-				eventBus.$emit('cms-quick-edit-save', this.elementKey, this.newValue ? 'true' : 'false');
-			});
-		}
-	}
+  props : [ 'value', 'elementKey' ],
+  template :
+      `<b-form-checkbox v-model="newValue" :id="elementKey" switch @change="save()"></b-form-checkbox>`,
+  data() {
+    return { newValue: false }
+  },
+  mounted() { this.$nextTick(() => { this.newValue = this.value; }); },
+  watch : {value : function() { this.newValue = this.value; }},
+  methods : {
+    save() {
+      this.$nextTick(() => {
+        eventBus.$emit('cms-quick-edit-save', this.elementKey,
+                       this.newValue ? 'true' : 'false');
+      });
+    }
+  }
 });
 
 Vue.component('cms-quick-edit-select', {
-	props: ['value', 'elementKey', 'options'],
-	template: `<b-form-select v-model="newValue" :id="elementKey" :options="options" size="sm" style="min-width:64px" @change="save()"></b-form-select>`,
-	data() {
-		return {
-			newValue: null
-		}
-	},
-	mounted() {
-		this.$nextTick(() => {
-			this.newValue = this.value;
-		});
-	},
-	methods: {
-		save() {
-			this.$nextTick(() => {
-				eventBus.$emit('cms-quick-edit-save', this.elementKey, this.newValue);
-			});
-		}
-	}
+  props : [ 'value', 'elementKey', 'options' ],
+  template :
+      `<b-form-select v-model="newValue" :id="elementKey" :options="options" size="sm" style="min-width:64px" @change="save()"></b-form-select>`,
+  data() {
+    return { newValue: null }
+  },
+  mounted() { this.$nextTick(() => { this.newValue = this.value; }); },
+  methods : {
+    save() {
+      this.$nextTick(() => {
+        eventBus.$emit('cms-quick-edit-save', this.elementKey, this.newValue);
+      });
+    }
+  }
 });
 
 Vue.component('cms-quick-edit-datetime', {
-	props: ['value', 'elementKey'],
-	template: `<b-form-datepicker v-model="newValue" :id="elementKey" size="sm" :startWeekday="1" :reset-button="true" :today-button="true" :date-format-options="{ 'year': 'numeric', 'month': 'short', 'day': 'numeric', 'weekday': 'short' }" style="font-size:10pt" @input="save()"></b-form-datepicker>`,
-	data() {
-		return {
-			newValue: ''
-		}
-	},
-	mounted() {
-		this.$nextTick(() => {
-			this.newValue = this.value;
-		});
-	},
-	methods: {
-		save() {
-			this.$nextTick(() => {
-				eventBus.$emit('cms-quick-edit-save', this.elementKey, this.newValue);
-			});
-		}
-	}
+  props : [ 'value', 'elementKey' ],
+  template :
+      `<b-form-datepicker v-model="newValue" :id="elementKey" size="sm" :startWeekday="1" :reset-button="true" :today-button="true" :date-format-options="{ 'year': 'numeric', 'month': 'short', 'day': 'numeric', 'weekday': 'short' }" style="font-size:10pt" @input="save()"></b-form-datepicker>`,
+  data() {
+    return { newValue: '' }
+  },
+  mounted() { this.$nextTick(() => { this.newValue = this.value; }); },
+  methods : {
+    save() {
+      this.$nextTick(() => {
+        eventBus.$emit('cms-quick-edit-save', this.elementKey, this.newValue);
+      });
+    }
+  }
 });
 
 Vue.component('support-chat', {
-	template: `<div v-if="show" id="cms-support">
+  template : `<div v-if="show" id="cms-support">
 	<div>
 		Support is coming soon.
 	</div>
 </div>`,
-	data() {
-		return {
-			show: false,
-		}
-	},
-	mounted() {
-		eventBus.$on('open-support', () => {
-			this.show = true;
-			this.sync();
-		});
-	},
-	methods: {
-		sync() {
-		}
-	}
+  data() {
+    return { show: false, }
+  },
+  mounted() {
+    eventBus.$on('open-support', () => {
+      this.show = true;
+      this.sync();
+    });
+  },
+  methods : {sync() {}}
 });
 
 Vue.prototype.link = link;
 
 function link(route, params = {}) {
-	let [plugin, view] = `${route}:`.split(':');
+  let [plugin, view] = `${route}:`.split(':');
 
-	if (plugin === '') {
-		plugin = 'Homepage';
-	}
-	if (view === '') {
-		view = 'default';
-	}
+  if (plugin === '') {
+    plugin = 'Homepage';
+  }
+  if (view === '') {
+    view = 'default';
+  }
 
-	let path = basePath + '/admin/';
-	let re = /([A-Z][a-z0-9]*)|(^[a-z]+)/g;
-	plugin = plugin.match(re).map(i => i.toLowerCase()).join('-').trim();
-	view = view.match(re).map(i => i.toLowerCase()).join('-').trim();
+  let path = basePath + '/admin/';
+  let re = /([A-Z][a-z0-9]*)|(^[a-z]+)/g;
+  plugin = plugin.match(re).map(i => i.toLowerCase()).join('-').trim();
+  view = view.match(re).map(i => i.toLowerCase()).join('-').trim();
 
-	if (plugin === 'homepage') {
-		if (view !== 'default') {
-			path += 'homepage/' + view;
-		}
-	} else {
-		path += `${plugin}${view !== 'default' ? '/' + view : ''}`;
-	}
+  if (plugin === 'homepage') {
+    if (view !== 'default') {
+      path += 'homepage/' + view;
+    }
+  } else {
+    path += `${plugin}${view !== 'default' ? '/' + view : ''}`;
+  }
 
-	let keys = Object.entries(params);
-	if (keys.length > 0) {
-		path += `?${httpBuildQuery(params)}`;
-	}
+  let keys = Object.entries(params);
+  if (keys.length > 0) {
+    path += `?${httpBuildQuery(params)}`;
+  }
 
-	return path;
+  return path;
 }
 
-// source: https://github.com/vladzadvorny/http-build-query/blob/master/index.js#L2
-function isNumeric(n) {
-	return !isNaN(parseFloat(n)) && isFinite(n);
-}
+// source:
+// https://github.com/vladzadvorny/http-build-query/blob/master/index.js#L2
+function isNumeric(n) { return !isNaN(parseFloat(n)) && isFinite(n); }
 
 function cleanArray(actual) {
-	let newArray = [];
-	for (let i = 0; i < actual.length; i++) {
-		if (actual[i]) {
-			newArray.push(actual[i]);
-		}
-	}
-	return newArray;
+  let newArray = [];
+  for (let i = 0; i < actual.length; i++) {
+    if (actual[i]) {
+      newArray.push(actual[i]);
+    }
+  }
+  return newArray;
 }
 
 function esc(param) {
-	return encodeURIComponent(param)
-		.replace(/[!'()*]/g, escape)
-		.replace(/%20/g, '+');
+  return encodeURIComponent(param)
+      .replace(/[!'()*]/g, escape)
+      .replace(/%20/g, '+');
 }
 
 function httpBuildQuery(queryData, numericPrefix, argSeparator, tempKey) {
-	numericPrefix = numericPrefix || null;
-	argSeparator = argSeparator || '&';
-	tempKey = tempKey || null;
-	if (!queryData) {
-		return '';
-	}
+  numericPrefix = numericPrefix || null;
+  argSeparator = argSeparator || '&';
+  tempKey = tempKey || null;
+  if (!queryData) {
+    return '';
+  }
 
-	let query = Object.keys(queryData).map(function (k) {
-		let res;
-		let key = k;
-		if (tempKey) key = tempKey + '[' + key + ']';
-		if (typeof queryData[k] === 'object' && queryData[k] !== null) {
-			res = httpBuildQuery(queryData[k], null, argSeparator, key);
-		} else {
-			if (numericPrefix) {
-				key = isNumeric(key) ? numericPrefix + Number(key) : key;
-			}
+  let query = Object.keys(queryData).map(function(k) {
+    let res;
+    let key = k;
+    if (tempKey)
+      key = tempKey + '[' + key + ']';
+    if (typeof queryData[k] === 'object' && queryData[k] !== null) {
+      res = httpBuildQuery(queryData[k], null, argSeparator, key);
+    } else {
+      if (numericPrefix) {
+        key = isNumeric(key) ? numericPrefix + Number(key) : key;
+      }
 
-			let val = queryData[k];
-			val = val === true ? '1' : val;
-			val = val === false ? '0' : val;
-			val = val === 0 ? '0' : val;
-			val = val || '';
+      let val = queryData[k];
+      val = val === true ? '1' : val;
+      val = val === false ? '0' : val;
+      val = val === 0 ? '0' : val;
+      val = val || '';
 
-			res = esc(key) + '=' + esc(val);
-		}
-		return res;
-	});
+      res = esc(key) + '=' + esc(val);
+    }
+    return res;
+  });
 
-	return cleanArray(query)
-		.join(argSeparator)
-		.replace(/[!'()*]/g, '');
+  return cleanArray(query).join(argSeparator).replace(/[!'()*]/g, '');
 }
