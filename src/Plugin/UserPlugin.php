@@ -83,6 +83,15 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 	}
 
 
+	public function actionForgotLastIdentity(): void
+	{
+		if (isset($_SESSION) && session_status() === PHP_SESSION_ACTIVE) {
+			unset($_SESSION[UserManager::LAST_IDENTITY_ID__SESSION_KEY]);
+		}
+		$this->redirect(Url::get()->getBaseUrl());
+	}
+
+
 	/** @return string[] */
 	public function getSearchColumns(): array
 	{

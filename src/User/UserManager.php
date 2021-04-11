@@ -133,6 +133,9 @@ final class UserManager implements Authenticator
 
 	public function logout(): void
 	{
+		if (isset($_SESSION) && session_status() === PHP_SESSION_ACTIVE) {
+			unset($_SESSION[self::LAST_IDENTITY_ID__SESSION_KEY]);
+		}
 		$this->userStorage->clearAuthentication(true);
 		$this->userStorage->setExpiration(null, true);
 	}
