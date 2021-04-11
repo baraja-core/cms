@@ -191,18 +191,21 @@ h1 {
 	margin: 32px 0 !important;
 }
 
-#admin-bar-container .global-search .autocomplete-body .search-result-item {
+#admin-bar-container .global-search .autocomplete-body .search-result-item a {
+	display: block;
+	text-decoration: none;
 	padding: 8px !important;
 	border-top: 1px solid #eee;
 }
 
-#admin-bar-container .global-search .autocomplete-body .search-result-item:hover {
+#admin-bar-container .global-search .autocomplete-body .search-result-item a:hover {
 	background: #eee !important;
 }
 
 #admin-bar-container .global-search .autocomplete-body .search-result-item .search-result-snippet {
-	font-size: 11pt;
-	color: #555 !important;
+	display: block;
+	font-size: 10pt;
+	color: #666 !important;
 	margin-top: .5em;
 }
 
@@ -212,6 +215,7 @@ h1 {
 
 #admin-bar-container .global-search .autocomplete-body .search-result-item .highlight {
 	font-weight: bold;
+	font-style: normal;
 }
 
 .flag__red {
