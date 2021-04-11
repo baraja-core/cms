@@ -24,6 +24,8 @@ use Nette\Security\UserStorage;
 
 final class UserManager implements Authenticator
 {
+	public const LAST_IDENTITY_ID__SESSION_KEY = '__BRJ_CMS--last-identity-id';
+
 	private ?AuthenticationService $authenticationService = null;
 
 	private string $defaultEntity;
@@ -251,10 +253,17 @@ final class UserManager implements Authenticator
 
 	public function loginAs(string $id): void
 	{
+		$currentIdentity = $this->getIdentity();
+		if ($currentIdentity === null || $currentIdentity->getId() === $id) {
+			return;
+		}
 		try {
 			$user = $this->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			throw new \InvalidArgumentException('User "' . $id . '" does not exist.');
+		}
+		if (isset($_SESSION) && session_status() === PHP_SESSION_ACTIVE) {
+			$_SESSION[self::LAST_IDENTITY_ID__SESSION_KEY] = $currentIdentity->getId();
 		}
 		$this->createIdentity($user);
 	}
