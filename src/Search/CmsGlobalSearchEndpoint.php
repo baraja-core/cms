@@ -6,6 +6,7 @@ namespace Baraja\Cms\Search;
 
 
 use Baraja\Cms\LinkGenerator;
+use Baraja\Doctrine\EntityManager;
 use Baraja\Plugin\PluginManager;
 use Baraja\Search\SearchAccessor;
 use Baraja\StructuredApi\BaseEndpoint;
@@ -15,6 +16,7 @@ final class CmsGlobalSearchEndpoint extends BaseEndpoint
 	public function __construct(
 		private PluginManager $pluginManager,
 		private SearchAccessor $searchAccessor,
+		private EntityManager $entityManager,
 	) {
 	}
 
@@ -43,7 +45,7 @@ final class CmsGlobalSearchEndpoint extends BaseEndpoint
 
 		$results = [];
 		foreach ($searchResult->getItems() as $searchItem) {
-			$entityClass = get_class($searchItem->getEntity());
+			$entityClass = $this->entityManager->getClassMetadata(get_class($searchItem->getEntity()))->rootEntityName;
 			$pluginClass = $entityToPlugin[$entityClass] ?? null;
 			$pluginName = $pluginClassToPluginName[$pluginClass] ?? null;
 			$results[] = [
