@@ -449,6 +449,12 @@ Vue.component('cms-quick-edit', {
 				this.newValue = value;
 				this.loading = true;
 				this.$emit('click');
+				axiosApi.interceptors.response.use((ok) => {
+					return Promise.resolve(ok);
+				}, (error) => {
+					this.loading = false;
+					return Promise.reject(error);
+				});
 				axiosApi.get((this.endpointUri ? this.endpointUri : 'quick-edit') + '?' + httpBuildQuery({
 					entity: this.entity,
 					property: this.property,
