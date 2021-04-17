@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Baraja\Cms;
 
+
+use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
+
 /**
  * @var string $basePath
- * @var string $assetsPath
- * @var string[] $customAssetPaths
+ * @var CmsAsset[] $staticAssets
  * @var mixed[] $globalSettings
  * @var string $content
  * @var mixed[] $menu
@@ -29,9 +31,9 @@ namespace Baraja\Cms;
 	<link type="text/css" rel="stylesheet" href="<?= Helpers::escapeHtmlAttr($basePath . '/admin/assets/core.css') ?>">
 	<link rel="shortcut icon" type="image/x-icon" href="<?= Helpers::escapeHtmlAttr($basePath . '/admin/assets/favicon.ico') ?>">
 	<?php
-	foreach ($customAssetPaths as $customAssetPath => $customAssetPathFormat) {
-		if ($customAssetPathFormat === 'css') {
-			echo '<link type="text/css" rel="stylesheet" href="' . Helpers::escapeHtmlAttr($customAssetPath) .'">' . "\n";
+	foreach ($staticAssets as $staticAsset) {
+		if ($staticAsset->getFormat() === 'css') {
+			echo '<link type="text/css" rel="stylesheet" href="' . Helpers::escapeHtmlAttr($staticAsset->getUrl()) .'">' . "\n";
 		}
 	}
 	?>
@@ -67,12 +69,10 @@ namespace Baraja\Cms;
 <script src="https://unpkg.com/bootstrap-vue@2.17.0/dist/bootstrap-vue.min.js"></script>
 <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<script src="<?= Helpers::escapeHtmlAttr($basePath . '/' . $assetsPath) ?>"></script>
-<script src="<?= Helpers::escapeHtmlAttr($basePath . '/admin/assets/core.js') ?>"></script>
 <?php
-foreach ($customAssetPaths as $customAssetPath => $customAssetPathFormat) {
-	if ($customAssetPathFormat === 'js') {
-	  echo '<script src="' . Helpers::escapeHtmlAttr($customAssetPath) . '"></script>' . "\n";
+foreach ($staticAssets as $staticAsset) {
+	if ($staticAsset->getFormat() === 'js') {
+	  echo '<script src="' . Helpers::escapeHtmlAttr($staticAsset->getUrl()) . '"></script>' . "\n";
 	}
 }
 ?>

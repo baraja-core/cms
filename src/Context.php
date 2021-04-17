@@ -6,6 +6,7 @@ namespace Baraja\Cms;
 
 
 use Baraja\AdminBar\Panel\BasicPanel;
+use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManagerAccessor;
 use Baraja\Cms\Translator\TranslatorFilter;
 use Baraja\Cms\User\UserManagerAccessor;
@@ -178,11 +179,11 @@ final class Context
 
 
 	/**
-	 * @return string[] (path => format)
+	 * @return CmsAsset[]
 	 */
 	public function getCustomGlobalAssetPaths(): array
 	{
-		return $this->customGlobalAssetManager->get()->toArray();
+		return $this->customGlobalAssetManager->get()->getAssets();
 	}
 
 
