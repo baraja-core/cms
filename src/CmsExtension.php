@@ -55,10 +55,10 @@ final class CmsExtension extends CompilerExtension
 			'assets' => Expect::arrayOf(Expect::string()),
 			'globalAssets' => Expect::arrayOf(Expect::anyOf(
 				Expect::string()->required(),
-				[
+				Expect::structure([
 					'format' => Expect::anyOf('css', 'js')->required(),
 					'url' => Expect::string()->required(),
-				],
+				])->castTo('array'),
 			)),
 		]);
 	}
