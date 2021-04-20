@@ -7,10 +7,20 @@ namespace Baraja\Cms\User\Entity;
 
 use Baraja\Doctrine\UUID\UuidIdentifier;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
+use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="cms__user_meta")
+ * @ORM\Table(
+ *     name="cms__user_meta",
+*      uniqueConstraints={
+ *         @UniqueConstraint(name="cms__user_meta_user_key", columns={"user_id", "key"})
+ *     },
+ *     indexes={
+ *         @Index(name="cms__user_meta_user_key_value", columns={"user_id", "key", "value"})
+ *     }
+ * )
  */
 class UserMeta
 {
@@ -30,7 +40,7 @@ class UserMeta
 	{
 		$this->user = $user;
 		$this->key = $key;
-		$this->value = $value;
+		$this->value = trim($value ?? '') ?: null;
 	}
 
 
