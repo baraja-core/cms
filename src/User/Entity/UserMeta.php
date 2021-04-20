@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
  * @ORM\Entity()
  * @ORM\Table(
  *     name="cms__user_meta",
-*      uniqueConstraints={
+ *     uniqueConstraints={
  *         @UniqueConstraint(name="cms__user_meta_user_key", columns={"user_id", "key"})
  *     },
  *     indexes={
