@@ -35,7 +35,7 @@ final class DoctrineStorage implements Storage
 
 		$return = [];
 		foreach ($data as $item) {
-			$return[$item['key']] = $item['value'];
+			$return[(string) $item['key']] = (string) $item['value'];
 		}
 
 		return $return;
