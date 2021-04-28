@@ -83,7 +83,7 @@ final class Context
 	 */
 	public function getPluginKey(Plugin $plugin): string
 	{
-		$type = \get_class($plugin);
+		$type = $plugin::class;
 		foreach ($this->pluginManager->getPluginInfo() as $info) {
 			if ($info['type'] === $type) {
 				return (string) $info['service'];
