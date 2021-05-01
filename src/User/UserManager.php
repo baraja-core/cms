@@ -29,6 +29,8 @@ final class UserManager implements Authenticator
 
 	private string $defaultEntity;
 
+	private UserMetaManager $userMetaManager;
+
 
 	public function __construct(
 		private EntityManager $entityManager,
@@ -40,6 +42,18 @@ final class UserManager implements Authenticator
 			throw new \InvalidArgumentException('User entity "' . $userEntity . '" must implements "' . CmsUser::class . '" interface.');
 		}
 		$this->defaultEntity = $userEntity;
+		$this->userMetaManager = new UserMetaManager($this->entityManager, $this);
+	}
+
+
+	public function isAdmin(): bool
+	{
+		$identity = $this->getIdentity();
+		if ($identity !== null) {
+			return in_array('admin', $identity->getRoles(), true);
+		}
+
+		return false;
 	}
 
 
@@ -187,7 +201,8 @@ final class UserManager implements Authenticator
 
 	public function checkAuthenticatorOtpCode(CmsUser $user, int $code): bool
 	{
-		if (($otpCode = $user->getOtpCode()) === null) {
+		$otpCode = $user->getOtpCode();
+		if ($otpCode === null) {
 			return false;
 		}
 
@@ -195,61 +210,20 @@ final class UserManager implements Authenticator
 	}
 
 
+	/** @deprecated since 2021-05-01, use UserMetaManager instead. */
 	public function getMeta(int $userId, string $key): ?string
 	{
-		try {
-			/** @var UserMeta $meta */
-			$meta = $this->entityManager->getRepository(UserMeta::class)
-				->createQueryBuilder('meta')
-				->where('meta.user = :userId')
-				->andWhere('meta.key = :key')
-				->setParameter('userId', $userId)
-				->setParameter('key', $key)
-				->setMaxResults(1)
-				->getQuery()
-				->getSingleResult();
+		trigger_error(__METHOD__ . ': This method is deprecated, use UserMetaManager instead.');
 
-			return $meta->getValue();
-		} catch (NoResultException | NonUniqueResultException) {
-		}
-
-		return null;
+		return $this->userMetaManager->get($userId, $key);
 	}
 
 
+	/** @deprecated since 2021-05-01, use UserMetaManager instead. */
 	public function setMeta(int $userId, string $key, ?string $value): self
 	{
-		try {
-			/** @var UserMeta $meta */
-			$meta = $this->entityManager->getRepository(UserMeta::class)
-				->createQueryBuilder('meta')
-				->where('meta.user = :userId')
-				->andWhere('meta.key = :key')
-				->setParameter('userId', $userId)
-				->setParameter('key', $key)
-				->setMaxResults(1)
-				->getQuery()
-				->getSingleResult();
-		} catch (NoResultException | NonUniqueResultException $e) {
-			if ($value === null) {
-				return $this;
-			}
-			try {
-				/** @var User $user */
-				$user = $this->getUserById($userId);
-			} catch (NoResultException | NonUniqueResultException) {
-				throw new \InvalidArgumentException('User "' . $userId . '" does not exist.', $e->getCode(), $e);
-			}
-
-			$meta = new UserMeta($user, $key, $value);
-			$this->entityManager->persist($meta);
-		}
-		if ($value === null) {
-			$this->entityManager->remove($meta);
-		} else {
-			$meta->setValue($value);
-		}
-		$this->entityManager->flush();
+		trigger_error(__METHOD__ . ': This method is deprecated, use UserMetaManager instead.');
+		$this->userMetaManager->set($userId, $key, $value);
 
 		return $this;
 	}
@@ -279,7 +253,8 @@ final class UserManager implements Authenticator
 
 		if ($identity instanceof User) {
 			$attempt->setUser($identity);
-			$this->entityManager->persist($userLogin = new UserLogin($identity));
+			$userLogin = new UserLogin($identity);
+			$this->entityManager->persist($userLogin);
 			$identity->addLogin($userLogin);
 		}
 
@@ -309,9 +284,9 @@ final class UserManager implements Authenticator
 		}
 		$this->entityManager->flush();
 
-		if ($this->getMeta((int) $user->getId(), 'blocked') === 'true') {
+		if ($this->userMetaManager->get((int) $user->getId(), 'blocked') === 'true') {
 			throw new AuthenticationException(
-				$this->getMeta((int) $user->getId(), 'block-reason') ?? '',
+				$this->userMetaManager->get((int) $user->getId(), 'block-reason') ?? '',
 				Authenticator::NOT_APPROVED,
 			);
 		}
