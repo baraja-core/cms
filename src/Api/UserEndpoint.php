@@ -13,6 +13,7 @@ use Baraja\Cms\User\Entity\User;
 use Baraja\Cms\User\Entity\UserLogin;
 use Baraja\Cms\User\Entity\UserMeta;
 use Baraja\Cms\User\UserManager;
+use Baraja\Cms\User\UserMetaManager;
 use Baraja\Doctrine\EntityManager;
 use Baraja\Plugin\PluginManager;
 use Baraja\StructuredApi\BaseEndpoint;
@@ -32,6 +33,7 @@ final class UserEndpoint extends BaseEndpoint
 {
 	public function __construct(
 		private UserManager $userManager,
+		private UserMetaManager $userMetaManager,
 		private EntityManager $entityManager,
 		private CloudManager $cloudManager,
 		private PluginManager $pluginManager,
@@ -380,26 +382,24 @@ final class UserEndpoint extends BaseEndpoint
 			return;
 		}
 
-		try {
-			/** @var UserMeta $meta */
-			$meta = $this->entityManager->getRepository(UserMeta::class)
-				->createQueryBuilder('meta')
-				->where('meta.user = :userId')
-				->andWhere('meta.key = :key')
-				->setParameter('userId', $id)
-				->setParameter('key', 'password-last-changed-date')
-				->setMaxResults(1)
-				->getQuery()
-				->getSingleResult();
-
-		} catch (NoResultException | NonUniqueResultException) {
-			$meta = new UserMeta($user, 'password-last-changed-date', $user->getRegisterDate()->format('Y-m-d'));
-			$this->entityManager->persist($meta)->flush();
+		$this->userMetaManager->loadAll($id);
+		$lastChangedPassword = $this->userMetaManager->get($id, 'password-last-changed-date');
+		if ($lastChangedPassword === null) {
+			$lastChangedPassword = $user->getRegisterDate()->format('Y-m-d');
+			$this->userMetaManager->set($id, 'password-last-changed-date', $lastChangedPassword);
 		}
+		$isBlocked = $this->userMetaManager->get($id, 'blocked') === 'true';
 
 		$this->sendJson([
-			'lastChangedPassword' => DateTime::from($meta->getValue() ?? 'now')->format('F j, Y'),
+			'lastChangedPassword' => DateTime::from($lastChangedPassword ?? 'now')->format('F j, Y'),
 			'twoFactorAuth' => $user->getOtpCode() !== null,
+			'options' => [
+				'canBan' => $isBlocked === false
+					&& $this->userManager->isAdmin()
+					&& $this->getUser()->getId() !== $id,
+				'isBlocked' => $isBlocked,
+				'blockedReason' => $this->userMetaManager->get($id, 'block-reason'),
+			],
 		]);
 	}
 
@@ -416,6 +416,55 @@ final class UserEndpoint extends BaseEndpoint
 
 		$user->setOtpCode(null);
 		$this->entityManager->flush();
+		$this->sendOk();
+	}
+
+
+	public function postBlockUser(int $id, string $reason): void
+	{
+		if ($this->userManager->isAdmin() === false) {
+			$this->sendError('You are not admin.');
+		}
+		if ($this->getUser()->getId() === $id) {
+			$this->sendError('Your account can not be blocked.');
+		}
+		$reason = trim($reason);
+		if ($reason === '') {
+			$this->flashMessage('Block reason can not be empty.', 'error');
+			$this->sendError('Block reason can not be empty.');
+		}
+		try {
+			$this->userManager->getUserById($id);
+		} catch (NoResultException | NonUniqueResultException) {
+			$this->sendError('User "' . $id . '" does not exist.');
+
+			return;
+		}
+
+		$this->userMetaManager->set($id, 'blocked', 'true');
+		$this->userMetaManager->set($id, 'block-reason', $reason);
+		$this->flashMessage('User has been blocked.', 'success');
+		$this->sendOk();
+	}
+
+
+	public function postBlockUserCancel(int $id): void
+	{
+		if ($this->userManager->isAdmin() === false) {
+			$this->sendError('You are not admin.');
+		}
+		try {
+			$this->userManager->getUserById($id);
+		} catch (NoResultException | NonUniqueResultException) {
+			$this->sendError('User "' . $id . '" does not exist.');
+
+			return;
+		}
+
+		$this->userMetaManager->loadAll($id);
+		$this->userMetaManager->set($id, 'blocked', null);
+		$this->userMetaManager->set($id, 'block-reason', null);
+		$this->flashMessage('Account blocking has been lifted.', 'success');
 		$this->sendOk();
 	}
 
@@ -672,7 +721,7 @@ final class UserEndpoint extends BaseEndpoint
 
 	public function actionSaveMeta(int $id, string $key, ?string $value = null): void
 	{
-		$this->userManager->setMeta($id, $key, $value);
+		$this->userMetaManager->set($id, $key, $value);
 		$this->sendOk();
 	}
 
@@ -751,7 +800,7 @@ final class UserEndpoint extends BaseEndpoint
 		}
 
 		$user->setPassword($password);
-		$this->userManager->setMeta((int) $user->getId(), 'password-last-changed-date', date('Y-m-d'));
+		$this->userMetaManager->set((int) $user->getId(), 'password-last-changed-date', date('Y-m-d'));
 		$this->entityManager->flush();
 		$this->flashMessage('User password has been changed.', 'success');
 
@@ -815,8 +864,8 @@ final class UserEndpoint extends BaseEndpoint
 		$nameParser = Helpers::nameParser($name);
 		$user->setFirstName($nameParser['firstName']);
 		$user->setLastName($nameParser['lastName']);
-		$this->userManager->setMeta((int) $user->getId(), 'name--degree-before', $nameParser['degreeBefore']);
-		$this->userManager->setMeta((int) $user->getId(), 'name--degree-after', $nameParser['degreeAfter']);
+		$this->userMetaManager->set((int) $user->getId(), 'name--degree-before', $nameParser['degreeBefore']);
+		$this->userMetaManager->set((int) $user->getId(), 'name--degree-after', $nameParser['degreeAfter']);
 		$this->entityManager->flush();
 	}
 

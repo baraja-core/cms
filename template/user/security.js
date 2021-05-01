@@ -32,6 +32,32 @@ Vue.component('user-security', {
 				</b-btn>
 			</b-col>
 		</b-row>
+		<div v-if="options === null" class="text-center my-4">
+			<b-spinner></b-spinner>
+		</div>
+		<b-row v-else>
+			<b-col lg="6">
+				<template v-if="options.canBan">
+					<h2 class="h3">Blocking</h2>
+					<b-button variant="danger" v-b-modal.block-user>Block this user</b-button>
+				</template>
+				<b-alert variant="danger" :show="options.isBlocked">
+					<div class="row">
+						<div class="col">
+							<p class="mb-0">
+								This user has been blocked.
+								<template v-if="options.blockedReason">
+									<br><b>Reason:</b> {{ options.blockedReason }}
+								</template>
+							</p>
+						</div>
+						<div class="col-sm-4 text-right">
+							<b-button variant="danger" size="sm" @click="blockCancel">Cancel blocking</b-button>
+						</div>
+					</div>
+				</b-alert>
+			</b-col>
+		</b-row>
 		<b-modal id="disable-auth" title="Disable Two-Step Verification">
 			<p>Are you sure you want to remove Two-Step Verification?</p>
 			<template v-slot:modal-footer>
@@ -40,12 +66,25 @@ Vue.component('user-security', {
 				<b-btn v-else size="sm" variant="danger" disabled>Disabling</b-btn>
 			</template>
 		</b-modal>
+		<b-modal id="block-user" hide-footer title="Block this user">
+			<p>Are you sure you want to block this user?</p>
+			<p class="text-secondary">
+				The user profile will remain in its current form, but the user will not be able to log in.
+			</p>
+			<p>Enter a reason for blocking this user:</p>
+			<b-textarea v-model="block.reason"></b-textarea>
+			<b-button variant="danger" @click="blockNow" class="mt-3">Block now</b-button>
+		</b-modal>
 	</b-card>`,
 	data() {
 		return {
 			lastChangedPassword: null,
 			isOAuth: null,
-			isDisabling: false
+			isDisabling: false,
+			options: null,
+			block: {
+				reason: ''
+			}
 		}
 	},
 	mounted() {
@@ -66,7 +105,24 @@ Vue.component('user-security', {
 				.then(req => {
 					this.lastChangedPassword = req.data.lastChangedPassword;
 					this.isOAuth = req.data.twoFactorAuth;
+					this.options = req.data.options;
 				})
+		},
+		blockNow() {
+			axiosApi.post('user/block-user', {
+				id: this.id,
+				reason: this.block.reason
+			}).then(req => {
+				this.$bvModal.hide('block-user');
+				this.sync();
+			});
+		},
+		blockCancel() {
+			axiosApi.post('user/block-user-cancel', {
+				id: this.id,
+			}).then(req => {
+				this.sync();
+			});
 		}
 	}
 });
