@@ -875,10 +875,8 @@ final class UserEndpoint extends BaseEndpoint
 
 		$return = [];
 		foreach ($metas as $meta) {
-			/** @phpstan-ignore-next-line */
-			$id = $meta['user']['id'] ?? throw new \LogicException('User ID does not exist.');
 			unset($meta['user']);
-			$return[(int) $id][$meta['key'] ?? ''] = $meta['value'] ?? '';
+			$return[(int) ($meta['user']['id'] ?? 0)][$meta['key'] ?? ''] = $meta['value'] ?? '';
 		}
 
 		return $return;
