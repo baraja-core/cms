@@ -58,7 +58,7 @@ final class CmsExtension extends CompilerExtension
 				Expect::structure([
 					'format' => Expect::anyOf('css', 'js')->required(),
 					'url' => Expect::string()->required(),
-				]),
+				])->castTo('array'),
 			)),
 		]);
 	}

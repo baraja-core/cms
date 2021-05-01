@@ -11,6 +11,7 @@ use Baraja\Cms\Context;
 use Baraja\Cms\Helpers;
 use Baraja\Cms\MenuManager;
 use Baraja\Cms\Plugin\ErrorPlugin;
+use Baraja\Cms\Proxy\GlobalAsset\CmsSimpleStaticAsset;
 use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\UserResetPasswordRequest;
 use Baraja\Plugin\BasePlugin;
@@ -47,8 +48,10 @@ final class TemplateRenderer
 		$args = [
 			'isDebug' => AdminBar::getBar()->isDebugMode(),
 			'basePath' => $baseUrl = Url::get()->getBaseUrl(),
-			'assetsPath' => 'admin/cms-web-loader/' . $this->context->getPluginNameByType($plugin) . '.js',
-			'customAssetPaths' => $this->context->getCustomGlobalAssetPaths(),
+			'staticAssets' => array_merge($this->context->getCustomGlobalAssetPaths(), [
+				new CmsSimpleStaticAsset('js', $baseUrl . '/admin/cms-web-loader/' . $this->context->getPluginNameByType($plugin) . '.js'),
+				new CmsSimpleStaticAsset('js', $baseUrl . '/admin/assets/core.js'),
+			]),
 			'content' => $this->renderContentCode($plugin, $pluginName, $view, $components),
 			'menu' => [
 				'dashboardLink' => $baseUrl . '/admin',
