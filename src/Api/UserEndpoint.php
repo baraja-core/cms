@@ -881,6 +881,7 @@ final class UserEndpoint extends BaseEndpoint
 			$return[$id][$key] = $value;
 		}
 
+		/** @phpstan-ignore-next-line */
 		return $return;
 	}
 }
