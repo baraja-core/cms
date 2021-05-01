@@ -6,7 +6,6 @@ namespace Baraja\Cms;
 
 
 use Baraja\AdminBar\Panel\BasicPanel;
-use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManagerAccessor;
 use Baraja\Cms\Translator\TranslatorFilter;
 use Baraja\Cms\User\UserManagerAccessor;
@@ -83,7 +82,7 @@ final class Context
 	 */
 	public function getPluginKey(Plugin $plugin): string
 	{
-		$type = $plugin::class;
+		$type = \get_class($plugin);
 		foreach ($this->pluginManager->getPluginInfo() as $info) {
 			if ($info['type'] === $type) {
 				return (string) $info['service'];
@@ -165,7 +164,11 @@ final class Context
 				? $this->authorizator->get()->isAllowedPlugin($pluginName)
 				: $this->authorizator->get()->isAllowedComponent($pluginName, $view);
 		} catch (\Throwable $e) {
-			trigger_error('Can not check permissions: ' . $e->getMessage());
+			if ($e->getCode() === 404) { // Identity is broken or user does not exist
+				$this->user->logout(true);
+			} else {
+				trigger_error('Can not check permissions: ' . $e->getMessage());
+			}
 		}
 
 		return false;
@@ -179,11 +182,11 @@ final class Context
 
 
 	/**
-	 * @return CmsAsset[]
+	 * @return array<string, string> (path => format)
 	 */
 	public function getCustomGlobalAssetPaths(): array
 	{
-		return $this->customGlobalAssetManager->get()->getAssets();
+		return $this->customGlobalAssetManager->get()->toArray();
 	}
 
 

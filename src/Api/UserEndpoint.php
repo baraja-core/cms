@@ -7,6 +7,7 @@ namespace Baraja\Cms\Api;
 
 use Baraja\BarajaCloud\CloudManager;
 use Baraja\Cms\Helpers;
+use Baraja\Cms\Settings;
 use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\User;
 use Baraja\Cms\User\Entity\UserLogin;
@@ -33,7 +34,8 @@ final class UserEndpoint extends BaseEndpoint
 		private UserManager $userManager,
 		private EntityManager $entityManager,
 		private CloudManager $cloudManager,
-		private PluginManager $pluginManager
+		private PluginManager $pluginManager,
+		private Settings $settings,
 	) {
 	}
 
@@ -53,12 +55,15 @@ final class UserEndpoint extends BaseEndpoint
 		$currentUserId = $this->getUser()->getId();
 		/** @var CmsUser $currentUser */
 		$currentUser = $this->entityManager->getRepository($this->userManager->getDefaultEntity())->find($currentUserId);
+		$count = $this->getCountUsers();
 		$selection = $this->entityManager->getRepository($this->userManager->getDefaultEntity())->createQueryBuilder('user');
+
 		if ($active !== null) {
 			$selection->andWhere('user.active = ' . ($active === 'active' ? 'TRUE' : 'FALSE'));
 		}
-
-		$allRoles = $this->getAllRoles();
+		$allRoles = ($role !== null || $count <= 5000)
+			? $this->getAllRoles()
+			: [];
 		if ($role !== null) {
 			if (isset($allRoles[$role]) === false) {
 				$this->sendError('Role "' . $role . '" does not exist. Did you mean "' . implode('", "', $allRoles) . '"?');
@@ -66,11 +71,11 @@ final class UserEndpoint extends BaseEndpoint
 			$selection->andWhere('user.roles LIKE :role')
 				->setParameter('role', '%"' . $role . '"%');
 		}
-
 		if ($query !== null) {
 			$orx = $selection->expr()->orX();
 			$isMysql = ($this->entityManager->getConnection()->getParams()['driver'] ?? '') === 'pdo_mysql';
-			if (preg_match('/^(\S+)\s+(.+)$/', $query = trim((string) preg_replace('/\s+/', ' ', $query)), $queryParser)) {
+			$query = trim((string) preg_replace('/\s+/', ' ', $query));
+			if (preg_match('/^(\S+)\s+(.+)$/', $query, $queryParser)) {
 				$orx->add('user.username LIKE :firstName');
 				$orx->add('user.username LIKE :lastName');
 				$orx->add('user.firstName LIKE :firstName');
@@ -98,9 +103,12 @@ final class UserEndpoint extends BaseEndpoint
 		$users = $selection->select('PARTIAL user.{id, firstName, lastName, password, emails, phone, roles, active, avatarUrl, otpCode}')
 			->setMaxResults($limit)
 			->setFirstResult(($page - 1) * $limit)
-			->orderBy('user.createDate', 'DESC')
+			->addOrderBy('user.active', 'DESC')
+			->addOrderBy('user.createDate', 'DESC')
 			->getQuery()
 			->getArrayResult();
+
+		$metaToUser = $this->getMetaByUsers(array_map(static fn(array $user): int => $user['id'], $users), ['blocked']);
 
 		$return = [];
 		foreach ($users as $user) {
@@ -116,11 +124,22 @@ final class UserEndpoint extends BaseEndpoint
 				'email' => $user['emails'][0] ?? null,
 				'roles' => $user['roles'],
 				'phone' => $user['phone'],
-				'isActive' => $user['active'],
 				'avatarUrl' => $user['avatarUrl'],
-				'2fa' => $user['otpCode'] !== null,
-				'verifying' => $user['password'] === '---empty-password---',
+				'options' => [
+					'active' => $user['active'],
+					'2fa' => $user['otpCode'] !== null,
+					'verifying' => $user['password'] === '---empty-password---',
+					'blocked' => ($metaToUser[$user['id']]['blocked'] ?? '') === 'true'
+				],
 			];
+		}
+		if ($count <= 5000) {
+			$allUsers = $this->getAllUsers();
+			$activeCount = \count(array_filter($allUsers, static fn(array $item): bool => $item['active'] === true));
+			$deletedCount = \count(array_filter($allUsers, static fn(array $item): bool => $item['active'] === false));
+		} else {
+			$activeCount = 'many';
+			$deletedCount = 'many';
 		}
 
 		$this->sendJson([
@@ -129,12 +148,12 @@ final class UserEndpoint extends BaseEndpoint
 			'isCurrentUserUsing2fa' => $currentUser->getOtpCode() !== null,
 			'currentUserId' => $currentUserId,
 			'statusCount' => [
-				'all' => \count($allUsers = $this->getAllUsers()),
-				'active' => \count(array_filter($allUsers, static fn(array $item): bool => $item['active'] === true)),
-				'deleted' => \count(array_filter($allUsers, static fn(array $item): bool => $item['active'] === false)),
+				'all' => $count,
+				'active' => $activeCount,
+				'deleted' => $deletedCount,
 			],
 			'paginator' => (new Paginator)
-				->setItemCount(\count($allUsers))
+				->setItemCount($count)
 				->setItemsPerPage($limit)
 				->setPage($page),
 		]);
@@ -147,7 +166,8 @@ final class UserEndpoint extends BaseEndpoint
 		string $role,
 		?string $phone = null,
 		?string $password = null
-	): void {
+	): void
+	{
 		if ($this->userExist($email) === true) {
 			$this->sendError('User "' . $email . '" already exist.');
 		}
@@ -191,7 +211,7 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function deleteDefault(string $id): void
+	public function deleteDefault(int $id): void
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
@@ -208,7 +228,7 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function actionRevertUser(string $id): void
+	public function actionRevertUser(int $id): void
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
@@ -236,7 +256,7 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function actionOverview(string $id): void
+	public function actionOverview(int $id): void
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
@@ -291,7 +311,7 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function postOverview(string $id, string $username, string $email, string $name): void
+	public function postOverview(int $id, string $username, string $email, string $name): void
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
@@ -327,7 +347,7 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function postSetPassword(string $id, string $password): void
+	public function postSetPassword(int $id, string $password): void
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
@@ -350,7 +370,7 @@ final class UserEndpoint extends BaseEndpoint
 	/**
 	 * Return info about user's password
 	 */
-	public function actionSecurity(string $id): void
+	public function actionSecurity(int $id): void
 	{
 		try {
 			/** @var User $user */
@@ -385,7 +405,7 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function postCancelOauth(string $id): void
+	public function postCancelOauth(int $id): void
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
@@ -401,7 +421,7 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function actionGenerateOauth(string $id): void
+	public function actionGenerateOauth(int $id): void
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
@@ -415,7 +435,8 @@ final class UserEndpoint extends BaseEndpoint
 		}
 
 		$otpCode = $this->userManager->generateOtpCode();
-		$otpCodeHash = md5($opCodeHuman = Helpers::otpBase32Encode($otpCode));
+		$opCodeHuman = Helpers::otpBase32Encode($otpCode);
+		$otpCodeHash = md5($opCodeHuman);
 
 		$this->getCache('user-endpoint-otp')->save($otpCodeHash, $otpCode, [
 			Cache::EXPIRE => '10 minutes',
@@ -428,7 +449,7 @@ final class UserEndpoint extends BaseEndpoint
 				'human' => $opCodeHuman,
 			],
 			'qrCodeUrl' => Helpers::getOtpQrUrl(
-				Url::get()->getNetteUrl()->getDomain(3) . ' | Baraja',
+				Url::get()->getNetteUrl()->getDomain(3) . ' | ' . ($this->settings->getProjectName() ?? 'Baraja CMS'),
 				$user->getUsername(),
 				$otpCode,
 			),
@@ -436,7 +457,7 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function postSetAuth(string $id, string $hash, string $code): void
+	public function postSetAuth(int $id, string $hash, string $code): void
 	{
 		/** @var string|null $otpCode */
 		$otpCode = $this->getCache('user-endpoint-otp')->load($hash);
@@ -464,7 +485,7 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function actionPermissions(string $id): void
+	public function actionPermissions(int $id): void
 	{
 		$currentUser = $this->userManager->getUserById($this->getUser()->getId());
 		if ($currentUser->isAdmin() === false) {
@@ -509,7 +530,7 @@ final class UserEndpoint extends BaseEndpoint
 	 * @param string[] $roles
 	 * @param mixed[] $permissions
 	 */
-	public function postSavePermissions(string $id, array $roles, array $permissions): void
+	public function postSavePermissions(int $id, array $roles, array $permissions): void
 	{
 		$currentUser = $this->userManager->getUserById($this->getUser()->getId());
 		if ($currentUser->isAdmin() === false) {
@@ -563,7 +584,7 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function postMarkUserAsAdmin(string $id, string $password): void
+	public function postMarkUserAsAdmin(int $id, string $password): void
 	{
 		$currentUser = $this->userManager->getUserById($this->getUser()->getId());
 		if ($currentUser->isAdmin() === false) {
@@ -589,7 +610,7 @@ final class UserEndpoint extends BaseEndpoint
 	/**
 	 * Return info about user's login history.
 	 */
-	public function actionLoginHistory(string $id, int $page = 1, int $limit = 32): void
+	public function actionLoginHistory(int $id, int $page = 1, int $limit = 32): void
 	{
 		$logins = $this->entityManager->getRepository(UserLogin::class)
 			->createQueryBuilder('userLogin')
@@ -650,24 +671,27 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function actionSaveMeta(string $id, string $key, ?string $value = null): void
+	public function actionSaveMeta(int $id, string $key, ?string $value = null): void
 	{
 		$this->userManager->setMeta($id, $key, $value);
 		$this->sendOk();
 	}
 
 
-	public function actionSavePhoto(string $id, string $url): void
+	public function actionSavePhoto(int $id, string $url): void
 	{
 		if (Validators::isUrl($url) === false) {
 			$this->sendError('URL must be absolute valid URL.');
 		}
-		if (!($imageHeaders = @get_headers($url)) || ($imageHeaders[0] ?? '') === 'HTTP/1.1 404 Not Found') {
+		$imageHeaders = @get_headers($url);
+		if (!$imageHeaders || ($imageHeaders[0] ?? '') === 'HTTP/1.1 404 Not Found') {
 			$this->sendError('URL does not exist.');
 		}
 		foreach ((array) $imageHeaders as $imageHeader) {
-			if (preg_match('/^Content-Type:\s(.+)$/', $imageHeader, $headerParser)
-				&& !\in_array($headerParser[1], ['image/jpeg', 'image/png', 'image/gif'], true)) {
+			if (
+				preg_match('/^Content-Type:\s(.+)$/', $imageHeader, $headerParser)
+				&& !\in_array($headerParser[1], ['image/jpeg', 'image/png', 'image/gif'], true)
+			) {
 				$this->sendError('Image type is not valid, because "' . $headerParser[1] . '" given.');
 			}
 		}
@@ -686,7 +710,7 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function actionSavePhone(string $id, string $phone, int $region = 420): void
+	public function actionSavePhone(int $id, string $phone, int $region = 420): void
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
@@ -707,10 +731,10 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function postSetUserPassword(string $id, string $password): void
+	public function postSetUserPassword(int $id, string $password): void
 	{
 		try {
-			$currentUser = $this->userManager->getUserById((string) $this->getUser()->getId());
+			$currentUser = $this->userManager->getUserById((int) $this->getUser()->getId());
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User is not logged in.');
 
@@ -728,7 +752,7 @@ final class UserEndpoint extends BaseEndpoint
 		}
 
 		$user->setPassword($password);
-		$this->userManager->setMeta((string) $user->getId(), 'password-last-changed-date', date('Y-m-d'));
+		$this->userManager->setMeta((int) $user->getId(), 'password-last-changed-date', date('Y-m-d'));
 		$this->entityManager->flush();
 		$this->flashMessage('User password has been changed.', 'success');
 
@@ -792,8 +816,8 @@ final class UserEndpoint extends BaseEndpoint
 		$nameParser = Helpers::nameParser($name);
 		$user->setFirstName($nameParser['firstName']);
 		$user->setLastName($nameParser['lastName']);
-		$this->userManager->setMeta((string) $user->getId(), 'name--degree-before', $nameParser['degreeBefore']);
-		$this->userManager->setMeta((string) $user->getId(), 'name--degree-after', $nameParser['degreeAfter']);
+		$this->userManager->setMeta((int) $user->getId(), 'name--degree-before', $nameParser['degreeBefore']);
+		$this->userManager->setMeta((int) $user->getId(), 'name--degree-after', $nameParser['degreeAfter']);
 		$this->entityManager->flush();
 	}
 
@@ -810,5 +834,53 @@ final class UserEndpoint extends BaseEndpoint
 				->select('PARTIAL user.{id, roles, active}')
 				->getQuery()
 				->getArrayResult();
+	}
+
+
+	private function getCountUsers(): int
+	{
+		try {
+			return (int) $this->entityManager->getRepository($this->userManager->getDefaultEntity())
+				->createQueryBuilder('user')
+				->select('COUNT(user.id)')
+				->getQuery()
+				->getSingleScalarResult();
+		} catch (\Throwable) {
+			return -1;
+		}
+	}
+
+
+	/**
+	 * @param array<int, int> $ids
+	 * @param array<int, string> $keys
+	 * @return array<int, array<string, string>>
+	 */
+	private function getMetaByUsers(array $ids, array $keys = []): array
+	{
+		$selection = $this->entityManager->getRepository(UserMeta::class)
+			->createQueryBuilder('meta')
+			->select('PARTIAL meta.{id, user, key, value}')
+			->addSelect('PARTIAL user.{id}')
+			->leftJoin('meta.user', 'user')
+			->where('user.id IN (:ids)')
+			->setParameter('ids', $ids);
+
+		if ($keys !== []) {
+			$selection->andWhere('meta.key IN (:keys)')
+				->setParameter('keys', $keys);
+		}
+
+		/** @var string[][] $metas */
+		$metas = $selection->getQuery()->getArrayResult();
+
+		$return = [];
+		foreach ($metas as $meta) {
+			$id = $meta['user']['id'] ?? throw new \LogicException('User ID does not exist.');
+			unset($meta['user']);
+			$return[$id][$meta['key'] ?? ''] = $meta['value'] ?? '';
+		}
+
+		return $return;
 	}
 }

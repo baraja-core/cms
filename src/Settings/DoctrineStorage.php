@@ -23,7 +23,7 @@ final class DoctrineStorage implements Storage
 
 
 	/**
-	 * @return array<string, string>
+	 * @return string[]
 	 */
 	public function loadAll(): array
 	{
@@ -35,7 +35,7 @@ final class DoctrineStorage implements Storage
 
 		$return = [];
 		foreach ($data as $item) {
-			$return[(string) $item['key']] = (string) $item['value'];
+			$return[$item['key']] = $item['value'];
 		}
 
 		return $return;
@@ -60,8 +60,8 @@ final class DoctrineStorage implements Storage
 
 
 	/**
-	 * @param array<int, string> $keys
-	 * @return array<string, string|null>
+	 * @param string[] $keys
+	 * @return string[]|null[]
 	 */
 	public function getMultiple(array $keys): array
 	{

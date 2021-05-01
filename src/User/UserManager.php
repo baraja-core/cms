@@ -94,12 +94,13 @@ final class UserManager implements Authenticator
 	public function authenticate(string $username, string $password, bool $remember = false): IIdentity
 	{
 		$expiration = $remember ? '14 days' : '15 minutes';
-		if (($username = trim($username)) === '' || ($password = trim($password)) === '') {
-			throw new AuthenticationException('Username or password is empty.');
+		$username = trim($username);
+		$password = trim($password);
+		if ($username === '' || $password === '') {
+			throw new AuthenticationException('Username or password is empty.', Authenticator::INVALID_CREDENTIAL);
 		}
 
 		$attempt = new UserLoginAttempt(null, $username);
-		$attempt->setLoginUrl(Url::get()->getCurrentUrl());
 		$this->entityManager->persist($attempt)->flush();
 
 		if ($this->authenticationService !== null) {
@@ -159,7 +160,7 @@ final class UserManager implements Authenticator
 	/**
 	 * @throws NoResultException|NonUniqueResultException
 	 */
-	public function getUserById(string $id): CmsUser
+	public function getUserById(int $id): CmsUser
 	{
 		/** @var CmsUser[] $cache */
 		static $cache = [];
@@ -195,7 +196,7 @@ final class UserManager implements Authenticator
 	}
 
 
-	public function getMeta(string $userId, string $key): ?string
+	public function getMeta(int $userId, string $key): ?string
 	{
 		try {
 			/** @var UserMeta $meta */
@@ -217,7 +218,7 @@ final class UserManager implements Authenticator
 	}
 
 
-	public function setMeta(string $userId, string $key, ?string $value): self
+	public function setMeta(int $userId, string $key, ?string $value): self
 	{
 		try {
 			/** @var UserMeta $meta */
@@ -237,11 +238,12 @@ final class UserManager implements Authenticator
 			try {
 				/** @var User $user */
 				$user = $this->getUserById($userId);
-			} catch (NoResultException | NonUniqueResultException $eUser) {
+			} catch (NoResultException | NonUniqueResultException) {
 				throw new \InvalidArgumentException('User "' . $userId . '" does not exist.', $e->getCode(), $e);
 			}
 
-			$this->entityManager->persist($meta = new UserMeta($user, $key, $value));
+			$meta = new UserMeta($user, $key, $value);
+			$this->entityManager->persist($meta);
 		}
 		if ($value === null) {
 			$this->entityManager->remove($meta);
@@ -254,7 +256,7 @@ final class UserManager implements Authenticator
 	}
 
 
-	public function loginAs(string $id): void
+	public function loginAs(int $id): void
 	{
 		$currentIdentity = $this->getIdentity();
 		if ($currentIdentity === null || $currentIdentity->getId() === $id) {
@@ -298,15 +300,30 @@ final class UserManager implements Authenticator
 		try {
 			$user = $this->getUserByUsername($username);
 		} catch (NoResultException | NonUniqueResultException) {
-			throw new AuthenticationException('The username is incorrect. Username "' . $username . '" given.');
+			throw new AuthenticationException(
+				'The username is incorrect. Username "' . $username . '" given.',
+				Authenticator::IDENTITY_NOT_FOUND,
+			);
 		}
 		if ($user instanceof User) {
 			$attempt->setUser($user);
 		}
 		$this->entityManager->flush();
 
-		if (($hash = $user->getPassword()) === '---empty-password---') {
-			throw new AuthenticationException('User password is empty or account is locked, please contact your administrator. Username "' . $username . '" given.');
+		if ($this->getMeta((int) $user->getId(), 'blocked') === 'true') {
+			throw new AuthenticationException(
+				$this->getMeta((int) $user->getId(), 'block-reason') ?? '',
+				Authenticator::NOT_APPROVED,
+			);
+		}
+
+		$hash = $user->getPassword();
+
+		if ($hash === '---empty-password---') {
+			throw new AuthenticationException(
+				'User password is empty or account is locked, please contact your administrator. Username "' . $username . '" given.',
+				Authenticator::FAILURE,
+			);
 		}
 		if ($user->passwordVerify($password) === false) {
 			throw new AuthenticationException('The password is incorrect. Username "' . $username . '" given.');

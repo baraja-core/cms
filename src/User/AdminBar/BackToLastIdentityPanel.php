@@ -27,7 +27,7 @@ final class BackToLastIdentityPanel implements Panel
 			return '';
 		}
 		try {
-			$user = $this->userManager->get()->getUserById((string) $userId);
+			$user = $this->userManager->get()->getUserById((int) $userId);
 		} catch (NoResultException | NonUniqueResultException) {
 			return '';
 		}

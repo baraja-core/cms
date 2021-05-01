@@ -147,10 +147,7 @@ final class Application
 		if ($haystack === null) {
 			$response = new VoidResponse;
 		} else {
-			if (AdminBar::getBar()->isDebugMode() === false) { // minify HTML in production mode
-				$haystack = Helpers::minifyHtml($haystack);
-			}
-			$response = new TextResponse($haystack);
+			$response = new TextResponse(Helpers::minifyHtml($haystack));
 		}
 		$response->send($this->context->getRequest(), $this->context->getResponse());
 		die;

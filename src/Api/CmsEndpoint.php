@@ -18,6 +18,7 @@ use Baraja\Url\Url;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Nette\Security\AuthenticationException;
+use Nette\Security\Authenticator;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
@@ -42,11 +43,23 @@ final class CmsEndpoint extends BaseEndpoint
 		}
 		try {
 			$user = $this->userManager->authenticate($username, $password, $remember);
-		} catch (AuthenticationException) {
-			$this->sendError('Wrong username or password.');
+		} catch (AuthenticationException $e) {
+			$code = $e->getCode();
+			if (in_array($code, [Authenticator::IDENTITY_NOT_FOUND, Authenticator::INVALID_CREDENTIAL, Authenticator::FAILURE], true)) {
+				$this->sendError($e->getMessage());
+			} elseif ($code === Authenticator::NOT_APPROVED) {
+				$reason = (string) $e->getMessage();
+				$this->sendError(
+					'The user has been assigned a permanent block. Please contact your administrator.'
+					. ($reason !== '' ? ' Reason for blocking: ' . $reason : ''),
+				);
+			} else {
+				$this->sendError('Wrong username or password.');
+			}
 
 			return;
 		} catch (\Throwable $e) {
+			bdump($e);
 			Debugger::log($e, ILogger::CRITICAL);
 			$this->sendError('Internal authentication error. Your account has been broken. Please contact your administrator or Baraja support team.');
 
@@ -73,7 +86,8 @@ final class CmsEndpoint extends BaseEndpoint
 		string $password,
 		bool $remember = false
 	): void {
-		if (($userEntity = $this->getUserEntity()) === null) {
+		$userEntity = $this->getUserEntity();
+		if ($userEntity === null) {
 			$this->sendError('User is not logged in.');
 
 			return;
@@ -119,7 +133,8 @@ final class CmsEndpoint extends BaseEndpoint
 				return;
 			}
 
-			$this->entityManager->persist($request = new UserResetPasswordRequest($user, '3 hours'));
+			$request = new UserResetPasswordRequest($user, '3 hours');
+			$this->entityManager->persist($request);
 			$this->entityManager->flush();
 
 			$this->cloudManager->callRequest('cloud/forgot-password', [
@@ -171,7 +186,8 @@ final class CmsEndpoint extends BaseEndpoint
 
 	public function postReportProblem(string $locale, string $description, string $username): void
 	{
-		if (($adminEmail = $this->settings->getAdminEmail()) === null) {
+		$adminEmail = $this->settings->getAdminEmail();
+		if ($adminEmail === null) {
 			$this->sendError('Admin e-mail does not exist. Can not report your problem right now.');
 		}
 
@@ -224,7 +240,7 @@ final class CmsEndpoint extends BaseEndpoint
 	}
 
 
-	public function postSetUserPassword(string $locale, string $userId, string $password): void
+	public function postSetUserPassword(string $locale, int $userId, string $password): void
 	{
 		try {
 			/** @var CmsUser $user */

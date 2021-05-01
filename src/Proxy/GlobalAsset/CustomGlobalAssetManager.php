@@ -18,10 +18,15 @@ final class CustomGlobalAssetManager
 
 
 	/**
-	 * @return CmsAsset[]
+	 * @return string[]
 	 */
-	public function getAssets(): array
+	public function toArray(): array
 	{
-		return $this->assets;
+		$return = [];
+		foreach ($this->assets as $asset) {
+			$return[$asset->getUrl()] = $asset->getFormat();
+		}
+
+		return $return;
 	}
 }
