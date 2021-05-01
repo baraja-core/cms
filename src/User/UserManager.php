@@ -13,7 +13,6 @@ use Baraja\Cms\User\Entity\UserLogin;
 use Baraja\Cms\User\Entity\UserLoginAttempt;
 use Baraja\Cms\User\Entity\UserMeta;
 use Baraja\Doctrine\EntityManager;
-use Baraja\Url\Url;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Nette\Security\AuthenticationException;

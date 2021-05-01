@@ -71,7 +71,7 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 	}
 
 
-	public function actionLoginAs(string $id): void
+	public function actionLoginAs(int $id): void
 	{
 		try {
 			$this->userManager->loginAs($id);

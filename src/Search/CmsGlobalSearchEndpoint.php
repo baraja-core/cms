@@ -45,7 +45,7 @@ final class CmsGlobalSearchEndpoint extends BaseEndpoint
 
 		$results = [];
 		foreach ($searchResult->getItems() as $searchItem) {
-			$entityClass = $this->entityManager->getClassMetadata(get_class($searchItem->getEntity()))->rootEntityName;
+			$entityClass = $this->entityManager->getClassMetadata($searchItem->getEntity()::class)->rootEntityName;
 			$pluginClass = $entityToPlugin[$entityClass] ?? null;
 			$pluginName = $pluginClassToPluginName[$pluginClass] ?? null;
 			$results[] = [

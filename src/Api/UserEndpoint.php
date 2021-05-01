@@ -129,7 +129,7 @@ final class UserEndpoint extends BaseEndpoint
 					'active' => $user['active'],
 					'2fa' => $user['otpCode'] !== null,
 					'verifying' => $user['password'] === '---empty-password---',
-					'blocked' => ($metaToUser[$user['id']]['blocked'] ?? '') === 'true'
+					'blocked' => ($metaToUser[$user['id']]['blocked'] ?? '') === 'true',
 				],
 			];
 		}
@@ -166,8 +166,7 @@ final class UserEndpoint extends BaseEndpoint
 		string $role,
 		?string $phone = null,
 		?string $password = null
-	): void
-	{
+	): void {
 		if ($this->userExist($email) === true) {
 			$this->sendError('User "' . $email . '" already exist.');
 		}
@@ -876,9 +875,10 @@ final class UserEndpoint extends BaseEndpoint
 
 		$return = [];
 		foreach ($metas as $meta) {
+			/** @phpstan-ignore-next-line */
 			$id = $meta['user']['id'] ?? throw new \LogicException('User ID does not exist.');
 			unset($meta['user']);
-			$return[$id][$meta['key'] ?? ''] = $meta['value'] ?? '';
+			$return[(int) $id][$meta['key'] ?? ''] = $meta['value'] ?? '';
 		}
 
 		return $return;
