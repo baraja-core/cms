@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Baraja\Cms\User\Entity;
 
 
-use Baraja\Doctrine\UUID\UuidIdentifier;
+use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Doctrine\ORM\Mapping as ORM;
 use Nette\Utils\DateTime;
 use Nette\Utils\Random;
@@ -16,7 +16,7 @@ use Nette\Utils\Random;
  */
 class UserResetPasswordRequest
 {
-	use UuidIdentifier;
+	use IdentifierUnsigned;
 
 	/** @ORM\ManyToOne(targetEntity="User", inversedBy="passwordResets") */
 	private User $user;

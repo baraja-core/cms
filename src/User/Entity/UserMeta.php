@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Baraja\Cms\User\Entity;
 
 
-use Baraja\Doctrine\UUID\UuidIdentifier;
+use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 use Doctrine\ORM\Mapping\UniqueConstraint;
@@ -24,9 +24,9 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
  */
 class UserMeta
 {
-	use UuidIdentifier;
+	use IdentifierUnsigned;
 
-	/** @ORM\ManyToOne(targetEntity="User", inversedBy="metas") */
+	/** @ORM\ManyToOne(targetEntity="User", inversedBy="metas", cascade={"persist", "remove"}) */
 	private User $user;
 
 	/** @ORM\Column(type="string", name="`key`", length=64) */

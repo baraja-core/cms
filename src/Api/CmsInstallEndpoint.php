@@ -45,37 +45,44 @@ final class CmsInstallEndpoint extends BaseEndpoint
 
 		$errors = [];
 
-		if (($name = trim($name)) === '') {
+		$name = trim($name);
+		$username = Strings::lower(trim($username));
+		$firstName = Strings::firstUpper(trim($firstName));
+		$lastName = Strings::firstUpper(trim($lastName));
+		$mail = trim($mail);
+		$password = trim($password);
+		$passwordVerify = trim($passwordVerify);
+		if ($name === '') {
 			$errors[] = 'Zadejte titulek (název) webu.';
 		}
-		if (($username = trim($username)) === '') {
+		if ($username === '') {
 			$errors[] = 'Zadejte uživatelské jméno správce.';
-		} elseif (preg_match('/^[a-z0-9]+$/', $username = Strings::lower($username)) === 0) {
+		} elseif (preg_match('/^[a-z0-9]+$/', $username) === 0) {
 			$errors[] = 'Uživatelské jméno se může skládat pouze z malých písmen anglické abecedy a číslic.';
 		}
-		if (($firstName = trim($firstName)) === '') {
+		if ($firstName === '') {
 			$errors[] = 'Zadejte jméno správce.';
 		}
-		if (($lastName = trim($lastName)) === '') {
+		if ($lastName === '') {
 			$errors[] = 'Zadejte příjmení správce.';
 		}
-		if (($mail = trim($mail)) === '') {
+		if ($mail === '') {
 			$errors[] = 'Zadejte e-mail.';
 		} elseif (Validators::isEmail($mail) === false) {
 			$errors[] = 'Zadaný e-mail neexistuje.';
 		}
-		if (($password = trim($password)) === '') {
+		if ($password === '') {
 			$errors[] = 'Zadejte heslo.';
 		}
-		if (($passwordVerify = trim($passwordVerify)) === '') {
+		if ($passwordVerify === '') {
 			$errors[] = 'Zadejte heslo znovu.';
 		}
-		if (Strings::length($password) < 6) {
+		if (mb_strlen($password, 'UTF-8') < 6) {
 			$errors[] = 'Heslo musí mít aspoň 6 znaků.';
-		} elseif (Strings::length($password) > 2_048) {
+		} elseif (mb_strlen($password, 'UTF-8') > 2_048) {
 			$errors[] = 'Maximální délka hesla je 2048 znaků.';
 		}
-		if ($password !== $passwordVerify && Strings::length($password) >= 1) {
+		if ($password !== $passwordVerify && $password !== '') {
 			$errors[] = 'Hesla se musí shodovat.';
 		}
 		if ($vop === false) {

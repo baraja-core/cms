@@ -51,10 +51,12 @@ final class InternalSupportEndpoint extends BaseEndpoint
 			$this->sendError('URL is not valid. Haystack "' . $url . '" given.');
 		}
 		$dueDateReal = null;
-		if ($dueDate !== null && ($dueDateReal = DateTime::from($dueDate))->getTimestamp() <= \time()) {
-			$this->sendError('Ths issue due date cannot be in the past.');
-
-			return;
+		if ($dueDate !== null) {
+			$dueDateReal = DateTime::from($dueDate);
+			if ($dueDateReal->getTimestamp() <= time()) {
+				$this->sendError('Ths issue due date cannot be in the past.');
+				return;
+			}
 		}
 
 		try {
