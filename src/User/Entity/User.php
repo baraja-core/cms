@@ -6,8 +6,8 @@ namespace Baraja\Cms\User\Entity;
 
 
 use Baraja\Cms\Helpers;
-use Baraja\PhoneNumber\PhoneNumberFormatter;
 use Baraja\Doctrine\Identifier\IdentifierUnsigned;
+use Baraja\PhoneNumber\PhoneNumberFormatter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;

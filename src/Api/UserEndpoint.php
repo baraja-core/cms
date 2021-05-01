@@ -870,13 +870,18 @@ final class UserEndpoint extends BaseEndpoint
 				->setParameter('keys', $keys);
 		}
 
-		/** @var array<int, array<string, int|string>> $metas */
+		/** @var array<int, array<string, int|string|array<int, int>>> $metas */
 		$metas = $selection->getQuery()->getArrayResult();
 
 		$return = [];
 		foreach ($metas as $meta) {
+			if (isset($meta['user']['id'])) {
+				$id = (int) $meta['user']['id'];
+			} else {
+				throw new \LogicException('User ID does not exist.');
+			}
 			unset($meta['user']);
-			$return[(int) ($meta['user']['id'] ?? 0)][$meta['key'] ?? ''] = $meta['value'] ?? '';
+			$return[$id][$meta['key'] ?? ''] = $meta['value'] ?? '';
 		}
 
 		return $return;
