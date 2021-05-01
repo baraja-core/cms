@@ -6,7 +6,7 @@ namespace Baraja\Cms\User\Entity;
 
 
 use Baraja\Cms\Helpers;
-use Baraja\Doctrine\UUID\UuidIdentifier;
+use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Baraja\PhoneNumber\PhoneNumberFormatter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -39,7 +39,7 @@ use Nette\Utils\Validators;
  */
 class User implements CmsUser
 {
-	use UuidIdentifier;
+	use IdentifierUnsigned;
 
 	/** @ORM\Column(type="string", length=64, unique=true) */
 	private string $username;

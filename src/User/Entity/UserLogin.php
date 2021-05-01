@@ -6,7 +6,7 @@ namespace Baraja\Cms\User\Entity;
 
 
 use Baraja\Cms\Helpers;
-use Baraja\Doctrine\UUID\UuidIdentifier;
+use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Doctrine\ORM\Mapping as ORM;
 use Nette\Utils\DateTime;
 
@@ -16,7 +16,7 @@ use Nette\Utils\DateTime;
  */
 class UserLogin
 {
-	use UuidIdentifier;
+	use IdentifierUnsigned;
 
 	/** @ORM\ManyToOne(targetEntity="User", inversedBy="logins") */
 	private User $user;

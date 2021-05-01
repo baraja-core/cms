@@ -47,7 +47,7 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 	}
 
 
-	public function actionDetail(string $id): void
+	public function actionDetail(int $id): void
 	{
 		try {
 			$user = $this->userManager->getUserById($id);
@@ -71,7 +71,7 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 	}
 
 
-	public function actionLoginAs(string $id): void
+	public function actionLoginAs(int $id): void
 	{
 		try {
 			$this->userManager->loginAs($id);

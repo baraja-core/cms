@@ -6,7 +6,8 @@ namespace Baraja\Cms\User\Entity;
 
 
 use Baraja\Cms\Helpers;
-use Baraja\Doctrine\UUID\UuidIdentifier;
+use Baraja\Doctrine\Identifier\IdentifierUnsigned;
+use Baraja\Url\Url;
 use Doctrine\ORM\Mapping as ORM;
 use Nette\Utils\DateTime;
 use Nette\Utils\Strings;
@@ -17,7 +18,7 @@ use Nette\Utils\Strings;
  */
 class UserLoginAttempt
 {
-	use UuidIdentifier;
+	use IdentifierUnsigned;
 
 	/** @ORM\ManyToOne(targetEntity="User", inversedBy="loginAttempts") */
 	private ?User $user;
@@ -29,10 +30,10 @@ class UserLoginAttempt
 	private bool $password = false;
 
 	/** @ORM\Column(type="string", length=2048, nullable=true) */
-	private ?string $loginUrl;
+	private ?string $loginUrl = null;
 
 	/** @ORM\Column(type="string", length=39, nullable=true) */
-	private ?string $ip;
+	private string $ip;
 
 	/** @ORM\Column(type="datetime") */
 	private \DateTime $insertedDateTime;
@@ -45,8 +46,9 @@ class UserLoginAttempt
 	{
 		$this->user = $user;
 		$this->username = Strings::substring($username, 0, 64);
-		$this->ip = Helpers::userIp();
+		$this->ip = PHP_SAPI === 'cli' ? 'cli' : Helpers::userIp();
 		$this->insertedDateTime = DateTime::from('now');
+		$this->setLoginUrl();
 	}
 
 
@@ -86,14 +88,6 @@ class UserLoginAttempt
 	}
 
 
-	public function setLoginUrl(?string $loginUrl): void
-	{
-		$this->loginUrl = $loginUrl !== null
-			? Strings::substring($loginUrl, 0, 2_000)
-			: null;
-	}
-
-
 	public function getIp(): ?string
 	{
 		return $this->ip;
@@ -121,5 +115,15 @@ class UserLoginAttempt
 	public function addNotice(?string $notice): void
 	{
 		$this->notice = trim($this->notice . "\n" . $notice);
+	}
+
+
+	private function setLoginUrl(): void
+	{
+		try {
+			$this->loginUrl = Strings::substring(Url::get()->getCurrentUrl(), 0, 2_000);
+		} catch (\Throwable) {
+			// Silence is golden.
+		}
 	}
 }

@@ -165,7 +165,11 @@ final class Context
 				? $this->authorizator->get()->isAllowedPlugin($pluginName)
 				: $this->authorizator->get()->isAllowedComponent($pluginName, $view);
 		} catch (\Throwable $e) {
-			trigger_error('Can not check permissions: ' . $e->getMessage());
+			if ($e->getCode() === 404) { // Identity is broken or user does not exist
+				$this->user->logout(true);
+			} else {
+				trigger_error('Can not check permissions: ' . $e->getMessage());
+			}
 		}
 
 		return false;
