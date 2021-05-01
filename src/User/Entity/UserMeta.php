@@ -7,7 +7,6 @@ namespace Baraja\Cms\User\Entity;
 
 use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\Index;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
@@ -16,9 +15,6 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
  *     name="cms__user_meta",
  *     uniqueConstraints={
  *         @UniqueConstraint(name="cms__user_meta_user_key", columns={"user_id", "key"})
- *     },
- *     indexes={
- *         @Index(name="cms__user_meta_user_key_value", columns={"user_id", "key", "value"})
  *     }
  * )
  */
@@ -26,7 +22,7 @@ class UserMeta
 {
 	use IdentifierUnsigned;
 
-	/** @ORM\ManyToOne(targetEntity="User", inversedBy="metas", cascade={"persist", "remove"}) */
+	/** @ORM\ManyToOne(targetEntity="User", inversedBy="metas") */
 	private User $user;
 
 	/** @ORM\Column(type="string", name="`key`", length=64) */
