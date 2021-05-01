@@ -20,6 +20,7 @@ use Baraja\Cms\Translator\TranslatorFilter;
 use Baraja\Cms\User\AdminBarUser;
 use Baraja\Cms\User\UserManager;
 use Baraja\Cms\User\UserManagerAccessor;
+use Baraja\Cms\User\UserMetaManager;
 use Baraja\Doctrine\ORM\DI\OrmAnnotationsExtension;
 use Baraja\Plugin\Component\VueComponent;
 use Baraja\Plugin\PluginComponentExtension;
@@ -144,6 +145,9 @@ final class CmsExtension extends CompilerExtension
 		// user
 		$builder->addDefinition($this->prefix('userManager'))
 			->setFactory(UserManager::class);
+
+		$builder->addDefinition($this->prefix('userMetaManager'))
+			->setFactory(UserMetaManager::class);
 
 		$builder->addAccessorDefinition($this->prefix('userManagerAccessor'))
 			->setImplement(UserManagerAccessor::class);
