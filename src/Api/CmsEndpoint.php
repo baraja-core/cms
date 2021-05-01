@@ -59,7 +59,6 @@ final class CmsEndpoint extends BaseEndpoint
 
 			return;
 		} catch (\Throwable $e) {
-			bdump($e);
 			Debugger::log($e, ILogger::CRITICAL);
 			$this->sendError('Internal authentication error. Your account has been broken. Please contact your administrator or Baraja support team.');
 

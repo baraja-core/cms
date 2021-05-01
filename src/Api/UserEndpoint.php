@@ -870,7 +870,7 @@ final class UserEndpoint extends BaseEndpoint
 				->setParameter('keys', $keys);
 		}
 
-		/** @var string[][] $metas */
+		/** @var array<int, array<string, int|string>> $metas */
 		$metas = $selection->getQuery()->getArrayResult();
 
 		$return = [];

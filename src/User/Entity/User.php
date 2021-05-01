@@ -6,6 +6,7 @@ namespace Baraja\Cms\User\Entity;
 
 
 use Baraja\Cms\Helpers;
+use Baraja\PhoneNumber\PhoneNumberFormatter;
 use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -539,7 +540,7 @@ class User implements CmsUser
 
 	public function setPhone(?string $phone, int $region = 420): void
 	{
-		$this->phone = $phone ? Helpers::fixPhone($phone, $region) : null;
+		$this->phone = $phone ? PhoneNumberFormatter::fix($phone, $region) : null;
 	}
 
 
