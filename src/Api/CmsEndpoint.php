@@ -39,7 +39,7 @@ final class CmsEndpoint extends BaseEndpoint
 	public function postSign(string $locale, string $username, string $password, bool $remember = false): void
 	{
 		if ($this->isAjax() === false) {
-			$this->sendError('Login request must be made via ajax.');
+			trigger_error('Login request must be made via ajax.'); // experimental
 		}
 		if ($username === '' || $password === '') {
 			$this->sendError('Empty username or password.');
