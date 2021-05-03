@@ -5,11 +5,6 @@ Vue.component('user-default', {
 				<h1>User manager</h1>
 			</b-col>
 			<b-col cols="9" class="text-right">
-				<!-- TODO
-				<cms-select label="All users" :values="[{'value': 'Role', 'text': 'abcd'}]"></cms-select>
-				<cms-select label="All roles" :values="roles"></cms-select>
-				<cms-search placeholder="Search name or data..." @value="processSearch"></cms-search>
-				-->
 				<b-button variant="primary" class="btn-add" v-b-modal.modal-user-create>New user</b-button>
 			</b-col>
 		</b-row>
@@ -97,65 +92,80 @@ Vue.component('user-default', {
 				<div class="w-100">
 					<div class="d-flex flex-column flex-sm-row align-items-sm-center pr-lg-0">
 						<b-form-input size="sm" v-model="search.name" @input="sync" class="mr-3" placeholder="Search users..."></b-form-input>
-						<b-form-select size="sm" :options="roles" v-model="search.role" @change="sync"></b-form-select>
+						<template v-if="Object.keys(roles).length > 0">
+							<b-form-select size="sm" :options="roles" v-model="search.role" @change="sync"></b-form-select>
+						</template>
 					</div>
 				</div>
 			</b-form>
 		</cms-filter>
 		<b-card>
-			<b-alert :show="isCurrentUserUsing2fa === false" variant="warning">
-				<h4 class="alert-heading">Security warning for your account!</h4>
-				<p><b>Your user account does not use 2-step authentication.</b></p>
-				<p>
-					If an attacker reveals your password, he can impersonate you.
-					If you set up 2-step login authentication, an attacker will still need to obtain your cell phone.
-				</p>
-			</b-alert>
-			<table class="table table-sm cms-table-no-border-top">
-				<tr>
-					<th>Full name</th>
-					<th>E-mail</th>
-					<th>Role</th>
-					<th>Status</th>
-					<th class="text-right">Actions</th>
-				</tr>
-				<tr v-for="(item, offset) of user.items">
-					<td>
-						<template v-if="item.avatarUrl">
-							<a :href="link('User:detail', {id: item.id})"><img v-if="item.avatarUrl" :src="item.avatarUrl" :alt="item.name" style="max-height:32px"></a>
-						</template>
-						<a :href="link('User:detail', {id: item.id})">{{ item.name }}</a>
-						<div v-if="item['2fa']" class="badge badge-pill badge-primary" v-b-tooltip title="This user is using 2-step login authentication (better security).">2FA</div>
-						<div v-if="item.id === currentUserId" class="badge badge-pill badge-primary" v-b-tooltip title="This is your account.">You</div>
-						<div v-if="item.verifying" class="badge badge-pill badge-secondary" v-b-tooltip title="We are awaiting user authentication and password entry for this account.">Verifying</div>
-					</td>
-					<td>{{ item.email }}</td>
-					<td>
-						<div v-for="role in item.roles" :class="['badge', 'badge-pill', 'mx-1', role === 'admin' ? 'badge-success' : 'badge-secondary']">{{ role }}</div>
-					</td>
-					<td>
-						<div v-if="item.isActive" class="badge badge-pill badge-success">active</div>
-						<div v-else class="badge badge-pill badge-danger">inactive</div>
-					</td>
-					<td class="text-right">
-						<b-button :href="link('User:detail', {id: item.id})" variant="warning" size="sm" title="Edit">
-							<b-icon icon="pencil"></b-icon>
-						</b-button>
-						<b-button :href="link('User:loginAs', {id: item.id})" variant="primary" size="sm" v-b-tooltip.hover title="Log in as this user.">
-							<b-icon icon="box-arrow-in-right"></b-icon>
-						</b-button>
-						<b-button @click="deleteUser(item.id)" variant="danger" size="sm" v-b-tooltip.hover title="Hide this user.">
-							<b-icon icon="trash"></b-icon>
-						</b-button>
-					</td>
-				</tr>
-			</table>
-			<b-pagination
-				v-model="paginator.page"
-				:per-page="paginator.itemsPerPage"
-				@change="sync()"
-				:total-rows="paginator.itemCount" align="right" size="sm" class="mb-0">
-			</b-pagination>
+			<div v-if="user.items === null" class="text-center my-5">
+				<b-spinner></b-spinner>
+			</div>
+			<template v-else>
+				<b-alert :show="isCurrentUserUsing2fa === false" variant="warning">
+					<h4 class="alert-heading">Security warning for your account!</h4>
+					<p><b>Your user account does not use 2-step authentication.</b></p>
+					<p>
+						If an attacker reveals your password, he can impersonate you.
+						If you set up 2-step login authentication, an attacker will still need to obtain your cell phone.
+					</p>
+				</b-alert>
+				<div v-if="user.items.length === 0" class="text-center my-5">
+					User list is empty.
+				</div>
+				<template v-else>
+					<table class="table table-sm cms-table-no-border-top">
+						<tr>
+							<th>Full name</th>
+							<th>E-mail</th>
+							<th style="width:128px !important">Role</th>
+							<th style="width:100px !important">Status</th>
+							<th class="text-right" style="width:128px !important">Actions</th>
+						</tr>
+						<tr v-for="(item, offset) in user.items">
+							<td>
+								<template v-if="item.avatarUrl">
+									<a :href="link('User:detail', {id: item.id})">
+										<img v-if="item.avatarUrl" :src="item.avatarUrl" :alt="item.name" style="max-height:32px">
+									</a>
+								</template>
+								<a :href="link('User:detail', {id: item.id})">{{ item.name }}</a>
+								<div v-if="item.options['2fa']" class="badge badge-pill badge-primary" v-b-tooltip title="This user is using 2-step login authentication (better security).">2FA</div>
+								<div v-if="item.id === currentUserId" class="badge badge-pill badge-primary" v-b-tooltip title="This is your account.">You</div>
+								<div v-if="item.options.verifying" class="badge badge-pill badge-secondary" v-b-tooltip title="We are awaiting user authentication and password entry for this account.">Verifying</div>
+								<div v-if="item.options.blocked" class="badge badge-pill badge-danger" v-b-tooltip :title="'The user has been permanently blocked by the administrator.' + (item.options.blockedReason ? ' (Reason: ' + item.options.blockedReason + ')' : '')">Blocked</div>
+							</td>
+							<td>{{ item.email }}</td>
+							<td>
+								<div v-for="role in item.roles" :class="['badge', 'badge-pill', 'mr-1', role === 'admin' ? 'badge-success' : 'badge-secondary']">{{ role }}</div>
+							</td>
+							<td>
+								<div v-if="item.options.active" class="badge badge-pill badge-success">active</div>
+								<div v-else class="badge badge-pill badge-danger">inactive</div>
+							</td>
+							<td class="text-right">
+								<b-button :href="link('User:detail', {id: item.id})" variant="warning" size="sm" title="Edit">
+									<b-icon icon="pencil"></b-icon>
+								</b-button>
+								<b-button :href="link('User:loginAs', {id: item.id})" variant="primary" size="sm" v-b-tooltip.hover title="Log in as this user.">
+									<b-icon icon="box-arrow-in-right"></b-icon>
+								</b-button>
+								<b-button @click="deleteUser(item.id)" variant="danger" size="sm" v-b-tooltip.hover title="Hide this user.">
+									<b-icon icon="trash"></b-icon>
+								</b-button>
+							</td>
+						</tr>
+					</table>
+					<b-pagination
+						v-model="paginator.page"
+						:per-page="paginator.itemsPerPage"
+						@change="sync()"
+						:total-rows="paginator.itemCount" align="right" size="sm" class="mb-0">
+					</b-pagination>
+				</template>
+			</template>
 		</b-card>
 	</div>`,
 	data() {
@@ -204,7 +214,7 @@ Vue.component('user-default', {
 					role: null
 				},
 				statusCount: null,
-				items: [],
+				items: null,
 			},
 			isCurrentUserUsing2fa: null,
 			isUserCreating: false,
