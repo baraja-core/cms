@@ -118,6 +118,9 @@ Vue.component('user-security', {
 			});
 		},
 		blockCancel() {
+			if (!confirm('Are you sure you want to unblock this account? The user will be able to log in.')) {
+				return;
+			}
 			axiosApi.post('user/block-user-cancel', {
 				id: this.id,
 			}).then(req => {
