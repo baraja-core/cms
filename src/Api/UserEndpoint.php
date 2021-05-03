@@ -110,7 +110,10 @@ final class UserEndpoint extends BaseEndpoint
 			->getQuery()
 			->getArrayResult();
 
-		$metaToUser = $this->getMetaByUsers(array_map(static fn(array $user): int => $user['id'], $users), ['blocked']);
+		$metaToUser = $this->getMetaByUsers(
+			array_map(static fn(array $user): int => $user['id'], $users),
+			['blocked', 'block-reason'],
+		);
 
 		$return = [];
 		foreach ($users as $user) {
@@ -132,6 +135,7 @@ final class UserEndpoint extends BaseEndpoint
 					'2fa' => $user['otpCode'] !== null,
 					'verifying' => $user['password'] === '---empty-password---',
 					'blocked' => ($metaToUser[$user['id']]['blocked'] ?? '') === 'true',
+					'blockedReason' => $metaToUser[$user['id']]['block-reason'] ?? null,
 				],
 			];
 		}
