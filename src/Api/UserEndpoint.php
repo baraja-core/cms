@@ -438,7 +438,10 @@ final class UserEndpoint extends BaseEndpoint
 			$this->sendError('Block reason can not be empty.');
 		}
 		try {
-			$this->userManager->getUserById($id);
+			$user = $this->userManager->getUserById($id);
+			$user->setActive(false);
+			$user->resetPrivileges();
+			$user->resetRoles();
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 
