@@ -74,6 +74,11 @@ final class UserEndpoint extends BaseEndpoint
 				->setParameter('role', '%"' . $role . '"%');
 		}
 		if ($query !== null) {
+			if (is_numeric($query) && $query >= 1) {
+				$selection->andWhere('(user.id = :userId OR user.id LIKE :userIdStart)')
+					->setParameter('userId', $query)
+					->setParameter('userIdStart', ((int) $query) . '%');
+			}
 			$orx = $selection->expr()->orX();
 			$isMysql = ($this->entityManager->getConnection()->getParams()['driver'] ?? '') === 'pdo_mysql';
 			$query = trim((string) preg_replace('/\s+/', ' ', $query));
