@@ -62,7 +62,8 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 			AdminBar::getBar()->addPanel(new LoginAsUserPanel($user->getId()));
 		}
 
-		$this->setTitle($user->getName());
+		$this->setTitle('(' . $user->getId() . ') ' . $user->getName());
+		$this->setSubtitle($user->getEmail());
 		$this->setLinkBack($this->link('Article:default'));
 
 		$this->addBreadcrumb(new Breadcrumb('Dashboard', $this->link('Homepage:default')));
