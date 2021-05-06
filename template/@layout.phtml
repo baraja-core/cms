@@ -26,8 +26,8 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 	<meta name="author" content="Baraja.cz">
 	<meta name="robots" content="noindex, nofollow, noarchive">
 	<title>Admin</title>
-	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css">
-	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css">
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.min.css">
 	<link type="text/css" rel="stylesheet" href="<?= Helpers::escapeHtmlAttr($basePath . '/admin/assets/core.css') ?>">
 	<link rel="shortcut icon" type="image/x-icon" href="<?= Helpers::escapeHtmlAttr($basePath . '/admin/assets/favicon.ico') ?>">
 	<?php
@@ -67,8 +67,8 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 </div>
 <script src="<?= $isDebug ? 'https://unpkg.com/vue@2.6.11/dist/vue.js' : 'https://unpkg.com/vue@2.6.11/dist/vue.min.js' ?>"></script>
 <script src="https://unpkg.com/bootstrap-vue@2.17.0/dist/bootstrap-vue.min.js"></script>
-<script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue-icons.min.js"></script>
+<script src="https://unpkg.com/axios@0.21.1/dist/axios.min.js"></script>
 <?php
 foreach ($staticAssets as $staticAsset) {
 	if ($staticAsset->getFormat() === 'js') {
