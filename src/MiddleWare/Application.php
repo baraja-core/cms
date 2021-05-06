@@ -81,7 +81,8 @@ final class Application
 			$pluginService->beforeRender();
 			$pluginService->run();
 
-			if (\method_exists($pluginService, $actionMethod = 'action' . $view) === true) {
+			$actionMethod = 'action' . $view;
+			if (\method_exists($pluginService, $actionMethod) === true) {
 				(new ServiceMethodInvoker)->invoke($pluginService, $actionMethod, $this->context->getRequest()->getUrl()->getQueryParameters());
 			}
 

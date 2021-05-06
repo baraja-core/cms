@@ -101,7 +101,8 @@ final class CmsEndpoint extends BaseEndpoint
 
 			return;
 		}
-		if (($otpCode = $user->getOtpCode()) === null) {
+		$otpCode = $user->getOtpCode();
+		if ($otpCode === null) {
 			$this->sendError('OTP code for user "' . $userEntity->getId() . '" does not exist.');
 
 			return;
@@ -148,6 +149,7 @@ final class CmsEndpoint extends BaseEndpoint
 				'expireDate' => $request->getExpireDate()->format('d. m. Y, H:i:s'),
 			]);
 		} catch (NoResultException | NonUniqueResultException) {
+			// Silence is golden.
 		}
 
 		$this->sendOk();
@@ -177,6 +179,7 @@ final class CmsEndpoint extends BaseEndpoint
 					'loginUrl' => Url::get()->getBaseUrl() . '/admin',
 				]);
 			} catch (NoResultException | NonUniqueResultException) {
+				// Silence is golden.
 			}
 		} else {
 			$this->sendError('Invalid name "' . $realName . '".');

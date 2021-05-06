@@ -50,7 +50,8 @@ final class CmsSettingsEndpoint extends BaseEndpoint
 
 	public function postSaveCommon(string $projectName, string $adminEmail, string $cloudToken): void
 	{
-		if (($projectName = trim($projectName)) === '') {
+		$projectName = trim($projectName);
+		if ($projectName === '') {
 			$this->sendError('Project name can not be empty.');
 		}
 		if (Validators::isEmail($adminEmail) === false) {
