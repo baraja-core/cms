@@ -64,6 +64,7 @@ final class UserMetaManager
 
 			return $meta->getValue();
 		} catch (NoResultException | NonUniqueResultException) {
+			// Silence is golden.
 		}
 
 		return null;

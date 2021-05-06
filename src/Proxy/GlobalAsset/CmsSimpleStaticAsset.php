@@ -9,14 +9,17 @@ use Nette\Utils\Validators;
 
 final class CmsSimpleStaticAsset implements CmsAsset
 {
+	public const SUPPORTED_FORMATS = ['js', 'css'];
+
+
 	public function __construct(
 		private string $format,
 		private string $url
 	) {
-		if (in_array($format, $supported = ['js', 'css'], true) === false) {
+		if (in_array($format, self::SUPPORTED_FORMATS, true) === false) {
 			throw new \InvalidArgumentException(
 				'Format "' . $format . '" is not supported. '
-				. 'Did you mean "' . implode('", "', $supported) . '"?',
+				. 'Did you mean "' . implode('", "', self::SUPPORTED_FORMATS) . '"?',
 			);
 		}
 		if (Validators::isUrl($url) === false) {

@@ -208,7 +208,8 @@ class User implements CmsUser
 
 	public function getSalutation(): ?string
 	{
-		if (trim($name = $this->getName()) !== '') {
+		$name = $this->getName();
+		if (trim($name) !== '') {
 			return Strings::firstUpper($name); // TODO: Currently not supported
 		}
 
@@ -437,7 +438,8 @@ class User implements CmsUser
 	{
 		$return = [];
 		foreach ($this->metas as $meta) {
-			if (($value = $meta->getValue()) !== null) {
+			$value = $meta->getValue();
+			if ($value !== null) {
 				$return[$meta->getKey()] = $value;
 			}
 		}
@@ -522,7 +524,8 @@ class User implements CmsUser
 		if ($this->getFirstName() === null && $this->getLastName() === null) {
 			return Strings::firstUpper((string) preg_replace('/^(.*)@.*$/', '$1', $this->getUsername()));
 		}
-		if (($name = $this->getFirstName() ?? '') || $this->getLastName() !== null) {
+		$name = $this->getFirstName() ?? '';
+		if ($name !== '' || $this->getLastName() !== null) {
 			$name = $reverse === true
 				? $this->getLastName() . ($name !== '' ? ', ' : '') . $name
 				: $name . ($name !== '' ? ' ' : '') . $this->getLastName();

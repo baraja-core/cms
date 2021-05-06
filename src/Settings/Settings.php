@@ -146,6 +146,7 @@ final class Settings
 				return true;
 			}
 		} catch (\InvalidArgumentException) {
+			// Silence is golden.
 		}
 
 		return false;
