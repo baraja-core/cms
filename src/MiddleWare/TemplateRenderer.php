@@ -96,14 +96,16 @@ final class TemplateRenderer
 	public function renderPermissionDenied(): string
 	{
 		return '<link type="text/css" rel="stylesheet" href="https://cdn.baraja.cz/bootstrap/bootstrap.min.css">
-<div style="margin:6em auto;max-width:32em;padding:0 1em">
-	<div class="row mb-4">
-		<div class="col-sm-3"><img src="https://cdn.baraja.cz/icon/warning-triangle.png" alt="Warning"></div>
-		<div class="col text-right"><h1>Permission denied</h1></div>
+<div class="card" style="margin:6em auto;max-width:32em;padding:0 1em">
+	<div class="card-body container-fluid">
+		<div class="row mb-4">
+			<div class="col-sm-2"><img src="https://cdn.baraja.cz/icon/warning-triangle.png" alt="Warning"></div>
+			<div class="col text-right"><h1>Permission denied</h1></div>
+		</div>
+		<p>Open this page is not permitted for your account.</p>
+		<p class="text-secondary">That’s all we know.</p>
+		<p><a href="' . Url::get()->getBaseUrl() . '/admin/cms/sign-out" class="btn btn-primary">Sign out</a></p>
 	</div>
-	<p>Open this page is not permitted for your account.</p>
-	<p class="text-secondary">That’s all we know.</p>
-	<p><a href="' . Url::get()->getBaseUrl() . '/admin/cms/sign-out" class="btn btn-primary">Sign out</a></p>
 </div>';
 	}
 
