@@ -10,8 +10,6 @@ use Baraja\Doctrine\EntityManager;
 use Baraja\DoctrineConfiguration\Option;
 use Baraja\DynamicConfiguration\Configuration;
 use Baraja\Localization\Localization;
-use Baraja\Url\Url;
-use Latte\Engine;
 use Nette\Caching\Cache;
 use Nette\Caching\Storage;
 use Nette\Utils\Validators;

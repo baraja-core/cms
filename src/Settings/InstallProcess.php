@@ -64,4 +64,3 @@ final class InstallProcess
 		return '<p>Configuration is broken, please clear cache and try load this page again.</p>';
 	}
 }
-
