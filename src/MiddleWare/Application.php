@@ -112,7 +112,7 @@ final class Application
 			if ($path !== '') { // canonize configuration request to base admin URL
 				$this->redirect(Url::get()->getBaseUrl() . '/admin');
 			}
-			$this->terminate($this->context->getSettings()->run());
+			$this->terminate($this->context->getSettings()->runInstallProcess());
 		}
 		if ($plugin === 'ResetPassword') { // route reset password form
 			$this->terminate($this->templateRenderer->renderResetPasswordTemplate($_GET['token'] ?? '', $locale));
