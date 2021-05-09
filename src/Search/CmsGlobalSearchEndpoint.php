@@ -29,6 +29,8 @@ final class CmsGlobalSearchEndpoint extends BaseEndpoint
 				'query' => $query,
 				'results' => [],
 			]);
+
+			return;
 		}
 
 		$entityToPlugin = $this->pluginManager->getBaseEntityToPlugin();
