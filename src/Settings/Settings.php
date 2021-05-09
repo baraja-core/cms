@@ -42,46 +42,9 @@ final class Settings
 	}
 
 
-	public function run(): string
+	public function runInstallProcess(): string
 	{
-		$url = Url::get()->getCurrentUrl();
-		$databaseException = null;
-		try {
-			$dbOk = $this->isDatabaseConnectionOk();
-		} catch (\Throwable $e) {
-			$dbOk = false;
-			$databaseException = $e;
-		}
-
-		if ($dbOk === false) {
-			return (new Engine)
-				->renderToString(__DIR__ . '/../../template/install-database.latte', [
-					'basePath' => Url::get()->getBaseUrl(),
-					'locale' => $this->localization->getLocale(),
-					'isCloudHost' => (bool) preg_match('/^.+?\.ondigitalocean\.com$/', $host = $this->entityManager->getConnection()->getParams()['host'] ?? ''),
-					'host' => $host,
-					'user' => $this->entityManager->getConnection()->getParams()['user'] ?? '?',
-					'exception' => $databaseException,
-				]);
-		}
-		if ($this->isCloudConnectionOk() === false) {
-			return (new Engine)
-				->renderToString(__DIR__ . '/../../template/install-cloud-connection.latte', [
-					'basePath' => Url::get()->getBaseUrl(),
-					'locale' => $this->localization->getLocale(),
-				]);
-		}
-		if ($this->isBasicConfigurationOk() === false) {
-			return (new Engine)
-				->renderToString(__DIR__ . '/../../template/install-basic.latte', [
-					'basePath' => Url::get()->getBaseUrl(),
-					'locale' => $this->localization->getLocale(),
-					'isLocalhost' => strpos($url, 'localhost') !== false,
-					'isBarajaCz' => strpos($url, 'baraja.cz') !== false,
-				]);
-		}
-
-		return '<p>Configuration is broken, please clear cache and try load this page again.</p>';
+		return (new InstallProcess($this, $this->localization, $this->entityManager))->run();
 	}
 
 
