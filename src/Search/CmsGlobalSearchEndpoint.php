@@ -15,14 +15,22 @@ final class CmsGlobalSearchEndpoint extends BaseEndpoint
 {
 	public function __construct(
 		private PluginManager $pluginManager,
-		private SearchAccessor $searchAccessor,
 		private EntityManager $entityManager,
+		private ?SearchAccessor $searchAccessor = null,
 	) {
 	}
 
 
 	public function actionDefault(string $query): void
 	{
+		if ($this->searchAccessor === null) {
+			$this->sendJson([
+				'active' => false,
+				'query' => $query,
+				'results' => [],
+			]);
+		}
+
 		$entityToPlugin = $this->pluginManager->getBaseEntityToPlugin();
 		$pluginClassToPluginName = [];
 		$entityMap = [];
@@ -58,6 +66,7 @@ final class CmsGlobalSearchEndpoint extends BaseEndpoint
 		}
 
 		$this->sendJson([
+			'active' => true,
 			'query' => $query,
 			'results' => $results,
 		]);
