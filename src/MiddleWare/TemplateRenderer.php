@@ -120,7 +120,7 @@ final class TemplateRenderer
 				[
 					'basePath' => Url::get()->getBaseUrl(),
 					'availableLocales' => Admin::SUPPORTED_LOCALES,
-					'projectName' => $this->context->getConfiguration()->get('name', 'core'),
+					'projectName' => $this->context->getConfiguration()->get('name'),
 					'locale' => $locale,
 				],
 			);

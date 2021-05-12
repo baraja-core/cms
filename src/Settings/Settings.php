@@ -9,6 +9,7 @@ use Baraja\BarajaCloud\CloudManager;
 use Baraja\Doctrine\EntityManager;
 use Baraja\DoctrineConfiguration\Option;
 use Baraja\DynamicConfiguration\Configuration;
+use Baraja\DynamicConfiguration\ConfigurationSection;
 use Baraja\Localization\Localization;
 use Nette\Caching\Cache;
 use Nette\Caching\Storage;
@@ -18,15 +19,18 @@ final class Settings
 {
 	private Cache $cache;
 
+	private ConfigurationSection $config;
+
 
 	public function __construct(
 		private EntityManager $entityManager,
 		private Localization $localization,
-		private Configuration $configuration,
 		private CloudManager $cloudManager,
 		Storage $storage,
+		Configuration $configuration,
 	) {
 		$this->cache = new Cache($storage, 'cms-settings');
+		$this->config = new ConfigurationSection($configuration, 'core');
 	}
 
 
@@ -60,13 +64,13 @@ final class Settings
 
 	public function getOption(string $key): ?string
 	{
-		return $this->configuration->get($key, 'core');
+		return $this->config->get($key);
 	}
 
 
 	public function setConfiguration(string $key, ?string $value): void
 	{
-		$this->configuration->save($key, $value, 'core');
+		$this->config->save($key, $value);
 	}
 
 
@@ -119,7 +123,7 @@ final class Settings
 		if ($this->cache->load('configuration') === true) {
 			return true;
 		}
-		if ($this->configuration->get('name', 'core') !== null) {
+		if ($this->config->get('name') !== null) {
 			$this->cache->save('configuration', true);
 
 			return true;
