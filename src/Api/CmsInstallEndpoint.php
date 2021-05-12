@@ -10,6 +10,7 @@ use Baraja\Cms\Settings;
 use Baraja\Cms\User\Entity\User;
 use Baraja\Doctrine\EntityManager;
 use Baraja\DynamicConfiguration\Configuration;
+use Baraja\DynamicConfiguration\ConfigurationSection;
 use Baraja\StructuredApi\BaseEndpoint;
 use Baraja\Url\Url;
 use Nette\Utils\Strings;
@@ -20,12 +21,16 @@ use Nette\Utils\Validators;
  */
 final class CmsInstallEndpoint extends BaseEndpoint
 {
+	private ConfigurationSection $config;
+
+
 	public function __construct(
 		private EntityManager $entityManager,
-		private Configuration $configuration,
 		private CloudManager $cloudManager,
-		private Settings $settings
+		private Settings $settings,
+		Configuration $configuration,
 	) {
+		$this->config = new ConfigurationSection($configuration, 'core');
 	}
 
 
@@ -89,14 +94,16 @@ final class CmsInstallEndpoint extends BaseEndpoint
 			$errors[] = 'Musíte souhlasit s podmínkami služby.';
 		}
 		if ($errors !== []) {
-			$this->sendJson([
-				'state' => 'error',
-				'errors' => $errors,
-			]);
+			$this->sendJson(
+				[
+					'state' => 'error',
+					'errors' => $errors,
+				]
+			);
 		}
 
-		$this->configuration->save('name', $name, 'core');
-		$this->configuration->save('admin-email', $mail, 'core');
+		$this->config->save('name', $name);
+		$this->config->save('admin-email', $mail);
 
 		$user = new User($username, $password, $mail, 'admin');
 		$user->setFirstName($firstName);
@@ -127,7 +134,18 @@ final class CmsInstallEndpoint extends BaseEndpoint
 			$this->sendError('Zadejte vaše reálné jméno, které musí existovat.');
 		}
 
-		$response = (array) json_decode(@file_get_contents(CloudManager::ENDPOINT_URL . '/cloud-status/create-account?domain=' . urlencode(Url::get()->getNetteUrl()->getDomain(3)) . '&email=' . urlencode($email) . '&password=' . urlencode($password) . '&firstName=' . urlencode($firstName) . '&lastName=' . urlencode($lastName) . ($phone ? '&phone=' . urlencode($phone) : '')) ?: '{}', true);
+		$response = (array)json_decode(
+			@file_get_contents(
+				CloudManager::ENDPOINT_URL . '/cloud-status/create-account?domain='
+				. urlencode(Url::get()->getNetteUrl()->getDomain(3))
+				. '&email=' . urlencode($email)
+				. '&password=' . urlencode($password)
+				. '&firstName=' . urlencode($firstName)
+				. '&lastName=' . urlencode($lastName)
+				. ($phone ? '&phone=' . urlencode($phone) : '')
+			) ?: '{}',
+			true
+		);
 		if (isset($response['token']) === false) {
 			$this->sendError($response['message'] ?? 'Account with given e-mail or password does not exist.');
 		}
@@ -150,7 +168,15 @@ final class CmsInstallEndpoint extends BaseEndpoint
 			$this->sendError('E-mail nemá správný formát.');
 		}
 
-		$response = (array) json_decode(@file_get_contents(CloudManager::ENDPOINT_URL . '/cloud-status/token-by-user?domain=' . urlencode(Url::get()->getNetteUrl()->getDomain(3)) . '&email=' . urlencode($email) . '&password=' . urlencode($password)) ?: '{}', true);
+		$response = (array)json_decode(
+			@file_get_contents(
+				CloudManager::ENDPOINT_URL . '/cloud-status/token-by-user?domain='
+				. urlencode(Url::get()->getNetteUrl()->getDomain(3))
+				. '&email=' . urlencode($email)
+				. '&password=' . urlencode($password)
+			) ?: '{}',
+			true
+		);
 		if (isset($response['token']) === false) {
 			$this->sendError($response['message'] ?? 'Account with given e-mail or password does not exist.');
 		}

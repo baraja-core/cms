@@ -12,6 +12,7 @@ use Baraja\Cms\Translator\TranslatorFilter;
 use Baraja\Cms\User\UserManagerAccessor;
 use Baraja\Doctrine\EntityManager;
 use Baraja\DynamicConfiguration\Configuration;
+use Baraja\DynamicConfiguration\ConfigurationSection;
 use Baraja\Localization\Localization;
 use Baraja\Plugin\Component\PluginComponent;
 use Baraja\Plugin\Plugin;
@@ -25,12 +26,13 @@ final class Context
 	/** @var string[] (type => path) */
 	private array $customAssets = [];
 
+	private ConfigurationSection $config;
+
 
 	public function __construct(
 		private Request $request,
 		private Response $response,
 		private EntityManager $entityManager,
-		private Configuration $configuration,
 		private Settings $settings,
 		private User $user,
 		private TranslatorFilter $translatorFilter,
@@ -40,7 +42,9 @@ final class Context
 		private UserManagerAccessor $userManager,
 		private CustomGlobalAssetManagerAccessor $customGlobalAssetManager,
 		private Localization $localization,
+		Configuration $configuration,
 	) {
+		$this->config = new ConfigurationSection($configuration, 'core');
 		$localization->setContextLocale($localization->getDefaultLocale());
 	}
 
@@ -118,9 +122,9 @@ final class Context
 	}
 
 
-	public function getConfiguration(): Configuration
+	public function getConfiguration(): ConfigurationSection
 	{
-		return $this->configuration;
+		return $this->config;
 	}
 
 
