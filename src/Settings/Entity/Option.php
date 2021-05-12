@@ -5,39 +5,29 @@ declare(strict_types=1);
 namespace Baraja\DoctrineConfiguration;
 
 
-use Baraja\Doctrine\Identifier\Identifier;
+use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\Index;
-use Nette\SmartObject;
 use Nette\Utils\DateTime;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(
- *    name="core__option",
- *    indexes={
- *       @Index(name="core__option_key_value", columns={"key", "value"}),
- *       @Index(name="core__option_id_value", columns={"id", "value"}),
- *       @Index(name="core__option_id_key_value", columns={"id", "key", "value"})
- *    }
- * )
+ * @ORM\Table(name="core__option")
  */
 class Option
 {
-	use Identifier;
-	use SmartObject;
+	use IdentifierUnsigned;
 
 	/** @ORM\Column(type="string", name="`key`", length=128, unique=true) */
 	private string $key;
 
-	/** @ORM\Column(type="string", length=512) */
+	/** @ORM\Column(type="text") */
 	private string $value;
 
 	/**
 	 * Last non empty values.
 	 *
 	 * @var string[]
-	 * @ORM\Column(type="json_array")
+	 * @ORM\Column(type="json")
 	 */
 	private array $oldValues = [];
 
@@ -45,7 +35,7 @@ class Option
 	private \DateTime $insertedDate;
 
 	/** @ORM\Column(type="datetime", nullable=true) */
-	private ?\DateTime $updatedDate;
+	private ?\DateTime $updatedDate = null;
 
 
 	public function __construct(string $key, string $value)

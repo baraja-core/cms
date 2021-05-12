@@ -92,7 +92,8 @@ final class DoctrineStorage implements Storage
 		try {
 			$option = $this->getOptionEntity($key);
 		} catch (NoResultException | NonUniqueResultException) {
-			$this->entityManager->persist($option = new Option($key, $value));
+			$option = new Option($key, $value);
+			$this->entityManager->persist($option);
 		}
 		$option->setValue($value);
 		$this->entityManager->flush();
