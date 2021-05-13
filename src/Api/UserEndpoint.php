@@ -107,7 +107,7 @@ final class UserEndpoint extends BaseEndpoint
 			}
 		}
 
-		$users = $selection->select('PARTIAL user.{id, firstName, lastName, password, emails, phone, roles, active, avatarUrl, registerDate, otpCode}')
+		$users = $selection->select('PARTIAL user.{id, firstName, lastName, password, email, phone, roles, active, registerDate, otpCode}')
 			->setMaxResults($limit)
 			->setFirstResult(($page - 1) * $limit)
 			->addOrderBy('user.active', 'DESC')
@@ -131,10 +131,10 @@ final class UserEndpoint extends BaseEndpoint
 
 					return Strings::firstUpper((string) $return) ?: null;
 				})(),
-				'email' => $user['emails'][0] ?? null,
+				'email' => $user['email'],
 				'roles' => $user['roles'],
 				'phone' => $user['phone'],
-				'avatarUrl' => $user['avatarUrl'],
+				'avatarUrl' => 'https://cdn.baraja.cz/avatar/' . md5($user['email']) . '.png',
 				'registerDate' => $user['registerDate'],
 				'options' => [
 					'active' => $user['active'],
@@ -306,7 +306,7 @@ final class UserEndpoint extends BaseEndpoint
 				})($user->getPhone()),
 				'avatarUrl' => $user->getAvatarUrl(),
 			],
-			'iconUrl' => $user->getAvatarUrl() ?? 'https://www.gravatar.com/avatar/' . md5($user->getEmail()) . '?s=256',
+			'avatarUrl' => $user->getAvatarUrl(),
 			'created' => $user->getCreateDate(),
 			'meta' => (static function (array $data): array {
 				$return = [];
@@ -741,6 +741,7 @@ final class UserEndpoint extends BaseEndpoint
 
 	public function actionSavePhoto(int $id, string $url): void
 	{
+		// TODO: Refactor this to file upload to Baraja CDN
 		if (Validators::isUrl($url) === false) {
 			$this->sendError('URL must be absolute valid URL.');
 		}
@@ -764,7 +765,6 @@ final class UserEndpoint extends BaseEndpoint
 			return;
 		}
 
-		$user->setAvatarUrl($url);
 		$this->entityManager->flush();
 		$this->flashMessage('User photo has been changed.', 'success');
 		$this->sendOk();

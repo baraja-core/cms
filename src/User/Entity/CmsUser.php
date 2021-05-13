@@ -95,9 +95,7 @@ interface CmsUser extends IIdentity
 
 	public function setActive(bool $active): void;
 
-	public function getAvatarUrl(): ?string;
-
-	public function setAvatarUrl(?string $avatarUrl): void;
+	public function getAvatarUrl(): string;
 
 	public function getName(bool $reverse = false): string;
 

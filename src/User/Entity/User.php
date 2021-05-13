@@ -106,9 +106,6 @@ class User implements CmsUser
 	 */
 	private $metas;
 
-	/** @ORM\Column(type="string", nullable=true) */
-	private ?string $avatarUrl;
-
 	/**
 	 * @var UserLogin[]|Collection
 	 * @ORM\OneToMany(targetEntity="UserLogin", mappedBy="user")
@@ -503,19 +500,9 @@ class User implements CmsUser
 	}
 
 
-	public function getAvatarUrl(): ?string
+	public function getAvatarUrl(): string
 	{
-		return $this->avatarUrl;
-	}
-
-
-	public function setAvatarUrl(?string $avatarUrl): void
-	{
-		if ($avatarUrl !== null && Validators::isUrl($avatarUrl) === false) {
-			throw new \InvalidArgumentException('Avatar URL "' . $avatarUrl . '" must be valid absolute URL.');
-		}
-
-		$this->avatarUrl = $avatarUrl;
+		return 'https://cdn.baraja.cz/avatar/' . md5($this->getEmail()) . '.png';
 	}
 
 
