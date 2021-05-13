@@ -9,7 +9,7 @@ Vue.component('user-overview', {
 				<b-row>
 					<b-col cols="1">
 						<div>
-							<img :src="iconUrl" :alt="'User ' + form.username" class="w-100">
+							<img :src="avatarUrl" :alt="'User ' + form.username" class="w-100">
 						</div>
 						<div class="mt-3">
 							<b-button variant="secondary" class="btn btn-sm py-0" v-b-modal.modal-change-photo>Change photo</b-button>
@@ -114,7 +114,7 @@ Vue.component('user-overview', {
 				<b-row>
 					<b-col cols="3">
 						<p class="text-secondary">Preview:</p>
-						<img :src="editPhoto.url ? editPhoto.url : iconUrl" alt="Photo" class="w-100">
+						<img :src="editPhoto.url ? editPhoto.url : avatarUrl" alt="Photo" class="w-100">
 					</b-col>
 					<b-col>
 						<p class="text-secondary">A&nbsp;photo helps personalize your account.</p>
@@ -176,7 +176,7 @@ Vue.component('user-overview', {
 				phone: ''
 			},
 			created: '',
-			iconUrl: null,
+			avatarUrl: null,
 			form: {
 				fullName: null,
 				email: null,
@@ -210,7 +210,7 @@ Vue.component('user-overview', {
 			axiosApi.get(`user/overview?id=${this.id}`).then(req => {
 				this.form = req.data.form;
 				this.created = req.data.created;
-				this.iconUrl = req.data.iconUrl;
+				this.avatarUrl = req.data.avatarUrl;
 				this.meta = req.data.meta;
 				this.loading.init = false;
 				this.loading.meta = false;

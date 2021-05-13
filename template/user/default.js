@@ -126,11 +126,9 @@ Vue.component('user-default', {
 						</tr>
 						<tr v-for="(item, offset) in user.items">
 							<td>
-								<template v-if="item.avatarUrl">
-									<a :href="link('User:detail', {id: item.id})">
-										<img v-if="item.avatarUrl" :src="item.avatarUrl" :alt="item.name" style="max-height:32px">
-									</a>
-								</template>
+								<a :href="link('User:detail', {id: item.id})">
+									<img v-if="item.avatarUrl" :src="item.avatarUrl" :alt="item.name" style="max-height:32px">
+								</a>
 								<a :href="link('User:detail', {id: item.id})">{{ item.name }}</a>
 								<div v-if="item.options['2fa']" class="badge badge-pill badge-primary" v-b-tooltip title="This user is using 2-step login authentication (better security).">2FA</div>
 								<div v-if="item.id === currentUserId" class="badge badge-pill badge-primary" v-b-tooltip title="This is your account.">You</div>
