@@ -765,6 +765,8 @@ final class UserEndpoint extends BaseEndpoint
 		$file = $request->getFile('avatar');
 		if ($file === null) {
 			$this->sendError('Please select avatar image to upload.');
+
+			return;
 		}
 		if ($file->isImage() === false) {
 			$this->sendError('Uploaded avatar file must be a image.');
