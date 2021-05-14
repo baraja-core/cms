@@ -21,11 +21,14 @@ use Baraja\Url\Url;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Nette\Caching\Cache;
+use Nette\Http\FileUpload;
+use Nette\Http\Request;
+use Nette\NotSupportedException;
+use Nette\Utils\Callback;
 use Nette\Utils\DateTime;
 use Nette\Utils\Paginator;
 use Nette\Utils\Random;
 use Nette\Utils\Strings;
-use Nette\Utils\Validators;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
@@ -739,34 +742,77 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	public function actionSavePhoto(int $id, string $url): void
+	public function postUploadAvatar(): void
 	{
-		// TODO: Refactor this to file upload to Baraja CDN
-		if (Validators::isUrl($url) === false) {
-			$this->sendError('URL must be absolute valid URL.');
-		}
-		$imageHeaders = @get_headers($url);
-		if (!$imageHeaders || ($imageHeaders[0] ?? '') === 'HTTP/1.1 404 Not Found') {
-			$this->sendError('URL does not exist.');
-		}
-		foreach ((array) $imageHeaders as $imageHeader) {
-			if (
-				preg_match('/^Content-Type:\s(.+)$/', $imageHeader, $headerParser)
-				&& !\in_array($headerParser[1], ['image/jpeg', 'image/png', 'image/gif'], true)
-			) {
-				$this->sendError('Image type is not valid, because "' . $headerParser[1] . '" given.');
-			}
-		}
+		/** @var Request $request */
+		$request = $this->container->getByType(Request::class);
+		$userId = (int) $request->getPost('userId');
+
 		try {
-			$user = $this->userManager->getUserById($id);
+			$user = $this->userManager->getUserById($userId);
 		} catch (NoResultException | NonUniqueResultException) {
-			$this->sendError('User "' . $id . '" does not exist.');
+			$this->sendError('User "' . $userId . '" does not exist.');
 
 			return;
 		}
+		if (
+			!$this->getUser()->isInRole('admin')
+			&& $this->getUser()->getId() !== $userId
+		) {
+			$this->sendError('Upload avatar is not permitted.');
+		}
 
-		$this->entityManager->flush();
-		$this->flashMessage('User photo has been changed.', 'success');
+		/** @var FileUpload $file */
+		$file = $request->getFile('avatar');
+
+		if ($file === null) {
+			$this->sendError('Please select avatar image to upload.');
+		}
+		if ($file->isImage() === false) {
+			$this->sendError('Uploaded avatar file must be a image.');
+		}
+
+		try {
+			$apiResponse = Callback::invokeSafe(
+				function: 'file_get_contents',
+				args: [
+					'https://cdn.baraja.cz/avatar/upload',
+					false,
+					stream_context_create([
+						'http' => [
+							'method' => 'POST',
+							'header' => 'Content-Type: application/x-www-form-urlencoded',
+							'user_agent' => 'BarajaBot in PHP',
+							'content' => http_build_query([
+								'email' => $user->getEmail(),
+								'blob' => base64_encode((static function(FileUpload $file): string {
+									try { // try to compress
+										return $file->toImage()->toString(IMAGETYPE_PNG);
+									} catch (NotSupportedException) { // fallback - send whole data
+										return (string) $file->getContents();
+									}
+								})($file)),
+							]),
+						],
+					]),
+				],
+				onError: static function (string $message): void {
+					throw new \RuntimeException($message);
+				}
+			);
+		} catch (\RuntimeException $e) {
+			Debugger::log($e, ILogger::CRITICAL);
+			$this->sendError('Can not upload avatar to CDN server: ' . $e->getMessage());
+
+			return;
+		}
+		if (str_starts_with($apiResponse, '{')) {
+			$response = json_decode($apiResponse, true, 512, JSON_THROW_ON_ERROR);
+			if (isset($response['error']) && $response['error'] === true) {
+				$this->sendError($response['message'] ?? 'CDN error');
+			}
+		}
+
 		$this->sendOk();
 	}
 
