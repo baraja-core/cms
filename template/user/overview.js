@@ -9,7 +9,7 @@ Vue.component('user-overview', {
 				<b-row>
 					<b-col cols="1">
 						<div>
-							<img :src="avatarUrl" :alt="'User ' + form.username" class="w-100">
+							<img :src="avatarUrl + '?' + avatarUrlRandom" :alt="'User ' + form.username" class="w-100">
 						</div>
 						<div class="mt-3">
 							<b-button variant="secondary" class="btn btn-sm py-0" v-b-modal.modal-change-photo>Change photo</b-button>
@@ -111,18 +111,25 @@ Vue.component('user-overview', {
 				</b-row>
 			</template>
 			<b-modal id="modal-change-photo" title="Change photo" size="lg" hide-footer>
-				<b-row>
-					<b-col cols="3">
-						<p class="text-secondary">Preview:</p>
-						<img :src="editPhoto.url ? editPhoto.url : avatarUrl" alt="Photo" class="w-100">
-					</b-col>
-					<b-col>
-						<p class="text-secondary">A&nbsp;photo helps personalize your account.</p>
-						Absolute URL to photo:
-						<b-form-input v-model="editPhoto.url" placeholder="Please enter absolute URL here"></b-form-input>
-						<b-button variant="primary" class="my-3" @click="savePhoto">Save photo</b-button>
-						<p class="text-secondary">Your profile photo is visible to everyone, across Baraja products.</p>
-					</b-col>
+				<b-form @submit="uploadPhoto">
+					<b-row>
+						<b-col cols="3">
+							<img :src="avatarUrl + '?' + avatarUrlRandom" alt="Avatar" title="Avatar" class="w-100">
+						</b-col>
+						<b-col>
+							<p class="text-secondary">A&nbsp;photo helps personalize your account.</p>
+							<b-form-file v-model="editPhoto.file" accept="image/*"></b-form-file>
+							<b-button variant="primary" type="submit" class="my-3">
+								<template v-if="editPhoto.loading">
+									<b-spinner small></b-spinner>
+								</template>
+								<template v-else>
+									Upload photo
+								</template>
+							</b-button>
+							<p class="text-secondary">Your profile photo is visible to everyone, across Baraja products.</p>
+						</b-col>
+					</b-form>
 				</b-row>
 			</b-modal>
 			<b-modal id="modal-change-meta" title="Change meta value" hide-footer>
@@ -169,7 +176,8 @@ Vue.component('user-overview', {
 				value: ''
 			},
 			editPhoto: {
-				url: ''
+				file: null,
+				loading: false
 			},
 			editPhone: {
 				region: '',
@@ -177,6 +185,7 @@ Vue.component('user-overview', {
 			},
 			created: '',
 			avatarUrl: null,
+			avatarUrlRandom: '',
 			form: {
 				fullName: null,
 				email: null,
@@ -208,6 +217,7 @@ Vue.component('user-overview', {
 		},
 		sync() {
 			axiosApi.get(`user/overview?id=${this.id}`).then(req => {
+				this.avatarUrlRandom = Math.random();
 				this.form = req.data.form;
 				this.created = req.data.created;
 				this.avatarUrl = req.data.avatarUrl;
@@ -231,10 +241,19 @@ Vue.component('user-overview', {
 				});
 			}
 		},
-		savePhoto() {
-			axiosApi.get(`user/save-photo?id=${this.id}&url=${this.editPhoto.url}`).then(req => {
+		uploadPhoto(evt) {
+			evt.preventDefault();
+			this.editPhoto.loading = true;
+			let formData = new FormData();
+			formData.append('userId', this.id);
+			formData.append('avatar', this.editPhoto.file);
+			axiosApi.post('user/upload-avatar', formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data'
+				}
+			}).then(req => {
+				this.editPhoto.loading = false;
 				this.$bvModal.hide('modal-change-photo');
-				this.editPhoto.url = '';
 				this.sync();
 			});
 		},
