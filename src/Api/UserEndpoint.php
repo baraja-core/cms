@@ -762,9 +762,7 @@ final class UserEndpoint extends BaseEndpoint
 			$this->sendError('Upload avatar is not permitted.');
 		}
 
-		/** @var FileUpload $file */
 		$file = $request->getFile('avatar');
-
 		if ($file === null) {
 			$this->sendError('Please select avatar image to upload.');
 		}
