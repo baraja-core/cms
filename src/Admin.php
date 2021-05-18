@@ -6,6 +6,7 @@ namespace Baraja\Cms;
 
 
 use Baraja\Cms\MiddleWare\Application;
+use Baraja\Cms\MiddleWare\Bridge\SentryBridge;
 use Baraja\Cms\MiddleWare\TemplateRenderer;
 use Baraja\PathResolvers\Resolvers\TempDirResolver;
 use Baraja\Plugin\CmsPluginPanel;
@@ -29,7 +30,8 @@ final class Admin
 		MenuManager $menuManager,
 		CmsPluginPanel $panel,
 	) {
-		FileSystem::createDir($cacheDir = $tempDirResolver->get('cache/baraja.cms'));
+		$cacheDir = $tempDirResolver->get('cache/baraja.cms');
+		FileSystem::createDir($cacheDir);
 		$this->application = new Application(
 			$context,
 			$panel,
@@ -42,6 +44,7 @@ final class Admin
 			$linkGenerator,
 		);
 		Debugger::getBar()->addPanel($panel);
+		(new SentryBridge($context->getUser()))->register();
 	}
 
 
