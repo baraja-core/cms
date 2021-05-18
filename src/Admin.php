@@ -26,7 +26,6 @@ final class Admin
 	public function __construct(
 		private Context $context,
 		TempDirResolver $tempDirResolver,
-		LinkGenerator $linkGenerator,
 		MenuManager $menuManager,
 		CmsPluginPanel $panel,
 	) {
@@ -41,7 +40,6 @@ final class Admin
 				$panel,
 				$menuManager,
 			),
-			$linkGenerator,
 		);
 		Debugger::getBar()->addPanel($panel);
 		(new SentryBridge($context->getUser()))->register();
