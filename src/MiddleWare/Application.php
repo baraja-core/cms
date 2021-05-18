@@ -8,7 +8,6 @@ namespace Baraja\Cms\MiddleWare;
 use Baraja\AdminBar\AdminBar;
 use Baraja\Cms\Context;
 use Baraja\Cms\Helpers;
-use Baraja\Cms\LinkGenerator;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Proxy\Proxy;
 use Baraja\Cms\Search\SearchAdminBarPlugin;
@@ -30,8 +29,7 @@ final class Application
 	public function __construct(
 		private Context $context,
 		private CmsPluginPanel $panel,
-		private TemplateRenderer $templateRenderer,
-		private LinkGenerator $linkGenerator
+		private TemplateRenderer $templateRenderer
 	) {
 	}
 
