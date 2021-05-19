@@ -459,6 +459,7 @@ final class UserEndpoint extends BaseEndpoint
 
 		$this->userMetaManager->set($id, 'blocked', 'true');
 		$this->userMetaManager->set($id, 'block-reason', $reason);
+		$this->userMetaManager->set($id, 'block-admin', (string) $this->getUser()->getId());
 		$this->flashMessage('User has been blocked.', 'success');
 		$this->sendOk();
 	}
