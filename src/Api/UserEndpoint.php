@@ -677,50 +677,59 @@ final class UserEndpoint extends BaseEndpoint
 	 */
 	public function actionLoginHistory(int $id, int $page = 1, int $limit = 32): void
 	{
-		$logins = $this->entityManager->getRepository(UserLogin::class)
-			->createQueryBuilder('userLogin')
-			->select('PARTIAL userLogin.{id, ip, hostname, userAgent, loginDatetime}')
-			->where('userLogin.user = :userId')
-			->setParameter('userId', $id)
-			->setMaxResults($limit)
-			->setFirstResult(($page - 1) * $limit)
-			->orderBy('userLogin.loginDatetime', 'DESC')
-			->getQuery()
-			->getArrayResult();
+		$permitted = $this->userManager->isAdmin() || $this->getUser()->getId() === $id;
+		if ($permitted === true) {
+			$logins = $this->entityManager->getRepository(UserLogin::class)
+				->createQueryBuilder('userLogin')
+				->select('PARTIAL userLogin.{id, ip, hostname, userAgent, loginDatetime}')
+				->where('userLogin.user = :userId')
+				->setParameter('userId', $id)
+				->setMaxResults($limit)
+				->setFirstResult(($page - 1) * $limit)
+				->orderBy('userLogin.loginDatetime', 'DESC')
+				->getQuery()
+				->getArrayResult();
 
-		if ($page === 1 && $logins === []) {
-			$count = 0;
-		} else {
-			try {
-				$count = (int) $this->entityManager->getRepository(UserLogin::class)
-					->createQueryBuilder('userLogin')
-					->select('COUNT(userLogin.id)')
-					->getQuery()
-					->getSingleScalarResult();
-			} catch (NoResultException | NonUniqueResultException) {
+			if ($page === 1 && $logins === []) {
 				$count = 0;
+			} else {
+				try {
+					$count = (int) $this->entityManager->getRepository(UserLogin::class)
+						->createQueryBuilder('userLogin')
+						->select('COUNT(userLogin.id)')
+						->getQuery()
+						->getSingleScalarResult();
+				} catch (NoResultException | NonUniqueResultException) {
+					$count = 0;
+				}
 			}
-		}
 
-		$userAgentIterator = 1;
-		$userAgents = [];
-		$userAgentIdToHaystack = [];
-		$return = [];
-		foreach ($logins as $login) {
-			if (isset($userAgents[$hash = md5($login['userAgent'])]) === false) {
-				$userAgents[$hash] = $userAgentIterator++;
-				$userAgentIdToHaystack[$userAgents[$hash]] = $login['userAgent'];
+			$userAgentIterator = 1;
+			$userAgents = [];
+			$userAgentIdToHaystack = [];
+			$return = [];
+			foreach ($logins as $login) {
+				if (isset($userAgents[$hash = md5($login['userAgent'])]) === false) {
+					$userAgents[$hash] = $userAgentIterator++;
+					$userAgentIdToHaystack[$userAgents[$hash]] = $login['userAgent'];
+				}
+
+				$return[] = [
+					'ip' => $login['ip'],
+					'hostname' => $login['hostname'],
+					'userAgent' => $userAgents[$hash],
+					'loginDatetime' => $login['loginDatetime'],
+				];
 			}
-
-			$return[] = [
-				'ip' => $login['ip'],
-				'hostname' => $login['hostname'],
-				'userAgent' => $userAgents[$hash],
-				'loginDatetime' => $login['loginDatetime'],
-			];
+		} else {
+			$return = [];
+			$userAgentIdToHaystack = [];
+			$userAgents = [];
+			$count = 0;
 		}
 
 		$this->sendJson([
+			'permitted' => $permitted,
 			'items' => $return,
 			'userAgents' => $userAgentIdToHaystack,
 			'count' => [

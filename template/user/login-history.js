@@ -1,8 +1,13 @@
 Vue.component('user-login-history', {
 	props: ['id'],
 	template: `<b-card>
-			<div v-if="items === null" class="text-center my-5">
-				<b-spinner></b-spinner>
+		<div v-if="items === null" class="text-center my-5">
+			<b-spinner></b-spinner>
+		</div>
+		<template v-else>
+			<div v-if="permitted === false" class="text-center my-5">
+				You are not allowed to access this data.
+				For more information, please contact the administrator.
 			</div>
 			<template v-else>
 				<div v-if="items.length === 0">
@@ -25,15 +30,18 @@ Vue.component('user-login-history', {
 					</table>
 				</template>
 			</template>
-		</b-card>`,
+		</template>
+	</b-card>`,
 	data() {
 		return {
+			permitted: null,
 			items: null
 		}
 	},
 	mounted() {
 		axiosApi.get(`user/login-history?id=${this.id}`).then(req => {
 			let data = req.data;
+			this.permitted = data.permitted;
 			this.items = data.items;
 			this.items.forEach(item => {
 				item.userAgentString = data.userAgents[item.userAgent];
