@@ -33,11 +33,11 @@ final class Helpers
 
 	public static function formatApiMethod(string $signal): string
 	{
-		$return = 'action' . str_replace('.', '', Strings::firstUpper($signal));
-
-		$return = (string) preg_replace_callback('/-([a-z])/', static fn(array $match): string => mb_strtoupper($match[1], 'UTF-8'), $return);
-
-		return $return;
+		return (string) preg_replace_callback(
+			'/-([a-z])/',
+			static fn(array $match): string => mb_strtoupper($match[1], 'UTF-8'),
+			'action' . str_replace('.', '', Strings::firstUpper($signal)),
+		);
 	}
 
 

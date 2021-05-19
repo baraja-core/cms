@@ -196,16 +196,12 @@ final class UserEndpoint extends BaseEndpoint
 					Debugger::log($e, ILogger::CRITICAL);
 				}
 				$this->sendError('Can not create user because user storage is broken.');
-
-				return;
 			}
 			$user->setPhone($phone);
 			$user->addRole($role);
 			$this->entityManager->persist($user)->flush();
 		} catch (\InvalidArgumentException $e) {
 			$this->sendError($e->getMessage());
-
-			return;
 		}
 
 		$this->setRealUserName($user, $fullName);
@@ -231,8 +227,6 @@ final class UserEndpoint extends BaseEndpoint
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
-
-			return;
 		}
 
 		$user->setActive(false);
@@ -248,8 +242,6 @@ final class UserEndpoint extends BaseEndpoint
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
-
-			return;
 		}
 
 		$user->setActive(true);
@@ -276,8 +268,6 @@ final class UserEndpoint extends BaseEndpoint
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
-
-			return;
 		}
 
 		$this->sendJson([
@@ -331,8 +321,6 @@ final class UserEndpoint extends BaseEndpoint
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
-
-			return;
 		}
 
 		$this->setRealUserName($user, $name);
@@ -367,8 +355,6 @@ final class UserEndpoint extends BaseEndpoint
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
-
-			return;
 		}
 
 		// TODO: if ($this->userManager->isSafePassword($password) === false) {
@@ -391,8 +377,6 @@ final class UserEndpoint extends BaseEndpoint
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
-
-			return;
 		}
 
 		$this->userMetaManager->loadAll($id);
@@ -423,8 +407,6 @@ final class UserEndpoint extends BaseEndpoint
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
-
-			return;
 		}
 
 		$user->setOtpCode(null);
@@ -453,8 +435,6 @@ final class UserEndpoint extends BaseEndpoint
 			$user->resetRoles();
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
-
-			return;
 		}
 
 		$this->userMetaManager->set($id, 'blocked', 'true');
@@ -474,8 +454,6 @@ final class UserEndpoint extends BaseEndpoint
 			$this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
-
-			return;
 		}
 
 		$this->userMetaManager->loadAll($id);
@@ -492,8 +470,6 @@ final class UserEndpoint extends BaseEndpoint
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
-
-			return;
 		}
 		if ($user->getOtpCode() !== null) {
 			$this->sendError('OTP code already exist.');
@@ -529,16 +505,12 @@ final class UserEndpoint extends BaseEndpoint
 
 		if ($otpCode === null) {
 			$this->sendError('Hash is invalid or already expired.');
-
-			return;
 		}
 		if (Helpers::checkAuthenticatorOtpCodeManually($otpCode, (int) $code) === true) {
 			try {
 				$user = $this->userManager->getUserById($id);
 			} catch (NoResultException | NonUniqueResultException) {
 				$this->sendError('User "' . $id . '" does not exist.');
-
-				return;
 			}
 
 			$user->setOtpCode($otpCode);
@@ -560,8 +532,6 @@ final class UserEndpoint extends BaseEndpoint
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
-
-			return;
 		}
 
 		$plugins = [];
@@ -605,8 +575,6 @@ final class UserEndpoint extends BaseEndpoint
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
-
-			return;
 		}
 		$roles = array_map(fn(string $role): string => strtolower($role), $roles);
 		if ($user->isAdmin() === false && \in_array('admin', $roles, true) === true) {
@@ -659,8 +627,6 @@ final class UserEndpoint extends BaseEndpoint
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
-
-			return;
 		}
 		if ($currentUser->passwordVerify($password) === false) {
 			$this->sendError('Admin password is incorrect.');
@@ -762,8 +728,6 @@ final class UserEndpoint extends BaseEndpoint
 			$user = $this->userManager->getUserById($userId);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $userId . '" does not exist.');
-
-			return;
 		}
 		if (
 			!$this->getUser()->isInRole('admin')
@@ -775,8 +739,6 @@ final class UserEndpoint extends BaseEndpoint
 		$file = $request->getFile('avatar');
 		if ($file === null) {
 			$this->sendError('Please select avatar image to upload.');
-
-			return;
 		}
 		if ($file->isImage() === false) {
 			$this->sendError('Uploaded avatar file must be a image.');
@@ -813,8 +775,6 @@ final class UserEndpoint extends BaseEndpoint
 		} catch (\RuntimeException $e) {
 			Debugger::log($e, ILogger::CRITICAL);
 			$this->sendError('Can not upload avatar to CDN server: ' . $e->getMessage());
-
-			return;
 		}
 		if (str_starts_with($apiResponse, '{')) {
 			$response = json_decode($apiResponse, true, 512, JSON_THROW_ON_ERROR);
@@ -833,8 +793,6 @@ final class UserEndpoint extends BaseEndpoint
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
-
-			return;
 		}
 		try {
 			$user->setPhone($phone, $region);
@@ -854,15 +812,11 @@ final class UserEndpoint extends BaseEndpoint
 			$currentUser = $this->userManager->getUserById((int) $this->getUser()->getId());
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User is not logged in.');
-
-			return;
 		}
 		try {
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
-
-			return;
 		}
 		if ($currentUser->getId() !== $user->getId() && \in_array('admin', $currentUser->getRoles(), true) === false) {
 			$this->sendError('Current user must be admin for change password.');
