@@ -55,7 +55,6 @@ final class InternalSupportEndpoint extends BaseEndpoint
 			$dueDateReal = DateTime::from($dueDate);
 			if ($dueDateReal->getTimestamp() <= time()) {
 				$this->sendError('Ths issue due date cannot be in the past.');
-				return;
 			}
 		}
 

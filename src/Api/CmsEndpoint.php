@@ -56,13 +56,9 @@ final class CmsEndpoint extends BaseEndpoint
 			} else {
 				$this->sendError('Wrong username or password.');
 			}
-
-			return;
 		} catch (\Throwable $e) {
 			Debugger::log($e, ILogger::CRITICAL);
 			$this->sendError('Internal authentication error. Your account has been broken. Please contact your administrator or Baraja support team.');
-
-			return;
 		}
 
 		$needOauth = false;
@@ -88,21 +84,15 @@ final class CmsEndpoint extends BaseEndpoint
 		$userEntity = $this->getUserEntity();
 		if ($userEntity === null) {
 			$this->sendError('User is not logged in.');
-
-			return;
 		}
 		try {
 			$user = $this->userManager->getUserById($userEntity->getId());
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $userEntity->getId() . '" does not exist.');
-
-			return;
 		}
 		$otpCode = $user->getOtpCode();
 		if ($otpCode === null) {
 			$this->sendError('OTP code for user "' . $userEntity->getId() . '" does not exist.');
-
-			return;
 		}
 		if (Helpers::checkAuthenticatorOtpCodeManually($otpCode, (int) $code) === true) {
 			$this->userManager->authenticate($username, $password, $remember);
@@ -129,8 +119,6 @@ final class CmsEndpoint extends BaseEndpoint
 
 			if (!$user instanceof User) {
 				$this->sendError('Reset password is available only for system CMS Users. Please contact your administrator');
-
-				return;
 			}
 
 			$request = new UserResetPasswordRequest($user, '3 hours');
@@ -255,8 +243,6 @@ final class CmsEndpoint extends BaseEndpoint
 				->getSingleResult();
 		} catch (NoResultException | NonUniqueResultException | \InvalidArgumentException) {
 			$this->sendError('User "' . $userId . '" does not exist.');
-
-			return;
 		}
 
 		$user->setPassword($password);
