@@ -12,6 +12,7 @@ use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\User;
 use Baraja\Cms\User\Entity\UserResetPasswordRequest;
 use Baraja\Cms\User\UserManager;
+use Baraja\Cms\User\UserMetaManager;
 use Baraja\Doctrine\EntityManager;
 use Baraja\StructuredApi\BaseEndpoint;
 use Baraja\Url\Url;
@@ -33,6 +34,31 @@ final class CmsEndpoint extends BaseEndpoint
 		private Settings $settings,
 		private EntityManager $entityManager
 	) {
+	}
+
+
+	/**
+	 * This method is called automatically at regular intervals by ajax.
+	 * It maintains a connection with the user session and passes basic system states
+	 * from the backend to the thin javascript client on the user's side.
+	 */
+	public function actionKeepConnection(): void
+	{
+		if ($this->getUser()->isLoggedIn() === false) { // ignore fot anonymous users
+			$this->sendJson([
+				'login' => false,
+			]);
+		}
+
+		$metaManager = new UserMetaManager($this->entityManager, $this->userManager);
+		$metaManager->set(
+			(int) $this->getUser()->getId(),
+			'last-activity',
+			date('Y-m-d H:i:s'),
+		);
+		$this->sendJson([
+			'login' => true,
+		]);
 	}
 
 
