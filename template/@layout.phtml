@@ -33,14 +33,16 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 	<?php
 	foreach ($staticAssets as $staticAsset) {
 		if ($staticAsset->getFormat() === 'css') {
-			echo '<link type="text/css" rel="stylesheet" href="' . Helpers::escapeHtmlAttr($staticAsset->getUrl()) .'">' . "\n";
+			echo '<link type="text/css" rel="stylesheet" href="'
+                . Helpers::escapeHtmlAttr($staticAsset->getUrl())
+                .'">' . "\n";
 		}
 	}
 	?>
 	<script>
-	  let basePath = <?=json_encode($basePath)?>;
-	  let baseApiPath = <?=json_encode($basePath . '/api/v1')?>;
-	  let cmsGlobalSettings = <?=json_encode($globalSettings)?>
+        let basePath = <?=json_encode($basePath)?>;
+        let baseApiPath = <?=json_encode($basePath . '/api/v1')?>;
+        let cmsGlobalSettings = <?=json_encode($globalSettings)?>
 	</script>
 </head>
 
@@ -50,15 +52,15 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 		<b-row>
 			<b-col cols="2" id="cms-menu" role="navigation" class="px-0">
 				<cms-menu
-						:structure="<?= Helpers::escapeHtmlAttr(json_encode($menu['structure'])) ?>"
-						dashboard-link="<?= Helpers::escapeHtmlAttr($menu['dashboardLink']) ?>"
-						:is-dashboard="<?= $menu['isDashboard'] ? 'true' : 'false' ?>"
-						active-key="<?= $menu['activeKey'] ?? null ?>"
-						:debug-mode="<?= $isDebug ? 'true' : 'false' ?>">
+					:structure="<?= Helpers::escapeHtmlAttr(json_encode($menu['structure'])) ?>"
+					dashboard-link="<?= Helpers::escapeHtmlAttr($menu['dashboardLink']) ?>"
+					:is-dashboard="<?= $menu['isDashboard'] ? 'true' : 'false' ?>"
+					active-key="<?= $menu['activeKey'] ?? null ?>"
+					:debug-mode="<?= $isDebug ? 'true' : 'false' ?>">
 				</cms-menu>
 			</b-col>
-			<b-col role="main" class="cms-main">
-		  <?= $content ?>
+			<b-col role="main" class="cms-main px-0">
+			<?= $content ?>
 			</b-col>
 		</b-row>
 	</b-container>
@@ -72,7 +74,7 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 <?php
 foreach ($staticAssets as $staticAsset) {
 	if ($staticAsset->getFormat() === 'js') {
-	  echo '<script src="' . Helpers::escapeHtmlAttr($staticAsset->getUrl()) . '"></script>' . "\n";
+		echo '<script src="' . Helpers::escapeHtmlAttr($staticAsset->getUrl()) . '"></script>' . "\n";
 	}
 }
 ?>
@@ -80,38 +82,38 @@ foreach ($staticAssets as $staticAsset) {
 	let axiosApi = axios.create({
 		baseURL: <?=json_encode($basePath . '/api/v1')?>
 	});
-  axiosApi.interceptors.response.use((ok) => {
-	  let data = ok.data;
-	  if ('flashMessages' in data) {
-		  data.flashMessages.forEach(flashItem => {
-			  app.$bvToast.toast(flashItem.message, {
-				  variant: flashItem.type,
-				  title: 'Notification',
-				  toaster: 'b-toaster-bottom-left'
-			  })
-		  })
-	  }
-	  return Promise.resolve(ok);
-  }, (error) => {
-	  let data = error.response.data;
-	  if ('flashMessages' in data) {
-		  data.flashMessages.forEach(flashItem => {
-			  app.$bvToast.toast(flashItem.message, {
-				  variant: flashItem.type,
-				  title: 'Warning',
-				  toaster: 'b-toaster-bottom-left'
-			  })
-		  })
-	  }
-	  if ('message' in data) {
-		  app.$bvToast.toast(data.message, {
-			  variant: 'danger',
-			  title: 'Error',
-			  toaster: 'b-toaster-bottom-left'
-		  })
-	  }
-	  return Promise.reject(error);
-  });
+    axiosApi.interceptors.response.use((ok) => {
+        let data = ok.data;
+        if ('flashMessages' in data) {
+            data.flashMessages.forEach(flashItem => {
+                app.$bvToast.toast(flashItem.message, {
+                    variant: flashItem.type,
+                    title: 'Notification',
+                    toaster: 'b-toaster-bottom-left'
+                })
+            })
+        }
+        return Promise.resolve(ok);
+    }, (error) => {
+        let data = error.response.data;
+        if ('flashMessages' in data) {
+            data.flashMessages.forEach(flashItem => {
+                app.$bvToast.toast(flashItem.message, {
+                    variant: flashItem.type,
+                    title: 'Warning',
+                    toaster: 'b-toaster-bottom-left'
+                })
+            })
+        }
+        if ('message' in data) {
+            app.$bvToast.toast(data.message, {
+                variant: 'danger',
+                title: 'Error',
+                toaster: 'b-toaster-bottom-left'
+            })
+        }
+        return Promise.reject(error);
+    });
 	let eventBus = new Vue();
 	let app = new Vue({el: '#app'});
 </script>
