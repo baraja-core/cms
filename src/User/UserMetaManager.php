@@ -73,29 +73,28 @@ final class UserMetaManager
 
 	public function set(int $userId, string $key, ?string $value): self
 	{
-		$cacheKey = $this->getCacheKey($userId, $key);
+		try {
+			/** @var User $user */
+			$user = $this->userManager->getUserById($userId);
+		} catch (NoResultException | NonUniqueResultException $e) {
+			throw new \InvalidArgumentException('User "' . $userId . '" does not exist.', $e->getCode(), $e);
+		}
+		$cacheKey = $this->getCacheKey($user->getId(), $key);
 		try {
 			/** @var UserMeta $meta */
 			$meta = self::$cache[$cacheKey] ?? $this->entityManager->getRepository(UserMeta::class)
 					->createQueryBuilder('meta')
 					->where('meta.user = :userId')
 					->andWhere('meta.key = :key')
-					->setParameter('userId', $userId)
+					->setParameter('userId', $user->getId())
 					->setParameter('key', $key)
 					->setMaxResults(1)
 					->getQuery()
 					->getSingleResult();
-		} catch (NoResultException | NonUniqueResultException $e) {
+		} catch (NoResultException | NonUniqueResultException) {
 			if ($value === null) {
 				return $this;
 			}
-			try {
-				/** @var User $user */
-				$user = $this->userManager->getUserById($userId);
-			} catch (NoResultException | NonUniqueResultException) {
-				throw new \InvalidArgumentException('User "' . $userId . '" does not exist.', $e->getCode(), $e);
-			}
-
 			$meta = new UserMeta($user, $key, $value);
 			$this->entityManager->persist($meta);
 		}
