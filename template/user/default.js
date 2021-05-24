@@ -132,6 +132,7 @@ Vue.component('user-default', {
 								<a :href="link('User:detail', {id: item.id})">{{ item.name }}</a>
 								<div v-if="item.options['2fa']" class="badge badge-pill badge-primary" v-b-tooltip title="This user is using 2-step login authentication (better security).">2FA</div>
 								<div v-if="item.id === currentUserId" class="badge badge-pill badge-primary" v-b-tooltip title="This is your account.">You</div>
+								<div v-if="item.options.online" class="badge badge-pill badge-success" v-b-tooltip title="This is online.">Online</div>
 								<div v-if="item.options.verifying" class="badge badge-pill badge-secondary" v-b-tooltip title="We are awaiting user authentication and password entry for this account.">Verifying</div>
 								<div v-if="item.options.blocked" class="badge badge-pill badge-danger" v-b-tooltip :title="'The user has been permanently blocked by the administrator.' + (item.options.blockedReason ? ' (Reason: ' + item.options.blockedReason + ')' : '')">Blocked</div>
 							</td>
