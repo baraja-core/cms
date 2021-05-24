@@ -19,6 +19,7 @@ use Nette\Security\Authenticator;
 use Nette\Security\IIdentity;
 use Nette\Security\Passwords;
 use Nette\Security\UserStorage;
+use Nette\Utils\DateTime;
 
 final class UserManager implements Authenticator
 {
@@ -225,6 +226,17 @@ final class UserManager implements Authenticator
 		$this->userMetaManager->set($userId, $key, $value);
 
 		return $this;
+	}
+
+
+	public function isOnline(int $userId): bool
+	{
+		$lastActivity = $this->userMetaManager->get($userId, 'last-activity');
+		if ($lastActivity === null) {
+			return false;
+		}
+
+		return DateTime::from($lastActivity)->getTimestamp() + 30 >= time();
 	}
 
 
