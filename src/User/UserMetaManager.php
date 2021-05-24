@@ -79,7 +79,7 @@ final class UserMetaManager
 		} catch (NoResultException | NonUniqueResultException $e) {
 			throw new \InvalidArgumentException('User "' . $userId . '" does not exist.', $e->getCode(), $e);
 		}
-		$cacheKey = $this->getCacheKey($user->getId(), $key);
+		$cacheKey = $this->getCacheKey((int) $user->getId(), $key);
 		try {
 			/** @var UserMeta $meta */
 			$meta = self::$cache[$cacheKey] ?? $this->entityManager->getRepository(UserMeta::class)
