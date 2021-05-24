@@ -114,8 +114,16 @@ foreach ($staticAssets as $staticAsset) {
         }
         return Promise.reject(error);
     });
-	let eventBus = new Vue();
-	let app = new Vue({el: '#app'});
+    let eventBus = new Vue();
+    let app = new Vue({el: '#app'});
+    setInterval(function() {
+        axiosApi.get(`cms/keep-connection`)
+            .then(req => {
+                if (req.data.login === false) {
+                    location.reload();
+                }
+            });
+    }, 5000);
 </script>
 </body>
 </html>
