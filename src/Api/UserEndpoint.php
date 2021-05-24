@@ -145,9 +145,9 @@ final class UserEndpoint extends BaseEndpoint
 					'verifying' => $user['password'] === '---empty-password---',
 					'blocked' => ($metaToUser[$user['id']]['blocked'] ?? '') === 'true',
 					'blockedReason' => $metaToUser[$user['id']]['block-reason'] ?? null,
-					'online' => (static function(string $lastActivity): bool {
-						return DateTime::from($lastActivity)->getTimestamp() + 30 >= time();
-					})($metaToUser[$user['id']]['last-activity'] ?? 'yesterday'),
+					'online' => (static fn(string $lastActivity): bool =>
+						DateTime::from($lastActivity)->getTimestamp() + 30 >= time())
+					($metaToUser[$user['id']]['last-activity'] ?? 'yesterday'),
 				],
 			];
 		}
