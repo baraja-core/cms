@@ -134,7 +134,7 @@ final class CmsInstallEndpoint extends BaseEndpoint
 			$this->sendError('Zadejte vaše reálné jméno, které musí existovat.');
 		}
 
-		$response = (array)json_decode(
+		$response = (array) json_decode(
 			@file_get_contents(
 				CloudManager::ENDPOINT_URL . '/cloud-status/create-account?domain='
 				. urlencode(Url::get()->getNetteUrl()->getDomain(3))
@@ -168,7 +168,7 @@ final class CmsInstallEndpoint extends BaseEndpoint
 			$this->sendError('E-mail nemá správný formát.');
 		}
 
-		$response = (array)json_decode(
+		$response = (array) json_decode(
 			@file_get_contents(
 				CloudManager::ENDPOINT_URL . '/cloud-status/token-by-user?domain='
 				. urlencode(Url::get()->getNetteUrl()->getDomain(3))

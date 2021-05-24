@@ -24,7 +24,7 @@ class Announcement
 	private User $user;
 
 	/** @ORM\ManyToOne(targetEntity="Announcement", inversedBy="children") */
-	private ?self $parent = null;
+	private ?self $parent;
 
 	/**
 	 * @var self[]|Collection
@@ -33,7 +33,7 @@ class Announcement
 	private $children;
 
 	/** @ORM\Column(type="string", length=2, nullable=true) */
-	private ?string $locale = null;
+	private ?string $locale;
 
 	/** @ORM\Column(type="text") */
 	private string $message;
@@ -68,7 +68,7 @@ class Announcement
 	}
 
 
-	public function getParent(): ?Announcement
+	public function getParent(): ?self
 	{
 		return $this->parent;
 	}
