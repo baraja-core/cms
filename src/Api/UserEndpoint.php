@@ -146,8 +146,7 @@ final class UserEndpoint extends BaseEndpoint
 					'blocked' => ($metaToUser[$user['id']]['blocked'] ?? '') === 'true',
 					'blockedReason' => $metaToUser[$user['id']]['block-reason'] ?? null,
 					'online' => (static fn(string $lastActivity): bool =>
-						DateTime::from($lastActivity)->getTimestamp() + 30 >= time())
-					($metaToUser[$user['id']]['last-activity'] ?? 'yesterday'),
+						DateTime::from($lastActivity)->getTimestamp() + 30 >= time())($metaToUser[$user['id']]['last-activity'] ?? 'yesterday'),
 				],
 			];
 		}
