@@ -9,9 +9,9 @@ use Baraja\AdminBar\User\AdminIdentity;
 use Baraja\Cms\Helpers;
 use Baraja\TracySentryBridge\SentryLogger;
 use Nette\Security\User;
-use Sentry\State\Scope;
-
 use function Sentry\configureScope;
+
+use Sentry\State\Scope;
 
 final class SentryBridge
 {

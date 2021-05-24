@@ -757,7 +757,7 @@ final class UserEndpoint extends BaseEndpoint
 							'user_agent' => 'BarajaBot in PHP',
 							'content' => http_build_query([
 								'email' => $user->getEmail(),
-								'blob' => base64_encode((static function(FileUpload $file): string {
+								'blob' => base64_encode((static function (FileUpload $file): string {
 									try { // try to compress
 										return $file->toImage()->toString(IMAGETYPE_PNG);
 									} catch (NotSupportedException) { // fallback - send whole data
