@@ -53,8 +53,6 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->error();
-
-			return;
 		}
 
 		$currentIdentity = $this->userManager->getIdentity();
