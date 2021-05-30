@@ -49,6 +49,9 @@ final class CmsEndpoint extends BaseEndpoint
 				'login' => false,
 			]);
 		}
+		session_write_close();
+		ignore_user_abort(true);
+		Debugger::enable(Debugger::PRODUCTION);
 
 		$metaManager = new UserMetaManager($this->entityManager, $this->userManager);
 		$metaManager->set(
