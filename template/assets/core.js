@@ -69,6 +69,12 @@ Vue.component('cms-footer', {
 </footer>`
 });
 
+Vue.component('cms-card', {
+	template: `<div class="card p-3 cms-card">
+	<slot></slot>
+</div>`
+});
+
 Vue.component('cms-filter', {
 	template: `<div class="card" style="border-bottom:0 !important">
 	<div class="card-header py-2">

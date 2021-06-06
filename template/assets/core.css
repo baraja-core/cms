@@ -117,6 +117,12 @@ h1 {
 	background: #e4e7ea;
 }
 
+.cms-card {
+	border-top: 0 !important;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
 .cms-search {
 	border: 1px solid #e6eaed;
 	background: #ffffff;
