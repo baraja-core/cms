@@ -8,7 +8,7 @@ Vue.component('user-default', {
 				<b-button variant="primary" class="btn-add" v-b-modal.modal-user-create>New user</b-button>
 			</b-col>
 		</b-row>
-		<b-modal id="modal-user-create" title="Create user">
+		<b-modal id="modal-user-create" title="Create new user account">
 			<b-form ref="form" autocomplete="off">
 				<b-form-group>
 					<template v-slot:label>
@@ -20,9 +20,14 @@ Vue.component('user-default', {
 					</div>
 				</b-form-group>
 				<b-form-group>
-					<template v-slot:label>
-						E-mail <span class="text-danger">*</span>
-					</template>
+					<div class="row mb-2">
+						<div class="col">
+							E-mail <span class="text-danger">*</span>
+						</div>
+						<div class="col text-right text-secondary">
+							<small><i>The e-mail must be working.</i></small>
+						</div>
+					</div>
 					<b-form-input v-model="user.form.email" :class="[errors.isEmailValid ? '' : 'is-invalid']" @input="checkMailDuplication()" required autocomplete="off" pattern="^([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$" type="email" trim></b-form-input>
 					<div class="invalid-feedback">
 						{{ errors.email }}
@@ -30,27 +35,30 @@ Vue.component('user-default', {
 				</b-form-group>
 				<b-form-group>
 					<template v-slot:label>
-						Role <span class="text-danger">*</span>
+						Primary role <span class="text-danger">*</span>
 					</template>
 					<b-form-select v-model="user.form.role" required :options="rolesSimple"></b-form-select>
 				</b-form-group>
 				<div class="row">
-					<div class="col-6">Password</div>
-					<div class="col-6 text-right">
-						<button v-if="!isInputPasswordOpen" class="btn btn-secondary btn-sm" @click="isInputPasswordOpen=true">Set user password</button>
+					<div class="col-4">
+						Password
+						<span v-if="isInputPasswordOpen" class="text-danger">*</span>
+					</div>
+					<div class="col-8 text-right">
+						<button v-if="!isInputPasswordOpen" class="btn btn-secondary btn-sm" @click="isInputPasswordOpen=true">Set user password manually</button>
 						<button v-else @click="[isInputPasswordOpen = false, user.form.password = null]" href="#" class="btn btn-outline-danger btn-sm">
 							<b-icon icon="x"></b-icon>
 							Ask user for password
 						</button>
 					</div>
 				</div>
-				<b-form-group v-if="isInputPasswordOpen" class="mt-3">
-					<b-form-input v-model="user.form.password" type="password" @keydown.space.prevent required></b-form-input>
+				<b-form-group v-if="isInputPasswordOpen" class="mt-1">
+					<b-form-input v-model="user.form.password" type="password" placeholder="Type safe password, never from another site." @keydown.space.prevent required></b-form-input>
 				</b-form-group>
 				<div v-else class="text-secondary mt-2">
 					<i>
-						We will not set a&nbsp;password for the user and send him an e-mail
-						with a&nbsp;link to set the first password.
+						We do not set a&nbsp;password for the user,
+						instead we send an e-mail with a&nbsp;link to set the first password.
 					</i>
 				</div>
 			</b-form>
@@ -99,15 +107,15 @@ Vue.component('user-default', {
 				</div>
 			</b-form>
 		</cms-filter>
-		<b-card>
+		<cms-card>
 			<div v-if="user.items === null" class="text-center my-5">
 				<b-spinner></b-spinner>
 			</div>
 			<template v-else>
 				<b-alert :show="isCurrentUserUsing2fa === false" variant="warning">
 					<h4 class="alert-heading">Security warning for your account!</h4>
-					<p><b>Your user account does not use 2-step authentication.</b></p>
-					<p>
+					<p class="mb-0">
+						<b>Your user account does not use 2-step authentication.</b><br>
 						If an attacker reveals your password, he can impersonate you.
 						If you set up 2-step login authentication, an attacker will still need to obtain your cell phone.
 					</p>
@@ -165,7 +173,7 @@ Vue.component('user-default', {
 					</b-pagination>
 				</template>
 			</template>
-		</b-card>
+		</cms-card>
 	</div>`,
 	data() {
 		return {
@@ -202,7 +210,7 @@ Vue.component('user-default', {
 			},
 			errors: {
 				fullName: 'Full name format is invalid. Please include first name and last name.',
-				email: 'E-mail format is invalid',
+				email: 'E-mail format is invalid.',
 				isEmailValid: true
 			},
 			user: {
@@ -269,6 +277,10 @@ Vue.component('user-default', {
 			})
 		},
 		createUser() {
+			if (this.isInputPasswordOpen && !this.user.form.password) {
+				alert('Please enter user password.');
+				return;
+			}
 			let valid = this.$refs.form.checkValidity();
 			if (!valid) this.$refs.form.classList.add('was-validated');
 			if (valid) {

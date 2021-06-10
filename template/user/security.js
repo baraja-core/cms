@@ -1,81 +1,81 @@
 Vue.component('user-security', {
 	props: ['id'],
-	template: `<b-card>
-		<modal-change-password :id="id"></modal-change-password>
-		<modal-two-step-verification :id="id" @success="sync"></modal-two-step-verification>
-		<b-row>
-			<b-col lg="6">
-				<h2 class="h3">Password</h2>
-				<b-card>
-					<b-row>
-						<b-col>
-							<div><span>*******</span></div>
-							<div v-if="lastChangedPassword" class="text-secondary">Last changed {{ lastChangedPassword }}</div>
-						</b-col>
-						<b-col cols="2">
-							<b-button variant="secondary" v-b-modal.modal-change-password>Change</b-button>
-						</b-col>
-					</b-row>
-				</b-card>
-			</b-col>
-			<b-col lg="6">
-				<h2 class="h3">Two-step verification</h2>
-				<b-spinner v-if="isOAuth === null"></b-spinner>
-				<b-alert v-else variant="danger" :show="!isOAuth">
-					<p>Two-step verification is not active.</p>
-					<b-btn v-if="!isOAuth" variant="secondary" title="Set two-step verification" v-b-modal.modal-two-step-verification>
-						Set verification
-					</b-btn>
-				</b-alert>
-				<b-btn v-if="isOAuth" variant="danger" size="sm" class="mt-4" title="Disable two-step verification" v-b-modal.disable-auth>
-					Disable Verification
+	template: `<cms-card>
+	<modal-change-password :id="id"></modal-change-password>
+	<modal-two-step-verification :id="id" @success="sync"></modal-two-step-verification>
+	<b-row>
+		<b-col lg="6">
+			<h2 class="h3">Password</h2>
+			<b-card>
+				<b-row>
+					<b-col>
+						<div><span>*******</span></div>
+						<div v-if="lastChangedPassword" class="text-secondary">Last changed {{ lastChangedPassword }}</div>
+					</b-col>
+					<b-col cols="2">
+						<b-button variant="secondary" v-b-modal.modal-change-password>Change</b-button>
+					</b-col>
+				</b-row>
+			</b-card>
+		</b-col>
+		<b-col lg="6">
+			<h2 class="h3">Two-step verification</h2>
+			<b-spinner v-if="isOAuth === null"></b-spinner>
+			<b-alert v-else variant="danger" :show="!isOAuth">
+				<p>Two-step verification is not active.</p>
+				<b-btn v-if="!isOAuth" variant="secondary" title="Set two-step verification" v-b-modal.modal-two-step-verification>
+					Set verification
 				</b-btn>
-			</b-col>
-		</b-row>
-		<div v-if="options === null" class="text-center my-4">
-			<b-spinner></b-spinner>
-		</div>
-		<b-row v-else>
-			<b-col lg="6">
-				<template v-if="options.canBan">
-					<h2 class="h3">Blocking</h2>
-					<b-button variant="danger" v-b-modal.block-user>Block this user</b-button>
-				</template>
-				<b-alert variant="danger" :show="options.isBlocked">
-					<div class="row">
-						<div class="col">
-							<p class="mb-0">
-								This user has been blocked.
-								<template v-if="options.blockedReason">
-									<br><b>Reason:</b> {{ options.blockedReason }}
-								</template>
-							</p>
-						</div>
-						<div class="col-sm-4 text-right">
-							<b-button variant="danger" size="sm" @click="blockCancel">Cancel blocking</b-button>
-						</div>
-					</div>
-				</b-alert>
-			</b-col>
-		</b-row>
-		<b-modal id="disable-auth" title="Disable Two-Step Verification">
-			<p>Are you sure you want to remove Two-Step Verification?</p>
-			<template v-slot:modal-footer>
-				<b-btn size="sm" variant="white" @click="$bvModal.hide('disable-auth')">Close</b-btn>
-				<b-btn v-if="!isDisabling" size="sm" variant="danger" @click="disableAuth">Disable</b-btn>
-				<b-btn v-else size="sm" variant="danger" disabled>Disabling</b-btn>
+			</b-alert>
+			<b-btn v-if="isOAuth" variant="danger" size="sm" class="mt-4" title="Disable two-step verification" v-b-modal.disable-auth>
+				Disable Verification
+			</b-btn>
+		</b-col>
+	</b-row>
+	<div v-if="options === null" class="text-center my-4">
+		<b-spinner></b-spinner>
+	</div>
+	<b-row v-else>
+		<b-col lg="6">
+			<template v-if="options.canBan">
+				<h2 class="h3">Blocking</h2>
+				<b-button variant="danger" v-b-modal.block-user>Block this user</b-button>
 			</template>
-		</b-modal>
-		<b-modal id="block-user" hide-footer title="Block this user">
-			<p>Are you sure you want to block this user?</p>
-			<p class="text-secondary">
-				The user profile will remain in its current form, but the user will not be able to log in.
-			</p>
-			<p>Enter a reason for blocking this user:</p>
-			<b-textarea v-model="block.reason"></b-textarea>
-			<b-button variant="danger" @click="blockNow" class="mt-3">Block now</b-button>
-		</b-modal>
-	</b-card>`,
+			<b-alert variant="danger" :show="options.isBlocked">
+				<div class="row">
+					<div class="col">
+						<p class="mb-0">
+							This user has been blocked.
+							<template v-if="options.blockedReason">
+								<br><b>Reason:</b> {{ options.blockedReason }}
+							</template>
+						</p>
+					</div>
+					<div class="col-sm-4 text-right">
+						<b-button variant="danger" size="sm" @click="blockCancel">Cancel blocking</b-button>
+					</div>
+				</div>
+			</b-alert>
+		</b-col>
+	</b-row>
+	<b-modal id="disable-auth" title="Disable Two-Step Verification">
+		<p>Are you sure you want to remove Two-Step Verification?</p>
+		<template v-slot:modal-footer>
+			<b-btn size="sm" variant="white" @click="$bvModal.hide('disable-auth')">Close</b-btn>
+			<b-btn v-if="!isDisabling" size="sm" variant="danger" @click="disableAuth">Disable</b-btn>
+			<b-btn v-else size="sm" variant="danger" disabled>Disabling</b-btn>
+		</template>
+	</b-modal>
+	<b-modal id="block-user" hide-footer title="Block this user">
+		<p>Are you sure you want to block this user?</p>
+		<p class="text-secondary">
+			The user profile will remain in its current form, but the user will not be able to log in.
+		</p>
+		<p>Enter a reason for blocking this user:</p>
+		<b-textarea v-model="block.reason"></b-textarea>
+		<b-button variant="danger" @click="blockNow" class="mt-3">Block now</b-button>
+	</b-modal>
+</cms-card>`,
 	data() {
 		return {
 			lastChangedPassword: null,
