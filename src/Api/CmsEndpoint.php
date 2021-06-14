@@ -6,6 +6,7 @@ namespace Baraja\Cms\Api;
 
 
 use Baraja\BarajaCloud\CloudManager;
+use Baraja\Cms\ContextAccessor;
 use Baraja\Cms\Helpers;
 use Baraja\Cms\MiddleWare\IntegrityWorkflow;
 use Baraja\Cms\Settings;
@@ -33,7 +34,8 @@ final class CmsEndpoint extends BaseEndpoint
 		private UserManager $userManager,
 		private CloudManager $cloudManager,
 		private Settings $settings,
-		private EntityManager $entityManager
+		private EntityManager $entityManager,
+		private ContextAccessor $contextAccessor,
 	) {
 	}
 
@@ -46,11 +48,10 @@ final class CmsEndpoint extends BaseEndpoint
 	public function actionKeepConnection(): void
 	{
 		$this->sendJson([
-			'login' => (new IntegrityWorkflow(
-				$this->getUser(),
-				$this->entityManager,
-				$this->userManager,
-			))->run(true),
+			'login' => $this->contextAccessor
+				->get()
+				->getIntegrityWorkflow()
+				->run(true),
 		]);
 	}
 

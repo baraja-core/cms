@@ -6,10 +6,12 @@ namespace Baraja\Cms;
 
 
 use Baraja\AdminBar\Panel\BasicPanel;
+use Baraja\Cms\MiddleWare\IntegrityWorkflow;
 use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManagerAccessor;
 use Baraja\Cms\Translator\TranslatorFilter;
 use Baraja\Cms\User\UserManagerAccessor;
+use Baraja\Cms\User\UserMetaManager;
 use Baraja\Doctrine\EntityManager;
 use Baraja\DynamicConfiguration\Configuration;
 use Baraja\DynamicConfiguration\ConfigurationSection;
@@ -155,6 +157,25 @@ final class Context
 	public function getSettings(): Settings
 	{
 		return $this->settings;
+	}
+
+
+	public function getIntegrityWorkflow(): IntegrityWorkflow
+	{
+		static $service;
+		if ($service === null) {
+			$service = new IntegrityWorkflow($this->user);
+			$service->addRunEvent(function(): void {
+				$metaManager = new UserMetaManager($this->entityManager, $this->userManager->get());
+				$metaManager->set(
+					(int) $this->user->getId(),
+					'last-activity',
+					date('Y-m-d H:i:s'),
+				);
+			});
+		}
+
+		return $service;
 	}
 
 

@@ -113,11 +113,7 @@ final class Application
 			$this->terminate($this->context->getSettings()->runInstallProcess());
 		}
 		if (IntegrityWorkflow::isNeedRun() === true) {
-			(new IntegrityWorkflow(
-				$this->context->getUser(),
-				$this->context->getEntityManager(),
-				$this->context->getUserManager()->get(),
-			))->run();
+			$this->context->getIntegrityWorkflow()->run();
 		}
 		if ($plugin === 'ResetPassword') { // route reset password form
 			$this->terminate($this->templateRenderer->renderResetPasswordTemplate($_GET['token'] ?? '', $locale));
