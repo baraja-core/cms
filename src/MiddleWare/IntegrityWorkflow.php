@@ -46,11 +46,12 @@ final class IntegrityWorkflow
 		if ($this->user->isLoggedIn() === false) { // ignore for anonymous users
 			return false;
 		}
-
-		session_write_close();
-		ignore_user_abort(true);
-		if (class_exists(Debugger::class)) {
-			Debugger::enable(Debugger::PRODUCTION);
+		if ($ajax === true) {
+			session_write_close();
+			ignore_user_abort(true);
+			if (class_exists(Debugger::class)) {
+				Debugger::enable(Debugger::PRODUCTION);
+			}
 		}
 
 		$metaManager = new UserMetaManager($this->entityManager, $this->userManager);
