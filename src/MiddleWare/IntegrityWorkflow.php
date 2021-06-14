@@ -27,11 +27,17 @@ final class IntegrityWorkflow
 	{
 		$checkExpiration = $_SESSION[self::SESSION_EXPIRE_KEY] ?? null;
 		if ($checkExpiration === null || ((int) $checkExpiration) < time()) {
-			$_SESSION[self::SESSION_EXPIRE_KEY] = (int) strtotime('now + 45 seconds');
+			self::setExpireCheckSession();
 			return true;
 		}
 
 		return false;
+	}
+
+
+	public static function setExpireCheckSession(string $interval = '45 seconds'): void
+	{
+		$_SESSION[self::SESSION_EXPIRE_KEY] = (int) strtotime('now + ' . $interval);
 	}
 
 
