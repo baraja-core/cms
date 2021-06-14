@@ -72,6 +72,17 @@ final class UserManager implements Authenticator
 	}
 
 
+	public function getCmsIdentity(): ?CmsUser
+	{
+		$identity = $this->getIdentity();
+		if ($identity !== null) {
+			return $this->getUserById($identity->getId());
+		}
+
+		return null;
+	}
+
+
 	public function getDefaultEntity(): string
 	{
 		return $this->defaultEntity;

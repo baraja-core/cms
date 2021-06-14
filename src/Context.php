@@ -173,6 +173,20 @@ final class Context
 					date('Y-m-d H:i:s'),
 				);
 			});
+			$service->addRunEvent(function(): void {
+				$sessionKey = '__BRJ_CMS--workflow-password-hash';
+				$hash = $_SESSION[$sessionKey] ?? null;
+				$identity = $this->userManager->get()->getCmsIdentity();
+				if ($identity !== null) {
+					$newHash = md5($identity->getPassword());
+					if ($hash === null) {
+						$_SESSION[$sessionKey] = $newHash;
+					} elseif ($hash !== $newHash) {
+						$this->user->logout(true);
+						unset($_SESSION[$sessionKey]);
+					}
+				}
+			});
 		}
 
 		return $service;
