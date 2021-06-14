@@ -91,6 +91,9 @@ final class CmsExtension extends CompilerExtension
 		$context = $builder->addDefinition($this->prefix('context'))
 			->setFactory(Context::class);
 
+		$builder->addAccessorDefinition($this->prefix('contextAccessor'))
+			->setImplement(ContextAccessor::class);
+
 		if (isset($this->config->assets) === true) {
 			foreach ($this->config->assets as $assetFormat => $assetPath) {
 				if (\in_array($assetFormat, ['css', 'js'], true) === false) {
