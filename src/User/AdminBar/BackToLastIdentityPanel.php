@@ -7,7 +7,7 @@ namespace Baraja\Cms\User\AdminBar;
 
 use Baraja\AdminBar\Panel\Panel;
 use Baraja\Cms\LinkGenerator;
-use Baraja\Cms\User\UserManager;
+use Baraja\Cms\Session;
 use Baraja\Cms\User\UserManagerAccessor;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -22,7 +22,7 @@ final class BackToLastIdentityPanel implements Panel
 
 	public function getTab(): string
 	{
-		$userId = $_SESSION[UserManager::LAST_IDENTITY_ID__SESSION_KEY] ?? null;
+		$userId = Session::get(Session::LAST_IDENTITY_ID);
 		if ($userId === null) {
 			return '';
 		}

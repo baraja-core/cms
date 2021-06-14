@@ -7,6 +7,11 @@ namespace Baraja\Cms;
 
 final class Session
 {
+	public const
+		WORKFLOW_PASSWORD_HASH = 'workflow-password-hash',
+		LAST_IDENTITY_ID = 'last-identity-id';
+
+
 	public static function get(string $key): mixed
 	{
 		return $_SESSION[self::getKey($key)] ?? null;

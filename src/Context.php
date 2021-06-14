@@ -174,16 +174,15 @@ final class Context
 				);
 			});
 			$service->addRunEvent(function(): void {
-				$sessionKey = '__BRJ_CMS--workflow-password-hash';
-				$hash = $_SESSION[$sessionKey] ?? null;
+				$hash = Session::get(Session::WORKFLOW_PASSWORD_HASH);
 				$identity = $this->userManager->get()->getCmsIdentity();
 				if ($identity !== null) {
 					$newHash = md5($identity->getPassword());
 					if ($hash === null) {
-						$_SESSION[$sessionKey] = $newHash;
+						Session::set(Session::WORKFLOW_PASSWORD_HASH, $newHash);
 					} elseif ($hash !== $newHash) {
 						$this->user->logout(true);
-						unset($_SESSION[$sessionKey]);
+						Session::remove(Session::WORKFLOW_PASSWORD_HASH);
 					}
 				}
 			});

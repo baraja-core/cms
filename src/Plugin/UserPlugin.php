@@ -7,6 +7,7 @@ namespace Baraja\Cms\Plugin;
 
 use Baraja\AdminBar\AdminBar;
 use Baraja\Cms\Search\SearchablePlugin;
+use Baraja\Cms\Session;
 use Baraja\Cms\User\AdminBar\LoginAsUserPanel;
 use Baraja\Cms\User\UserManager;
 use Baraja\Plugin\BasePlugin;
@@ -89,7 +90,7 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 	public function actionForgotLastIdentity(): void
 	{
 		if (isset($_SESSION) && session_status() === PHP_SESSION_ACTIVE) {
-			unset($_SESSION[UserManager::LAST_IDENTITY_ID__SESSION_KEY]);
+			Session::remove(Session::LAST_IDENTITY_ID);
 		}
 		$this->redirect(Url::get()->getBaseUrl());
 	}

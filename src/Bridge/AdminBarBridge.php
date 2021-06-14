@@ -9,6 +9,7 @@ use Baraja\AdminBar\AdminBar;
 use Baraja\AdminBar\User\AdminIdentity;
 use Baraja\Cms\LinkGenerator;
 use Baraja\Cms\MenuAuthorizatorAccessor;
+use Baraja\Cms\Session;
 use Baraja\Cms\User\AdminBar\BackToLastIdentityPanel;
 use Baraja\Cms\User\UserManager;
 use Baraja\Cms\User\UserManagerAccessor;
@@ -50,7 +51,7 @@ final class AdminBarBridge
 		$menu->addLink('Sign out', $this->linkGenerator->link('Cms:signOut'), 'ui');
 
 		if ($this->user->getIdentity() instanceof AdminIdentity) {
-			if (isset($_SESSION[UserManager::LAST_IDENTITY_ID__SESSION_KEY])) {
+			if (Session::get(Session::LAST_IDENTITY_ID) !== null) {
 				AdminBar::getBar()->addPanel(new BackToLastIdentityPanel($this->userManagerAccessor));
 			}
 			if (AdminBar::getBar()->isDebugMode() === false) {

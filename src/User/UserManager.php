@@ -7,6 +7,7 @@ namespace Baraja\Cms\User;
 
 use Baraja\AdminBar\User\AdminIdentity;
 use Baraja\Cms\Helpers;
+use Baraja\Cms\Session;
 use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\User;
 use Baraja\Cms\User\Entity\UserLogin;
@@ -23,6 +24,7 @@ use Nette\Utils\DateTime;
 
 final class UserManager implements Authenticator
 {
+	/** @deprecated since 2021-06-14 use Session::LAST_IDENTITY_ID */
 	public const LAST_IDENTITY_ID__SESSION_KEY = '__BRJ_CMS--last-identity-id';
 
 	private ?AuthenticationService $authenticationService = null;
@@ -159,7 +161,7 @@ final class UserManager implements Authenticator
 	public function logout(): void
 	{
 		if (isset($_SESSION) && session_status() === PHP_SESSION_ACTIVE) {
-			unset($_SESSION[self::LAST_IDENTITY_ID__SESSION_KEY]);
+			Session::remove(Session::LAST_IDENTITY_ID);
 		}
 		$this->userStorage->clearAuthentication(true);
 		$this->userStorage->setExpiration(null, true);
@@ -263,7 +265,7 @@ final class UserManager implements Authenticator
 			throw new \InvalidArgumentException('User "' . $id . '" does not exist.');
 		}
 		if (isset($_SESSION) && session_status() === PHP_SESSION_ACTIVE) {
-			$_SESSION[self::LAST_IDENTITY_ID__SESSION_KEY] = $currentIdentity->getId();
+			Session::set(Session::LAST_IDENTITY_ID, $currentIdentity->getId());
 		}
 		$this->createIdentity($user);
 	}
