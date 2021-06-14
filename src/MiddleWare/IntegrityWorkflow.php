@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Baraja\Cms\MiddleWare;
 
 
+use Baraja\Cms\Session;
 use Nette\Security\User;
 use Nette\Utils\Arrays;
 use Tracy\Debugger;
 
 final class IntegrityWorkflow
 {
-	private const SESSION_EXPIRE_KEY = '__BRJ_CMS--workflow-check-expiration';
-
 	/** @var array<int, callable(self): void> */
 	private array $onRun = [];
 
@@ -24,7 +23,7 @@ final class IntegrityWorkflow
 
 	public static function isNeedRun(): bool
 	{
-		$checkExpiration = $_SESSION[self::SESSION_EXPIRE_KEY] ?? null;
+		$checkExpiration = Session::get(Session::WORKFLOW_CHECK_EXPIRATION);
 		if ($checkExpiration === null || ((int) $checkExpiration) < time()) {
 			self::setExpireCheckSession();
 			return true;
@@ -36,7 +35,7 @@ final class IntegrityWorkflow
 
 	public static function setExpireCheckSession(string $interval = '45 seconds'): void
 	{
-		$_SESSION[self::SESSION_EXPIRE_KEY] = (int) strtotime('now + ' . $interval);
+		Session::set(Session::WORKFLOW_CHECK_EXPIRATION, (int) strtotime('now + ' . $interval));
 	}
 
 
