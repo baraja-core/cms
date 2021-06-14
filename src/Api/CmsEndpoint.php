@@ -7,6 +7,7 @@ namespace Baraja\Cms\Api;
 
 use Baraja\BarajaCloud\CloudManager;
 use Baraja\Cms\Helpers;
+use Baraja\Cms\MiddleWare\IntegrityWorkflow;
 use Baraja\Cms\Settings;
 use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\User;
@@ -44,23 +45,12 @@ final class CmsEndpoint extends BaseEndpoint
 	 */
 	public function actionKeepConnection(): void
 	{
-		if ($this->getUser()->isLoggedIn() === false) { // ignore fot anonymous users
-			$this->sendJson([
-				'login' => false,
-			]);
-		}
-		session_write_close();
-		ignore_user_abort(true);
-		Debugger::enable(Debugger::PRODUCTION);
-
-		$metaManager = new UserMetaManager($this->entityManager, $this->userManager);
-		$metaManager->set(
-			(int) $this->getUser()->getId(),
-			'last-activity',
-			date('Y-m-d H:i:s'),
-		);
 		$this->sendJson([
-			'login' => true,
+			'login' => (new IntegrityWorkflow(
+				$this->getUser(),
+				$this->entityManager,
+				$this->userManager,
+			))->run(),
 		]);
 	}
 
