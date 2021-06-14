@@ -50,7 +50,7 @@ final class CmsEndpoint extends BaseEndpoint
 				$this->getUser(),
 				$this->entityManager,
 				$this->userManager,
-			))->run(),
+			))->run(true),
 		]);
 	}
 

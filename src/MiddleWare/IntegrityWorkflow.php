@@ -13,6 +13,8 @@ use Tracy\Debugger;
 
 final class IntegrityWorkflow
 {
+	private const SESSION_EXPIRE_KEY = '__BRJ_CMS--workflow-check-expiration';
+
 	public function __construct(
 		private User $user,
 		private EntityManager $entityManager,
@@ -21,7 +23,19 @@ final class IntegrityWorkflow
 	}
 
 
-	public function run(): bool
+	public static function isNeedRun(): bool
+	{
+		$checkExpiration = $_SESSION[self::SESSION_EXPIRE_KEY] ?? null;
+		if ($checkExpiration === null || ((int) $checkExpiration) < time()) {
+			$_SESSION[self::SESSION_EXPIRE_KEY] = (int) strtotime('now + 45 seconds');
+			return true;
+		}
+
+		return false;
+	}
+
+
+	public function run(bool $ajax = false): bool
 	{
 		if ($this->user->isLoggedIn() === false) { // ignore for anonymous users
 			return false;
