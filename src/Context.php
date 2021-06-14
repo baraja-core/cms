@@ -182,7 +182,7 @@ final class Context
 						Session::set(Session::WORKFLOW_PASSWORD_HASH, $newHash);
 					} elseif ($hash !== $newHash) {
 						$this->user->logout(true);
-						Session::remove(Session::WORKFLOW_PASSWORD_HASH);
+						Session::removeAll();
 					}
 				}
 			});

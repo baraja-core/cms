@@ -37,6 +37,16 @@ final class Session
 	}
 
 
+	public static function removeAll(): void
+	{
+		foreach ($_SESSION as $key => $value) {
+			if (str_starts_with($key, '__BRJ_CMS--')) {
+				unset($_SESSION[$key]);
+			}
+		}
+	}
+
+
 	public static function getKey(string $key): string
 	{
 		return '__BRJ_CMS--' . $key;
