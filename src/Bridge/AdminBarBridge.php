@@ -11,7 +11,6 @@ use Baraja\Cms\LinkGenerator;
 use Baraja\Cms\MenuAuthorizatorAccessor;
 use Baraja\Cms\Session;
 use Baraja\Cms\User\AdminBar\BackToLastIdentityPanel;
-use Baraja\Cms\User\UserManager;
 use Baraja\Cms\User\UserManagerAccessor;
 use Baraja\Url\Url;
 use Nette\Security\User;

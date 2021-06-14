@@ -165,7 +165,7 @@ final class Context
 		static $service;
 		if ($service === null) {
 			$service = new IntegrityWorkflow($this->user);
-			$service->addRunEvent(function(): void {
+			$service->addRunEvent(function (): void {
 				$metaManager = new UserMetaManager($this->entityManager, $this->userManager->get());
 				$metaManager->set(
 					(int) $this->user->getId(),
@@ -173,7 +173,7 @@ final class Context
 					date('Y-m-d H:i:s'),
 				);
 			});
-			$service->addRunEvent(function(): void {
+			$service->addRunEvent(function (): void {
 				$hash = Session::get(Session::WORKFLOW_PASSWORD_HASH);
 				$identity = $this->userManager->get()->getCmsIdentity();
 				if ($identity !== null) {

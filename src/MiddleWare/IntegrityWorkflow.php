@@ -15,6 +15,7 @@ final class IntegrityWorkflow
 	/** @var array<int, callable(self): void> */
 	private array $onRun = [];
 
+
 	public function __construct(
 		private User $user,
 	) {
