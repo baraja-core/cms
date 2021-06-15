@@ -52,7 +52,6 @@ final class IntegrityWorkflow
 			return false;
 		}
 		if ($ajax === true) {
-			session_write_close();
 			ignore_user_abort(true);
 			if (class_exists(Debugger::class)) {
 				Debugger::enable(Debugger::PRODUCTION);
@@ -60,6 +59,10 @@ final class IntegrityWorkflow
 		}
 
 		Arrays::invoke($this->onRun, $this);
+
+		if ($ajax === true) {
+			self::setExpireCheckSession();
+		}
 
 		return true;
 	}
