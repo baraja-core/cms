@@ -52,6 +52,7 @@ final class TemplateRenderer
 				new CmsSimpleStaticAsset('js', $baseUrl . '/admin/cms-web-loader/' . $this->context->getPluginNameByType($plugin) . '.js'),
 				new CmsSimpleStaticAsset('js', $baseUrl . '/admin/assets/core.js'),
 			]),
+			'title' => $plugin instanceof BasePlugin ? $plugin->getTitle() : null,
 			'content' => $this->renderContentCode($plugin, $pluginName, $view, $components),
 			'menu' => [
 				'dashboardLink' => $baseUrl . '/admin',
