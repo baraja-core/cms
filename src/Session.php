@@ -10,6 +10,7 @@ final class Session
 	public const
 		WORKFLOW_PASSWORD_HASH = 'workflow-password-hash',
 		WORKFLOW_CHECK_EXPIRATION = 'workflow-check-expiration',
+		WORKFLOW_NEED_OTP_AUTH = 'workflow-need-otp-auth',
 		LAST_IDENTITY_ID = 'last-identity-id';
 
 

@@ -242,26 +242,6 @@
 							</template>
 						</button>
 					</form>
-					<div v-else>
-						<form ref="oauth" id="oauthForm">
-							<b-form-group label="Authentication code:" label-for="oauth">
-								<b-form-input ref="otpInput" type="string" maxlength="7" minlength="6" v-model="form.oauth" id="oauth" autocomplete="one-time-code" required></b-form-input>
-								<div class="invalid-feedback">
-									{{ translator[locale].otp.invalidCode }}
-								</div>
-								<small>{{ translator[locale].otp.info }}</small>
-							</b-form-group>
-
-							<button type="submit" @click.prevent="verifyOAuth()" :disabled="form.oauth.length < 6" class="btn btn-block btn-primary">
-								<template v-if="isLoading">
-									<b-spinner small></b-spinner>
-								</template>
-								<template v-else>
-									{{ translator[locale].form.submit }}
-								</template>
-							</button>
-						</form>
-					</div>
 				</div>
 				<div class="card-footer">
 					<b-row>
@@ -356,7 +336,6 @@
 				form: {
 					username: '',
 					password: '',
-					oauth: '',
 					remember: 'yes'
 				},
 				reportProblem: {
@@ -376,10 +355,6 @@
 							rememberText: 'Stay signed in',
 							rememberAlt: 'Permanent login creates 14-day cookies.',
 							help: 'Need help?'
-						},
-						otp: {
-							invalidCode: 'The entered code does not correspond to the real one.',
-							info: 'Enter the code from your 2-step verification application.'
 						},
 						needHelp: {
 							title: 'Helper center',
@@ -403,10 +378,6 @@
 							rememberText: 'Trvalé přihlášení',
 							rememberAlt: 'Trvalé přihlášení vytvoří cookies s platností na 14 dnů.',
 							help: 'Potřebujete pomoct?'
-						},
-						otp: {
-							invalidCode: 'Zadaný kód neodpovídá reálnému.',
-							info: 'Zadejte kód z vaší aplikace pro dvoufázové ověřování.'
 						},
 						needHelp: {
 							title: 'Centrum technické podpory',
@@ -435,28 +406,6 @@
 			this.locale = nLang;
 		},
 		methods: {
-			verifyOAuth() {
-				this.isLoading = true;
-				fetch({$basePath . '/api/v1'} + '/cms/check-oauth-code', {
-					method: 'POST',
-					body: JSON.stringify({
-						locale: this.locale,
-						code: this.form.oauth.replace(/\s+/, ''),
-						username: this.form.username,
-						password: this.form.password,
-						remember: this.form.remember === 'yes'
-					})
-				})
-					.then(json => json.json())
-					.then(json => {
-						if ('state' in json && json.state === 'error') {
-							this.form.oauth = '';
-							this.$refs.oauth.classList.add('was-validated')
-						} else {
-							window.location.href = this.redirect;
-						}
-					}).finally(json => this.isLoading = false)
-			},
 			loginProcess: function (e) {
 				this.isLoading = true;
 				fetch({$basePath . '/api/v1'} + '/cms/sign', {
@@ -475,12 +424,7 @@
 						if ('state' in data && data.state === 'error') {
 							this.errorMessage = data.message;
 						} else {
-							if (data.data.needOauth === true) {
-								this.isOAuth = true;
-								setTimeout(() => this.$refs.otpInput.focus(), 150)
-							} else {
-								window.location.href = this.redirect;
-							}
+							window.location.href = this.redirect;
 						}
 					});
 			},

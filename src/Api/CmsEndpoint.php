@@ -8,6 +8,7 @@ namespace Baraja\Cms\Api;
 use Baraja\BarajaCloud\CloudManager;
 use Baraja\Cms\ContextAccessor;
 use Baraja\Cms\Helpers;
+use Baraja\Cms\Session;
 use Baraja\Cms\Settings;
 use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\User;
@@ -78,16 +79,12 @@ final class CmsEndpoint extends BaseEndpoint
 			Debugger::log($e, ILogger::CRITICAL);
 			$this->sendError('Internal authentication error. Your account has been broken. Please contact your administrator or Baraja support team.');
 		}
-
-		$needOauth = false;
 		if ($user instanceof CmsUser && $user->getOtpCode() !== null) { // need OTP authentication
-			$this->userManager->logout();
-			$needOauth = $user->getOtpCode() !== null;
+			Session::set(Session::WORKFLOW_NEED_OTP_AUTH, true);
 		}
 
 		$this->sendOk([
 			'loginStatus' => true,
-			'needOauth' => $needOauth,
 		]);
 	}
 
