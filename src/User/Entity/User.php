@@ -258,7 +258,7 @@ class User implements CmsUser
 
 	public function setNick(?string $nick): void
 	{
-		$this->nick = trim($nick ?? '') ?: null;
+		$this->nick = Strings::webalize($nick ?? '', '.,-@', false) ?: null;
 	}
 
 
