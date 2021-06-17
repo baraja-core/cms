@@ -246,7 +246,7 @@ class User implements CmsUser
 
 	public function setUsername(string $username): void
 	{
-		$this->username = trim($username);
+		$this->username = Strings::webalize($nick ?? '', '.,-@', false);
 	}
 
 
