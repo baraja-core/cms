@@ -327,7 +327,11 @@ final class UserManager implements Authenticator
 			throw new AuthenticationException('The password is incorrect. Username "' . $username . '" given.');
 		}
 		if ((new Passwords)->needsRehash($hash)) {
-			$user->setPassword($password);
+			try {
+				$user->setPassword($password);
+			} catch (\InvalidArgumentException) {
+				// Silence is golden.
+			}
 		}
 
 		$this->logLoginAttempt($attempt, $user);
