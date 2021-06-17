@@ -11,6 +11,7 @@ use Baraja\Cms\Helpers;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Proxy\Proxy;
 use Baraja\Cms\Search\SearchAdminBarPlugin;
+use Baraja\Cms\Session;
 use Baraja\Plugin\CmsPluginPanel;
 use Baraja\Plugin\Exception\PluginRedirectException;
 use Baraja\Plugin\Exception\PluginTerminateException;
@@ -132,6 +133,9 @@ final class Application
 
 	private function processLoginPage(string $path, string $locale): void
 	{
+		if (Session::get(Session::WORKFLOW_NEED_OTP_AUTH) === true) { // route login form for OTP auth
+			$this->terminate($this->templateRenderer->renderLoginOtpAuthTemplate($locale));
+		}
 		if (
 			str_starts_with($path, 'cms/') === false
 			&& $this->context->getUser()->isLoggedIn() === false

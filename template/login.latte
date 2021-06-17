@@ -226,7 +226,7 @@
 						now dead, unfortunately.  So now you might wonder what the meaning of death
 						is...</p>
 					</b-alert>
-					<form v-if="!isOAuth" @submit.prevent id="loginForm" role="form">
+					<form @submit.prevent id="loginForm" role="form">
 						<b-form-group :label="translator[locale].form.username + ':'" label-for="username">
 							<b-form-input type="text" v-model="form.username" id="username" tabindex="1" required></b-form-input>
 						</b-form-group>
@@ -246,7 +246,7 @@
 				<div class="card-footer">
 					<b-row>
 						<b-col>
-							<b-form-group label-for="remember" v-if="!isOAuth" class="mb-0">
+							<b-form-group label-for="remember" class="mb-0">
 								<b-form-checkbox id="remember" v-model="form.remember" value="yes" unchecked-value="no">
 									<span v-b-tooltip :title="translator[locale].form.rememberAlt" style="cursor:pointer">
 										{{ translator[locale].form.rememberText }}
@@ -330,7 +330,6 @@
 				projectName: {$projectName},
 				redirect: '',
 				isLoading: false,
-				isOAuth: false,
 				errorMessage: '',
 				needHelpPage: null,
 				form: {

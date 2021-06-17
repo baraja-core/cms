@@ -128,6 +128,23 @@ final class TemplateRenderer
 	}
 
 
+	public function renderLoginOtpAuthTemplate(string $locale): string
+	{
+		return (new Engine)
+			->setTempDirectory($this->cacheDir)
+			->addFilter('translate', $this->context->getTranslatorFilter())
+			->renderToString(
+				__DIR__ . '/../../template/loginOthAuth.latte',
+				[
+					'basePath' => Url::get()->getBaseUrl(),
+					'availableLocales' => Admin::SUPPORTED_LOCALES,
+					'projectName' => $this->context->getConfiguration()->get('name'),
+					'locale' => $locale,
+				],
+			);
+	}
+
+
 	public function renderResetPasswordTemplate(string $token, string $locale): string
 	{
 		try {

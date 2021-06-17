@@ -89,13 +89,8 @@ final class CmsEndpoint extends BaseEndpoint
 	}
 
 
-	public function postCheckOauthCode(
-		string $locale,
-		string $code,
-		string $username,
-		string $password,
-		bool $remember = false
-	): void {
+	public function postCheckOtpCode(string $locale, string $code): void
+	{
 		$userEntity = $this->getUserEntity();
 		if ($userEntity === null) {
 			$this->sendError('User is not logged in.');
@@ -110,11 +105,10 @@ final class CmsEndpoint extends BaseEndpoint
 			$this->sendError('OTP code for user "' . $userEntity->getId() . '" does not exist.');
 		}
 		if (Helpers::checkAuthenticatorOtpCodeManually($otpCode, (int) $code) === true) {
-			$this->userManager->authenticate($username, $password, $remember);
+			Session::remove(Session::WORKFLOW_NEED_OTP_AUTH);
 			$this->sendOk();
-		} else {
-			$this->sendError('OTP code is invalid. Please try again.');
 		}
+		$this->sendError('OTP code is invalid. Please try again.');
 	}
 
 

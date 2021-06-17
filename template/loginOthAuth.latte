@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=.8, shrink-to-fit=no">
+	<meta name="description" content="Baraja administration">
+	<meta name="author" content="Baraja.cz">
+	<meta name="robots" content="noindex, nofollow, noarchive">
+	<title>{$projectName} CMS</title>
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.min.css">
+	<link rel="shortcut icon" type="image/x-icon" href="{$basePath}/admin/assets/favicon.ico">
+	<script>
+		window.onerror = function (message, file, line, col, error) {
+			if (error !== null) {
+				document.getElementById('unsupportedErrorMessage').innerHTML += message + '<br><code>' + file + '</code>:' + line + '<hr>';
+				document.getElementById('unsupportedErrorDiv').style.display = 'block';
+				document.getElementById('loginFormContainer').style.display = 'none';
+			}
+
+			return false;
+		};
+	</script>
+
+	<style>
+		body {
+			background: #f3f3f3;
+		}
+
+		.modal-backdrop {
+			background: rgba(0, 0, 0, .5);
+		}
+
+		a {
+			color: #007bff;
+			text-decoration: none;
+		}
+
+		a:hover, a:focus {
+			color: #004386;
+		}
+
+		.corner-logo {
+			color: #555;
+			text-decoration: underline;
+		}
+
+		.page-wrapper {
+			height: 75vh;
+		}
+
+		@media (min-width: 769px) {
+			.card-wrapper {
+				width: 400px;
+			}
+		}
+
+		.card {
+			border: 0;
+			border-radius: 0.25rem;
+			-webkit-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+			box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+		}
+
+		.card-header, .card-footer {
+			border-bottom-color: #e9ecef;
+		}
+
+		.card-header {
+			background-color: #00000008;
+		}
+
+		.card-footer {
+			background-color: #fff;
+		}
+
+		.btn-primary, .btn-primary:disabled {
+			background-color: #007bff;
+			border-color: #007bff;
+		}
+
+		.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+			background-color: #007bff !important;
+			border-color: #007bff !important;
+			-webkit-box-shadow: 0 0 0 0.2rem rgba(17, 27, 185, 0.5) !important;
+			box-shadow: 0 0 0 0.2rem rgba(55, 42, 179, 0.5) !important;
+		}
+
+		.custom-control-input:checked ~ .custom-control-label::before {
+			background-color: #007bff;
+			border-color: #007bff;
+		}
+
+		.form-control {
+			display: block;
+			width: 100%;
+			height: calc(1.5em + 0.876rem + 2px);
+			padding: 0.438rem 1rem;
+			font-size: 1rem;
+			font-weight: 400;
+			line-height: 1.5;
+			color: #495057;
+			background-color: #fff;
+			background-clip: padding-box;
+			border: 1px solid #ced4da;
+			border-radius: 0.25rem;
+			-webkit-transition: border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+			transition: border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+			-o-transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+			transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+			transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+		}
+
+		.form-control:focus {
+			color: #495057;
+			background-color: #fff;
+			border-color: #8dc9ff;
+			outline: 0;
+			-webkit-box-shadow: 0 0 0 0.2rem rgba(50, 100, 165, 0.25);
+			box-shadow: 0 0 0 0.2rem rgba(63, 106, 165, 0.25);
+		}
+
+		.text-muted {
+			color: #6c757d !important;
+		}
+	</style>
+</head>
+<body>
+<div id="app">
+	<div class="page-wrapper d-flex flex-column align-items-center justify-content-center pt-5">
+		<noscript>
+			<div class="card-wrapper">
+				<div class="card">
+					<div class="card-header d-flex justify-content-between">
+						<a href="https://baraja.cz" class="corner-logo" target="_blank">
+							{$projectName}
+						</a>
+					</div>
+					<div class="card-body py-4">
+						<table class="w-100 mb-3">
+							<tr>
+								<td valign="top" class="pr-4">❌</td>
+								<td valign="top" class="text-center text-danger">
+									Your browser does not support javascript.
+								</td>
+							</tr>
+						</table>
+						<p>
+							You must have javascript active in&nbsp;your browser for the correct
+							functionality of&nbsp;the administration interface.
+						</p>
+						<p>
+							If&nbsp;you are unsure, please contact your administrator
+							or&nbsp;<a href="https://help.baraja.cz" target="_blank">official support</a>.
+						</p>
+					</div>
+				</div>
+			</div>
+		</noscript>
+		<div style="display:none" id="unsupportedErrorDiv">
+			<div class="card-wrapper">
+				<div class="card">
+					<div class="card-header d-flex justify-content-between">
+						<a href="https://baraja.cz" class="corner-logo" target="_blank">
+							{$projectName}
+						</a>
+					</div>
+					<div class="card-body py-4">
+						<table class="w-100 mb-3">
+							<tr>
+								<td valign="top" class="pr-4">❌</td>
+								<td valign="top">
+									Your browser is not supported yet. We are compatible with browsers:<br>
+									<b>Chrome&nbsp;55+, Firefox&nbsp;53+, MS&nbsp;Edge&nbsp;16+, Safari&nbsp;11+ and iOS&nbsp;Safari&nbsp;11+</b>
+								</td>
+							</tr>
+						</table>
+						<p>
+							If&nbsp;you are unsure, please contact your administrator
+							or&nbsp;<a href="https://help.baraja.cz" target="_blank">official support</a>.
+						</p>
+						<p>List of errors:</p>
+						<i id="unsupportedErrorMessage" class="text-secondary"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="loginFormContainer">
+			<login :locales="{$availableLocales|escapeJs}" init-locale="{$locale}"></login>
+		</div>
+	</div>
+</div>
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.min.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue-icons.min.js"></script>
+<script>
+	Vue.component('login', {
+		props: ['locales', 'initLocale'],
+		template: `
+		<div class="card-wrapper">
+			<div v-if="errorMessage" class="alert alert-danger text-center mb-2">
+				{{ errorMessage }}
+			</div>
+			<div class="card">
+				<div class="card-header d-flex justify-content-between">
+					<a :href="'https://baraja.cz/cms?locale=' + locale" class="corner-logo" target="_blank">
+						{{ projectName }}
+					</a>
+					<div>
+						<template v-for="(localeItem, offset) in locales">
+							<b-link class="card-link mx-1" @click="locale=localeItem">{{ localeItem }}</b-link>
+							<span v-if="offset < locales.length-1" class="small text-muted" style="position:relative;top:-1px">|</span>
+						</template>
+					</div>
+				</div>
+				<div class="card-body py-4">
+					<form ref="otpAuth" id="otpAuth">
+						<b-form-group label="Authentication code:" label-for="otpAuth">
+							<b-form-input ref="otpInput" type="string" maxlength="7" minlength="6" v-model="form.code" id="otpAuth" autocomplete="one-time-code" required></b-form-input>
+							<div class="invalid-feedback">
+								{{ translator[locale].otp.invalidCode }}
+							</div>
+							<small>{{ translator[locale].otp.info }}</small>
+						</b-form-group>
+						<button type="submit" @click.prevent="verifyOAuth()" :disabled="form.code.length < 6" class="btn btn-block btn-primary">
+							<template v-if="isLoading">
+								<b-spinner small></b-spinner>
+							</template>
+							<template v-else>
+								{{ translator[locale].form.submit }}
+							</template>
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>`,
+		data: function () {
+			return {
+				locale: 'en',
+				projectName: {$projectName},
+				redirect: '',
+				isLoading: false,
+				errorMessage: '',
+                form: {
+				    code: ''
+                },
+				translator: {
+					en: {
+						otp: {
+							invalidCode: 'The entered code does not correspond to the real one.',
+							info: 'Enter the code from your 2-step verification application.'
+						}
+					},
+					cs: {
+						otp: {
+							invalidCode: 'Zadaný kód neodpovídá reálnému.',
+							info: 'Zadejte kód z vaší aplikace pro dvoufázové ověřování.'
+						}
+					}
+				}
+			}
+		},
+		created() {
+			let nLang = navigator.language;
+			if (nLang === 'cs' || nLang === 'cs-cz' || nLang === 'cz') {
+				nLang = 'cs';
+			} else {
+				nLang = 'en';
+			}
+			this.locale = nLang;
+		},
+		methods: {
+			verifyOAuth() {
+				this.isLoading = true;
+				fetch({$basePath . '/api/v1'} + '/cms/check-otp-code', {
+					method: 'POST',
+					body: JSON.stringify({
+						locale: this.locale,
+						code: this.form.code.replace(/\s+/, '')
+					})
+				})
+					.then(json => json.json())
+					.then(json => {
+						if ('state' in json && json.state === 'error') {
+							this.form.code = '';
+							this.$refs.code.classList.add('was-validated')
+						} else {
+							window.location.href = this.redirect;
+						}
+					}).finally(json => this.isLoading = false)
+			}
+		}
+	});
+	const app = new Vue({
+		el: '#app',
+	})
+</script>
+</body>
+</html>
