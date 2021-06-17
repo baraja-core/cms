@@ -24,6 +24,9 @@ final class IntegrityWorkflow
 
 	public static function isNeedRun(): bool
 	{
+		if (Session::get(Session::WORKFLOW_NEED_OTP_AUTH) === true) {
+			return false;
+		}
 		$checkExpiration = Session::get(Session::WORKFLOW_CHECK_EXPIRATION);
 		if ($checkExpiration === null || ((int) $checkExpiration) < time()) {
 			self::setExpireCheckSession();
@@ -48,7 +51,10 @@ final class IntegrityWorkflow
 
 	public function run(bool $ajax = false): bool
 	{
-		if ($this->user->isLoggedIn() === false) { // ignore for anonymous users
+		if (
+			$this->user->isLoggedIn() === false
+			|| Session::get(Session::WORKFLOW_NEED_OTP_AUTH) === true
+		) { // ignore for anonymous users
 			return false;
 		}
 		if ($ajax === true) {
