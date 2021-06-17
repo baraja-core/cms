@@ -357,12 +357,11 @@ final class UserEndpoint extends BaseEndpoint
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 		}
-
-		// TODO: if ($this->userManager->isSafePassword($password) === false) {
-		// TODO:  $this->sendError('Password must be safe!');
-		// TODO: }
-
-		$user->setPassword($password);
+		try {
+			$user->setPassword($password);
+		} catch (\InvalidArgumentException $e) {
+			$this->sendError('Password can not be changed. Reason: ' . $e->getMessage());
+		}
 		$this->entityManager->flush();
 		$this->sendOk();
 	}
@@ -822,8 +821,11 @@ final class UserEndpoint extends BaseEndpoint
 		if ($currentUser->getId() !== $user->getId() && \in_array('admin', $currentUser->getRoles(), true) === false) {
 			$this->sendError('Current user must be admin for change password.');
 		}
-
-		$user->setPassword($password);
+		try {
+			$user->setPassword($password);
+		} catch (\InvalidArgumentException $e) {
+			$this->sendError('Password can not be changed. Reason: ' . $e->getMessage());
+		}
 		$this->userMetaManager->set((int) $user->getId(), 'password-last-changed-date', date('Y-m-d'));
 		$this->entityManager->flush();
 		$this->flashMessage('User password has been changed.', 'success');

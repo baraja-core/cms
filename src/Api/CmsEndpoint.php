@@ -219,8 +219,11 @@ final class CmsEndpoint extends BaseEndpoint
 			if ($request->isExpired() === true) {
 				$this->sendError('Token has been expired.');
 			}
-
-			$request->getUser()->setPassword($password);
+			try {
+				$request->getUser()->setPassword($password);
+			} catch (\InvalidArgumentException $e) {
+				$this->sendError('Password can not be changed. Reason: ' . $e->getMessage());
+			}
 			$request->setExpired();
 
 			$this->entityManager->flush([$request, $request->getUser()]);
@@ -253,8 +256,11 @@ final class CmsEndpoint extends BaseEndpoint
 		} catch (NoResultException | NonUniqueResultException | \InvalidArgumentException) {
 			$this->sendError('User "' . $userId . '" does not exist.');
 		}
-
-		$user->setPassword($password);
+		try {
+			$user->setPassword($password);
+		} catch (\InvalidArgumentException $e) {
+			$this->sendError('Password can not be changed. Reason: ' . $e->getMessage());
+		}
 		$this->entityManager->flush();
 		$this->sendOk();
 	}

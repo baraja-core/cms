@@ -273,6 +273,9 @@ class User implements CmsUser
 		if (trim($password) === '') {
 			throw new \InvalidArgumentException('User (id: "' . $this->getId() . '") password can not be empty.');
 		}
+		if (strlen($password) < 4) {
+			throw new \InvalidArgumentException('Given password is not safe.');
+		}
 
 		$this->password = (new Passwords)->hash($password);
 	}
