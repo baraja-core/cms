@@ -222,7 +222,7 @@ class User implements CmsUser
 
 	public function setFirstName(?string $firstName): void
 	{
-		$this->firstName = $firstName;
+		$this->firstName = Strings::firstUpper(trim($firstName ?? '')) ?: null;
 	}
 
 
@@ -234,7 +234,7 @@ class User implements CmsUser
 
 	public function setLastName(?string $lastName): void
 	{
-		$this->lastName = $lastName;
+		$this->lastName = Strings::firstUpper(trim($lastName ?? '')) ?: null;
 	}
 
 
@@ -246,7 +246,7 @@ class User implements CmsUser
 
 	public function setUsername(string $username): void
 	{
-		$this->username = $username;
+		$this->username = trim($username);
 	}
 
 
@@ -258,7 +258,7 @@ class User implements CmsUser
 
 	public function setNick(?string $nick): void
 	{
-		$this->nick = $nick;
+		$this->nick = trim($nick ?? '') ?: null;
 	}
 
 
