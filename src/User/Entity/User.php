@@ -223,7 +223,10 @@ class User implements CmsUser
 	public function setFirstName(?string $firstName): void
 	{
 		$firstName = Strings::firstUpper(trim($firstName ?? '')) ?: null;
-		if ($firstName !== null && !preg_match('/^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.\'-]+$/u', $firstName)) {
+		if (
+			$firstName !== null
+			&& !preg_match('/^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.\'-]+$/u', $firstName)
+		) {
 			throw new \InvalidArgumentException('User first name is not valid, because "' . $firstName . '" given.');
 		}
 		$this->firstName = $firstName;
@@ -239,7 +242,10 @@ class User implements CmsUser
 	public function setLastName(?string $lastName): void
 	{
 		$lastName = Strings::firstUpper(trim($lastName ?? '')) ?: null;
-		if ($lastName !== null && !preg_match('/^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.\'-]+$/u', $lastName)) {
+		if (
+			$lastName !== null
+			&& !preg_match('/^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.\'-]+$/u', $lastName)
+		) {
 			throw new \InvalidArgumentException('User first name is not valid, because "' . $lastName . '" given.');
 		}
 		$this->lastName = $lastName;
