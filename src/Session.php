@@ -13,44 +13,42 @@ final class Session
 		WORKFLOW_NEED_OTP_AUTH = 'workflow-need-otp-auth',
 		LAST_IDENTITY_ID = 'last-identity-id';
 
+	private const PREFIX = '__BRJ_CMS';
+
 
 	public static function get(string $key): mixed
 	{
-		return $_SESSION[self::getKey($key)] ?? null;
+		if (isset($_SESSION[self::PREFIX]) === false) {
+			return null;
+		}
+
+		return $_SESSION[self::PREFIX][$key] ?? null;
 	}
 
 
 	public static function set(string $key, mixed $value): void
 	{
+		if (isset($_SESSION[self::PREFIX]) === false) {
+			$_SESSION[self::PREFIX] = [];
+		}
 		if ($value === null) {
 			self::remove($key);
 		} else {
-			$_SESSION[self::getKey($key)] = $value;
+			$_SESSION[self::PREFIX][$key] = $value;
 		}
 	}
 
 
 	public static function remove(string $key): void
 	{
-		$sessionKey = self::getKey($key);
-		if (isset($_SESSION[$sessionKey]) === true) {
-			unset($_SESSION[$sessionKey]);
+		if (isset($_SESSION[self::PREFIX][$key]) === true) {
+			unset($_SESSION[self::PREFIX][$key]);
 		}
 	}
 
 
 	public static function removeAll(): void
 	{
-		foreach ($_SESSION as $key => $value) {
-			if (str_starts_with($key, '__BRJ_CMS--')) {
-				unset($_SESSION[$key]);
-			}
-		}
-	}
-
-
-	public static function getKey(string $key): string
-	{
-		return '__BRJ_CMS--' . $key;
+		$_SESSION[self::PREFIX] = [];
 	}
 }
