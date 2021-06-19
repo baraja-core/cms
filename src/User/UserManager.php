@@ -213,17 +213,6 @@ final class UserManager implements Authenticator
 	}
 
 
-	public function checkAuthenticatorOtpCode(CmsUser $user, int $code): bool
-	{
-		$otpCode = $user->getOtpCode();
-		if ($otpCode === null) {
-			return false;
-		}
-
-		return Helpers::checkAuthenticatorOtpCodeManually($otpCode, $code);
-	}
-
-
 	/** @deprecated since 2021-05-01, use UserMetaManager instead. */
 	public function getMeta(int $userId, string $key): ?string
 	{
