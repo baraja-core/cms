@@ -216,8 +216,8 @@
 				</div>
 				<div class="card-body py-4">
 					<form ref="otpAuth" id="otpAuth">
-						<b-form-group label="Authentication code:" label-for="otpAuth">
-							<b-form-input ref="otpInput" type="string" maxlength="7" minlength="6" v-model="form.code" id="otpAuth" autocomplete="one-time-code" required></b-form-input>
+						<b-form-group :label="translator[locale].otp.authCode" label-for="otpAuth">
+							<b-form-input ref="otpInput" type="text" maxlength="7" minlength="6" v-model="form.code" id="otpAuth" autocomplete="one-time-code" required></b-form-input>
 							<div class="invalid-feedback">
 								{{ translator[locale].otp.invalidCode }}
 							</div>
@@ -228,7 +228,7 @@
 								<b-spinner small></b-spinner>
 							</template>
 							<template v-else>
-								{{ translator[locale].form.submit }}
+								{{ translator[locale].otp.submit }}
 							</template>
 						</button>
 					</form>
@@ -248,14 +248,18 @@
 				translator: {
 					en: {
 						otp: {
+							authCode: 'Authentication code:',
 							invalidCode: 'The entered code does not correspond to the real one.',
-							info: 'Enter the code from your 2-step verification application.'
+							info: 'Enter the code from your 2-step verification application.',
+							submit: 'Submit'
 						}
 					},
 					cs: {
 						otp: {
+							authCode: 'Ověřovací kód:',
 							invalidCode: 'Zadaný kód neodpovídá reálnému.',
-							info: 'Zadejte kód z vaší aplikace pro dvoufázové ověřování.'
+							info: 'Zadejte kód z vaší aplikace pro dvoufázové ověřování.',
+							submit: 'Odeslat'
 						}
 					}
 				}
@@ -283,6 +287,7 @@
 					.then(json => json.json())
 					.then(json => {
 						if ('state' in json && json.state === 'error') {
+							alert(json.message);
 							this.form.code = '';
 							this.$refs.code.classList.add('was-validated')
 						} else {
