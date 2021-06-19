@@ -6,7 +6,6 @@ namespace Baraja\Cms\User;
 
 
 use Baraja\AdminBar\User\AdminIdentity;
-use Baraja\Cms\Helpers;
 use Baraja\Cms\Session;
 use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\User;
@@ -24,9 +23,6 @@ use Nette\Utils\DateTime;
 
 final class UserManager implements Authenticator
 {
-	/** @deprecated since 2021-06-14 use Session::LAST_IDENTITY_ID */
-	public const LAST_IDENTITY_ID__SESSION_KEY = '__BRJ_CMS--last-identity-id';
-
 	private ?AuthenticationService $authenticationService = null;
 
 	private string $defaultEntity;
