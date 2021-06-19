@@ -258,6 +258,7 @@ final class UserManager implements Authenticator
 			Session::set(Session::LAST_IDENTITY_ID, $currentIdentity->getId());
 		}
 		$this->createIdentity($user);
+		Session::remove(Session::WORKFLOW_NEED_OTP_AUTH);
 	}
 
 
