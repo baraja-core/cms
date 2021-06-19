@@ -227,12 +227,14 @@ final class TemplateRenderer
 			$componentsData = [];
 
 			$first = true;
-			foreach ($components as $component) {
+			foreach ($components as $key => $component) {
 				if ($this->context->checkPermission($pluginName, $component->getName())) {
 					$active = $first === true;
-					$componentsData[] = '<b-tab lazy @click="$emit(\'activeMe\')" title="' . Helpers::escapeHtmlAttr($component->getTab()) . '"'
+					$componentsData[] = '<b-tab lazy @click="$emit(\'activeMe\')" '
+						. 'id="cms-component-' . Helpers::escapeHtmlAttr(($key + 1) . '-' . $component->getName()) . '" '
+						. 'title="' . Helpers::escapeHtmlAttr($component->getTab()) . '"'
 						. ($active ? ' active' : '')
-						. '>' . $this->renderVueComponent($component, $plugin) . "\n" . '</b-tab>';
+						. '>' . "\n" . $this->renderVueComponent($component, $plugin) . "\n" . '</b-tab>';
 					$first = false;
 				}
 			}
