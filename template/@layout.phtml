@@ -61,7 +61,7 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 				</cms-menu>
 			</b-col>
 			<b-col cols="10" role="main" class="cms-main px-0">
-			<b-alert variant="danger" :show="true" dismissible>
+			<b-alert variant="danger" :show="isOnline === false" dismissible>
 				<table class="w-100">
 					<tr>
 						<td style="width:32px"><b-spinner small></b-spinner></td>
