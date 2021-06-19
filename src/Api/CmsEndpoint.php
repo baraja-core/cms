@@ -79,9 +79,6 @@ final class CmsEndpoint extends BaseEndpoint
 			Debugger::log($e, ILogger::CRITICAL);
 			$this->sendError('Internal authentication error. Your account has been broken. Please contact your administrator or Baraja support team.');
 		}
-		if ($user instanceof CmsUser && $user->getOtpCode() !== null) { // need OTP authentication
-			Session::set(Session::WORKFLOW_NEED_OTP_AUTH, true);
-		}
 
 		$this->sendOk([
 			'loginStatus' => true,
