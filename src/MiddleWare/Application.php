@@ -134,6 +134,7 @@ final class Application
 	private function processLoginPage(string $path, string $locale): void
 	{
 		if (Session::get(Session::WORKFLOW_NEED_OTP_AUTH) === true) { // route login form for OTP auth
+			AdminBar::enable(AdminBar::MODE_DISABLED);
 			$this->terminate($this->templateRenderer->renderLoginOtpAuthTemplate($locale));
 		}
 		if (
