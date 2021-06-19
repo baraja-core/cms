@@ -61,6 +61,7 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 				</cms-menu>
 			</b-col>
 			<b-col cols="10" role="main" class="cms-main px-0">
+			<b-alert variant="danger" :show="isOnline === false">You are currently offline, some features may not be available.</b-alert>
 			<?= $content ?>
 			</b-col>
 		</b-row>
@@ -80,9 +81,9 @@ foreach ($staticAssets as $staticAsset) {
 }
 ?>
 <script>
-	let axiosApi = axios.create({
-		baseURL: <?=json_encode($basePath . '/api/v1')?>
-	});
+    let axiosApi = axios.create({
+       baseURL: <?=json_encode($basePath . '/api/v1')?>
+    });
     axiosApi.interceptors.response.use((ok) => {
         let data = ok.data;
         if ('flashMessages' in data) {
@@ -116,15 +117,43 @@ foreach ($staticAssets as $staticAsset) {
         return Promise.reject(error);
     });
     let eventBus = new Vue();
-    let app = new Vue({el: '#app'});
-    setInterval(function() {
-        axiosApi.get(`cms/keep-connection`)
-            .then(req => {
-                if (req.data.login === false) {
-                    location.reload();
+    let app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                isOnline: null
+            }
+        },
+        mounted() {
+            this.isOnline = navigator.onLine;
+            window.addEventListener('online',  this.updateOnlineStatus);
+            window.addEventListener('offline', this.updateOnlineStatus);
+            setInterval(this.keepConnection, 5000);
+        },
+        methods: {
+            updateOnlineStatus(event) {
+                this.isOnline = navigator.onLine;
+                if (this.isOnline === true) {
+                    app.$bvToast.toast('The connection to the server has been successfully restored.', {
+                        variant: 'success',
+                        title: 'Connection info',
+                        toaster: 'b-toaster-bottom-left'
+                    })
                 }
-            });
-    }, 5000);
+            },
+            keepConnection() {
+                if (this.isOnline === false) {
+                    return;
+                }
+                axiosApi.get(`cms/keep-connection`)
+                    .then(req => {
+                        if (req.data.login === false) {
+                            location.reload();
+                        }
+                    });
+            }
+        }
+    });
 </script>
 </body>
 </html>
