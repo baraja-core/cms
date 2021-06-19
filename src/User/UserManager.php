@@ -98,6 +98,9 @@ final class UserManager implements Authenticator
 		if ($user instanceof CmsUser) {
 			$name = $user->getName();
 			$avatarUrl = $user->getAvatarUrl();
+			if ($user->getOtpCode() !== null) { // need OTP authentication
+				Session::set(Session::WORKFLOW_NEED_OTP_AUTH, true);
+			}
 		}
 
 		$identity = new AdminIdentity($user->getId(), $user->getRoles(), [], $name, $avatarUrl);
