@@ -6,7 +6,12 @@
 	margin-top: 45px !important;
 }
 
+#app-content {
+	display: flex;
+}
+
 #cms-menu {
+	flex: 20%;
 	font-size: 11pt;
 	padding-bottom: 1em;
 	max-width: 256px !important;
@@ -41,6 +46,10 @@
 	margin: .75em .5em;
 	-webkit-box-shadow: 0 5px 16px 0 rgba(214, 206, 194, 0.5);
 	box-shadow: 0 5px 16px 0 rgba(214, 206, 194, 0.5);
+}
+
+.cms-main {
+	flex: 80%;
 }
 
 .cms-main .nav-pills .nav-link {
