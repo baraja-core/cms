@@ -1,5 +1,5 @@
 Vue.component('user-default', {
-	template: `<div class="my-3" title="User manager" :breadcrumb="breadcrumb" :buttons="buttons">
+	template: `<div class="container-fluid my-3" title="User manager" :breadcrumb="breadcrumb" :buttons="buttons">
 		<b-row>
 			<b-col>
 				<h1>User manager</h1>
