@@ -49,18 +49,17 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 
 <body id="app-cms">
 <div id="app">
-	<b-container fluid>
-		<b-row>
-			<b-col cols="2" id="cms-menu" role="navigation" class="px-0">
-				<cms-menu
+	<div id="app-content">
+		<div id="cms-menu" role="navigation">
+			<cms-menu
 					:structure="<?= Helpers::escapeHtmlAttr(json_encode($menu['structure'])) ?>"
 					dashboard-link="<?= Helpers::escapeHtmlAttr($menu['dashboardLink']) ?>"
 					:is-dashboard="<?= $menu['isDashboard'] ? 'true' : 'false' ?>"
 					active-key="<?= $menu['activeKey'] ?? null ?>"
 					:debug-mode="<?= $isDebug ? 'true' : 'false' ?>">
-				</cms-menu>
-			</b-col>
-			<b-col cols="10" role="main" class="cms-main px-0">
+			</cms-menu>
+		</div>
+		<div role="main" class="cms-main">
 			<b-alert variant="danger" :show="isOnline === false" dismissible>
 				<table class="w-100">
 					<tr>
@@ -70,11 +69,10 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 				</table>
 			</b-alert>
 			<?= $content ?>
-			</b-col>
-		</b-row>
-	</b-container>
+		</div>
+	</div>
 	<support-chat></support-chat>
-	<cms-footer year="<?=date('Y')?>"></cms-footer>
+	<cms-footer :year="<?=date('Y')?>"></cms-footer>
 </div>
 <script src="<?= $isDebug ? 'https://unpkg.com/vue@2.6.11/dist/vue.js' : 'https://unpkg.com/vue@2.6.11/dist/vue.min.js' ?>"></script>
 <script src="https://unpkg.com/bootstrap-vue@2.17.0/dist/bootstrap-vue.min.js"></script>
