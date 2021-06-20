@@ -231,7 +231,7 @@ Vue.component('cms-default', {
 		<div v-if="breadcrumb" class="mb-2">
 			<breadcrumb :items="breadcrumb"></breadcrumb>
 		</div>
-		<div class="d-flex justify-content-between align-items-center flex-wrap">
+		<div v-if="title || subtitle || (buttons && buttons.length)" class="d-flex justify-content-between align-items-center flex-wrap">
 			<div class="mb-2">
 				<h1 v-if="title || subtitle">
 					{{ title }}
