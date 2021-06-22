@@ -118,6 +118,9 @@ final class UserManager implements Authenticator
 	 */
 	public function authenticate(string $username, string $password, bool $remember = false): IIdentity
 	{
+		if ($this->isLoginFirewallBlocked($username) === true) {
+			throw new AuthenticationException('Too many failed login attempts.', Authenticator::NOT_APPROVED);
+		}
 		$expiration = $remember ? '14 days' : '15 minutes';
 		$username = trim($username);
 		$password = trim($password);
@@ -258,6 +261,45 @@ final class UserManager implements Authenticator
 		}
 		$this->createIdentity($user);
 		Session::remove(Session::WORKFLOW_NEED_OTP_AUTH);
+	}
+
+
+	public function isLoginFirewallBlocked(string $username, ?string $ip = null): bool
+	{
+		if (PHP_SAPI === 'cli') {
+			return false;
+		}
+		$blockCountKey = 'user-login-attempts-block-count';
+		$blockIntervalKey = 'user-login-attempts-block-interval';
+
+		$configuration = $this->configuration->getSection('core');
+		$blockCount = $configuration->get($blockCountKey);
+		if ($blockCount === null) {
+			$blockCount = 10;
+			$configuration->save($blockCountKey, (string) $blockCount);
+		}
+		$blockInterval = $configuration->get($blockIntervalKey);
+		if ($blockInterval === null) {
+			$blockInterval = '20 minutes';
+			$configuration->save($blockIntervalKey, $blockInterval);
+		}
+
+		/** @var array<int, array<string, int>> $attempts */
+		$attempts = $this->entityManager->getRepository(UserLoginAttempt::class)
+			->createQueryBuilder('login')
+			->select('PARTIAL login.{id}')
+			->leftJoin('login.user', 'user')
+			->where('login.user IS NULL OR user.username = :username OR user.email = :username OR login.username = :username OR login.ip = :ip')
+			->andWhere('login.insertedDateTime >= :intervalDate')
+			->andWhere('login.password = FALSE')
+			->setParameter('username', $username)
+			->setParameter('ip', $ip ?? Helpers::userIp())
+			->setParameter('intervalDate', DateTime::from('now - ' . $blockInterval))
+			->setMaxResults(((int) $blockCount) * 2)
+			->getQuery()
+			->getArrayResult();
+
+		return count($attempts) >= (int) $blockCount;
 	}
 
 
