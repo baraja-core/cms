@@ -1,5 +1,5 @@
 #app-cms {
-	background: #F3F2EE;
+	background: #f3f2ee;
 }
 
 #app {
@@ -87,7 +87,9 @@ h1 {
 	color: white;
 }
 
-.btn-add:hover, .btn-add:active, .btn-add:focus {
+.btn-add:hover,
+.btn-add:active,
+.btn-add:focus {
 	background: #9cca3f !important;
 	background: linear-gradient(0, #9cca3f 0%, #7fb01d 100%) !important;
 	box-shadow: 0 0 0 .2rem #bdd4ae;
@@ -95,7 +97,7 @@ h1 {
 
 .cms-select {
 	border: 1px solid #e6eaed;
-	background: #ffffff;
+	background: #fff;
 	color: #3f464a;
 	padding: 4px 8px !important;
 	height: 38px !important;
@@ -114,7 +116,7 @@ h1 {
 	margin-left: -8px !important;
 	margin-right: -9px !important;
 	border: 1px solid #e6eaed;
-	background: #ffffff;
+	background: #fff;
 	z-index: 1000 !important;
 }
 
@@ -134,7 +136,7 @@ h1 {
 
 .cms-search {
 	border: 1px solid #e6eaed;
-	background: #ffffff;
+	background: #fff;
 	color: #3f464a;
 	padding: 4px 8px !important;
 	height: 38px !important;
@@ -142,7 +144,9 @@ h1 {
 	display: inline-block !important;
 }
 
-.cms-search input, .cms-search input:focus, .cms-search input:active {
+.cms-search input,
+.cms-search input:focus,
+.cms-search input:active {
 	border: 0 white !important;
 	outline: none;
 }
