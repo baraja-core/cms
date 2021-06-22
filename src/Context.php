@@ -206,7 +206,7 @@ final class Context
 			if ($e->getCode() === 404) { // Identity is broken or user does not exist
 				$this->user->logout(true);
 			} else {
-				trigger_error('Can not check permissions: ' . $e->getMessage());
+				trigger_error('Can not check permissions: ' . htmlspecialchars($e->getMessage()));
 			}
 		}
 
