@@ -6,12 +6,14 @@ namespace Baraja\Cms\User;
 
 
 use Baraja\AdminBar\User\AdminIdentity;
+use Baraja\Cms\Helpers;
 use Baraja\Cms\Session;
 use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\User;
 use Baraja\Cms\User\Entity\UserLogin;
 use Baraja\Cms\User\Entity\UserLoginAttempt;
 use Baraja\Doctrine\EntityManager;
+use Baraja\DynamicConfiguration\Configuration;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Nette\Security\AuthenticationException;
@@ -33,6 +35,7 @@ final class UserManager implements Authenticator
 	public function __construct(
 		private EntityManager $entityManager,
 		private UserStorage $userStorage,
+		private Configuration $configuration,
 		?string $userEntity = null,
 	) {
 		$userEntity ??= User::class;
