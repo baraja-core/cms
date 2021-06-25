@@ -44,13 +44,6 @@ final class InstallProcess
 					'exception' => $databaseException,
 				]);
 		}
-		if ($this->settings->isCloudConnectionOk() === false) {
-			return (new Engine)
-				->renderToString(__DIR__ . '/../../template/install-cloud-connection.latte', [
-					'basePath' => Url::get()->getBaseUrl(),
-					'locale' => $this->localization->getLocale(),
-				]);
-		}
 		if ($this->settings->isBasicConfigurationOk() === false) {
 			return (new Engine)
 				->renderToString(__DIR__ . '/../../template/install-basic.latte', [
