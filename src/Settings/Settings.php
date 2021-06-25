@@ -37,7 +37,7 @@ final class Settings
 	public function isOk(): bool
 	{
 		try {
-			return $this->isDatabaseConnectionOk() && $this->isCloudConnectionOk() && $this->isBasicConfigurationOk();
+			return $this->isDatabaseConnectionOk() && $this->isBasicConfigurationOk();
 		} catch (\Throwable) {
 			return false;
 		}
