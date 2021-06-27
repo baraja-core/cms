@@ -10,6 +10,7 @@
 	],
 	"require": {
 		"php": "^8.0",
+		"composer-runtime-api": "^2.0.0",
 		"baraja-core/dynamic-configuration": "^2.1",
 		"baraja-core/doctrine": "^3.0",
 		"baraja-core/structured-api": "^3.0 >=3.0.6",
