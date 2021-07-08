@@ -11,14 +11,13 @@ use Baraja\Cms\User\Entity\User;
 use Baraja\Doctrine\EntityManager;
 use Baraja\DynamicConfiguration\Configuration;
 use Baraja\DynamicConfiguration\ConfigurationSection;
+use Baraja\StructuredApi\Attributes\PublicEndpoint;
 use Baraja\StructuredApi\BaseEndpoint;
 use Baraja\Url\Url;
 use Nette\Utils\Strings;
 use Nette\Utils\Validators;
 
-/**
- * @public
- */
+#[PublicEndpoint]
 final class CmsInstallEndpoint extends BaseEndpoint
 {
 	private ConfigurationSection $config;

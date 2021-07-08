@@ -15,6 +15,7 @@ use Baraja\Cms\User\Entity\User;
 use Baraja\Cms\User\Entity\UserResetPasswordRequest;
 use Baraja\Cms\User\UserManager;
 use Baraja\Doctrine\EntityManager;
+use Baraja\StructuredApi\Attributes\PublicEndpoint;
 use Baraja\StructuredApi\BaseEndpoint;
 use Baraja\Url\Url;
 use Doctrine\ORM\NonUniqueResultException;
@@ -24,9 +25,7 @@ use Nette\Security\Authenticator;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
-/**
- * @public
- */
+#[PublicEndpoint]
 final class CmsEndpoint extends BaseEndpoint
 {
 	public function __construct(
