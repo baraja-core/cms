@@ -109,7 +109,8 @@ final class CmsInstallEndpoint extends BaseEndpoint
 		$user->setFirstName($firstName);
 		$user->setLastName($lastName);
 
-		$this->entityManager->persist($user)->flush();
+		$this->entityManager->persist($user);
+		$this->entityManager->flush();
 		$this->sendOk();
 	}
 

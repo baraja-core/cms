@@ -132,7 +132,8 @@ final class UserManager implements Authenticator
 		}
 
 		$attempt = new UserLoginAttempt(null, $username);
-		$this->entityManager->persist($attempt)->flush();
+		$this->entityManager->persist($attempt);
+		$this->entityManager->flush();
 
 		if ($this->authenticationService !== null) {
 			try {

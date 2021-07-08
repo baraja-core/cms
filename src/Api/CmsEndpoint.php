@@ -222,8 +222,7 @@ final class CmsEndpoint extends BaseEndpoint
 				$this->sendError('Password can not be changed. Reason: ' . $e->getMessage());
 			}
 			$request->setExpired();
-
-			$this->entityManager->flush([$request, $request->getUser()]);
+			$this->entityManager->flush();
 
 			$this->cloudManager->callRequest('cloud/forgot-password-has-been-changed', [
 				'domain' => Url::get()->getNetteUrl()->getDomain(3),
