@@ -200,7 +200,8 @@ final class UserEndpoint extends BaseEndpoint
 			}
 			$user->setPhone($phone);
 			$user->addRole($role);
-			$this->entityManager->persist($user)->flush();
+			$this->entityManager->persist($user);
+			$this->entityManager->flush();
 		} catch (\InvalidArgumentException $e) {
 			$this->sendError($e->getMessage());
 		}
