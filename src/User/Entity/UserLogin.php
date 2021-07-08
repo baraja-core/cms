@@ -8,7 +8,6 @@ namespace Baraja\Cms\User\Entity;
 use Baraja\Cms\Helpers;
 use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Doctrine\ORM\Mapping as ORM;
-use Nette\Utils\DateTime;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'cms__user_login')]
