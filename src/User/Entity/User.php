@@ -28,52 +28,42 @@ use Nette\Utils\Validators;
  *
  * 1. Scalar values set to $data array section with namespace.
  * 2. For complex values create new Doctrine entity with relation here.
- *
- * @ORM\Entity()
- * @ORM\Table(
- *    name="cms__user",
- *    indexes={
- *       @Index(name="core__user_active", columns={"active"})
- *    }
- * )
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'cms__user')]
+#[Index(columns: ['active'], name: 'core__user_active')]
 class User implements CmsUser
 {
 	use IdentifierUnsigned;
 
-	/** @ORM\Column(type="string", length=64, unique=true) */
+	#[ORM\Column(type: 'string', length: 64, unique: true)]
 	private string $username;
 
 	/**
 	 * User real password stored as BCrypt hash.
 	 * More info on https://php.baraja.cz/hashovani
-	 *
-	 * @ORM\Column(type="string", length=60)
 	 */
+	#[ORM\Column(type: 'string', length: 60)]
 	private string $password;
 
-	/** @ORM\Column(type="string", length=32, nullable=true) */
+	#[ORM\Column(type: 'string', length: 32, nullable: true)]
 	private ?string $firstName;
 
-	/** @ORM\Column(type="string", length=32, nullable=true) */
+	#[ORM\Column(type: 'string', length: 32, nullable: true)]
 	private ?string $lastName;
 
-	/** @ORM\Column(type="string", nullable=true, length=50, unique=true) */
+	#[ORM\Column(type: 'string', length: 32, unique: true, nullable: true)]
 	private ?string $nick;
 
-	/** @ORM\Column(type="string", length=128, unique=true) */
+	#[ORM\Column(type: 'string', length: 128, unique: true)]
 	private string $email;
 
-	/**
-	 * @var string[]
-	 * @ORM\Column(type="json")
-	 */
+	/** @var string[] */
+	#[ORM\Column(type: 'json')]
 	private array $emails = [];
 
-	/**
-	 * @var string[]|null
-	 * @ORM\Column(type="json")
-	 */
+	/** @var string[]|null */
+	#[ORM\Column(type: 'json')]
 	private ?array $roles = [];
 
 	/**
@@ -81,53 +71,43 @@ class User implements CmsUser
 	 * When we assign a specific role to a user, we automatically insert all his rights as a simple array.
 	 *
 	 * @var string[]|null
-	 * @ORM\Column(type="json")
 	 */
+	#[ORM\Column(type: 'json')]
 	private ?array $privileges = [];
 
-	/** @ORM\Column(type="string", length=16, nullable=true) */
+	#[ORM\Column(type: 'string', length: 16, nullable: true)]
 	private ?string $phone;
 
-	/** @ORM\Column(type="string", length=39) */
+	#[ORM\Column(type: 'string', length: 39)]
 	private string $registerIp;
 
-	/** @ORM\Column(type="datetime") */
+	#[ORM\Column(type: 'datetime')]
 	private \DateTime $registerDate;
 
-	/** @ORM\Column(type="datetime") */
+	#[ORM\Column(type: 'datetime')]
 	private \DateTime $createDate;
 
-	/** @ORM\Column(type="boolean") */
+	#[ORM\Column(type: 'boolean')]
 	private bool $active = true;
 
-	/**
-	 * @var UserMeta[]|Collection
-	 * @ORM\OneToMany(targetEntity="UserMeta", mappedBy="user")
-	 */
+	/** @var UserMeta[]|Collection */
+	#[ORM\OneToMany(mappedBy: 'user', targetEntity: UserMeta::class)]
 	private $metas;
 
-	/**
-	 * @var UserLogin[]|Collection
-	 * @ORM\OneToMany(targetEntity="UserLogin", mappedBy="user")
-	 */
+	/** @var UserLogin[]|Collection */
+	#[ORM\OneToMany(mappedBy: 'user', targetEntity: UserLogin::class)]
 	private $logins;
 
-	/**
-	 * @var UserLoginAttempt[]|Collection
-	 * @ORM\OneToMany(targetEntity="UserLoginAttempt", mappedBy="user")
-	 */
+	/** @var UserLoginAttempt[]|Collection */
+	#[ORM\OneToMany(mappedBy: 'user', targetEntity: UserLoginAttempt::class)]
 	private $loginAttempts;
 
-	/**
-	 * @var UserResetPasswordRequest[]|Collection
-	 * @ORM\OneToMany(targetEntity="UserResetPasswordRequest", mappedBy="user")
-	 */
+	/** @var UserResetPasswordRequest[]|Collection */
+	#[ORM\OneToMany(mappedBy: 'user', targetEntity: UserResetPasswordRequest::class)]
 	private $passwordResets;
 
-	/**
-	 * @var string|resource|null
-	 * @ORM\Column(type="binary", nullable=true)
-	 */
+	/** @var string|resource|null */
+	#[ORM\Column(type: 'binary', nullable: true)]
 	private $otpCode;
 
 

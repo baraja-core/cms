@@ -12,33 +12,31 @@ use Doctrine\ORM\Mapping as ORM;
 use Nette\Utils\DateTime;
 use Nette\Utils\Strings;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="cms__user_login_attempt")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'cms__user_login_attempt')]
 class UserLoginAttempt
 {
 	use IdentifierUnsigned;
 
-	/** @ORM\ManyToOne(targetEntity="User", inversedBy="loginAttempts") */
+	#[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'loginAttempts')]
 	private ?User $user;
 
-	/** @ORM\Column(type="string", length=64) */
+	#[ORM\Column(type: 'string', length: 64)]
 	private string $username;
 
-	/** @ORM\Column(type="boolean") */
+	#[ORM\Column(type: 'boolean')]
 	private bool $password = false;
 
-	/** @ORM\Column(type="string", length=2048, nullable=true) */
+	#[ORM\Column(type: 'string', length: 2048, nullable: true)]
 	private ?string $loginUrl = null;
 
-	/** @ORM\Column(type="string", length=39, nullable=true) */
+	#[ORM\Column(type: 'string', length: 39, nullable: true)]
 	private string $ip;
 
-	/** @ORM\Column(type="datetime") */
+	#[ORM\Column(type: 'datetime')]
 	private \DateTime $insertedDateTime;
 
-	/** @ORM\Column(type="text", nullable=true) */
+	#[ORM\Column(type: 'text', nullable: true)]
 	private ?string $notice;
 
 

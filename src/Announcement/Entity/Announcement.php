@@ -12,42 +12,38 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="cms__announcement")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'cms__announcement')]
 class Announcement
 {
 	use IdentifierUnsigned;
 
-	/** @ORM\ManyToOne(targetEntity="User", inversedBy="logins") */
+	#[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'logins')]
 	private User $user;
 
-	/** @ORM\ManyToOne(targetEntity="Announcement", inversedBy="children") */
+	#[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
 	private ?self $parent;
 
-	/**
-	 * @var self[]|Collection
-	 * @ORM\OneToMany(targetEntity="Announcement", mappedBy="parent")
-	 */
+	/** @var self[]|Collection */
+	#[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
 	private $children;
 
-	/** @ORM\Column(type="string", length=2, nullable=true) */
+	#[ORM\Column(type: 'string', length: 2, nullable: true)]
 	private ?string $locale;
 
-	/** @ORM\Column(type="text") */
+	#[ORM\Column(type: 'text')]
 	private string $message;
 
-	/** @ORM\Column(type="datetime") */
+	#[ORM\Column(type: 'datetime')]
 	private \DateTime $showSince;
 
-	/** @ORM\Column(type="datetime", nullable=true) */
+	#[ORM\Column(type: 'datetime', nullable: true)]
 	private ?\DateTime $showUntil = null;
 
-	/** @ORM\Column(type="boolean") */
+	#[ORM\Column(type: 'boolean')]
 	private bool $active = false;
 
-	/** @ORM\Column(type="boolean") */
+	#[ORM\Column(type: 'boolean')]
 	private bool $pinned = false;
 
 

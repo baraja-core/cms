@@ -10,27 +10,25 @@ use Doctrine\ORM\Mapping as ORM;
 use Nette\Utils\DateTime;
 use Nette\Utils\Random;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="cms__user_reset_password_request")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'cms__user_reset_password_request')]
 class UserResetPasswordRequest
 {
 	use IdentifierUnsigned;
 
-	/** @ORM\ManyToOne(targetEntity="User", inversedBy="passwordResets") */
+	#[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'passwordResets')]
 	private User $user;
 
-	/** @ORM\Column(type="string", length=40, unique=true) */
+	#[ORM\Column(type: 'string', length: 40, unique: true)]
 	private string $token;
 
-	/** @ORM\Column(type="datetime") */
-	private \DateTime $insertedDate;
+	#[ORM\Column(type: 'datetime')]
+	private \DateTimeInterface $insertedDate;
 
-	/** @ORM\Column(type="datetime") */
-	private \DateTime $expireDate;
+	#[ORM\Column(type: 'datetime')]
+	private \DateTimeInterface $expireDate;
 
-	/** @ORM\Column(type="boolean") */
+	#[ORM\Column(type: 'boolean')]
 	private bool $expired = false;
 
 
@@ -61,7 +59,7 @@ class UserResetPasswordRequest
 	}
 
 
-	public function getExpireDate(): \DateTime
+	public function getExpireDate(): \DateTimeInterface
 	{
 		return $this->expireDate;
 	}
@@ -79,7 +77,7 @@ class UserResetPasswordRequest
 	}
 
 
-	public function getInsertedDate(): \DateTime
+	public function getInsertedDate(): \DateTimeInterface
 	{
 		return $this->insertedDate;
 	}
