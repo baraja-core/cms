@@ -9,26 +9,20 @@ use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(
- *     name="cms__user_meta",
- *     uniqueConstraints={
- *         @UniqueConstraint(name="cms__user_meta_user_key", columns={"user_id", "key"})
- *     }
- * )
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'cms__user_meta')]
+#[UniqueConstraint(name: 'cms__user_meta_user_key', columns: ['user_id', 'key'])]
 class UserMeta
 {
 	use IdentifierUnsigned;
 
-	/** @ORM\ManyToOne(targetEntity="User", inversedBy="metas") */
+	#[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'metas')]
 	private User $user;
 
-	/** @ORM\Column(type="string", name="`key`", length=64) */
+	#[ORM\Column(name: '`key`', type: 'string', length: 64)]
 	private string $key;
 
-	/** @ORM\Column(type="text", name="`value`", nullable=true) */
+	#[ORM\Column(name: '`value`', type: 'text', nullable: true)]
 	private ?string $value;
 
 

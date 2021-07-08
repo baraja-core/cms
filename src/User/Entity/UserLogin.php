@@ -10,28 +10,26 @@ use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Doctrine\ORM\Mapping as ORM;
 use Nette\Utils\DateTime;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="cms__user_login")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'cms__user_login')]
 class UserLogin
 {
 	use IdentifierUnsigned;
 
-	/** @ORM\ManyToOne(targetEntity="User", inversedBy="logins") */
+	#[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'logins')]
 	private User $user;
 
-	/** @ORM\Column(type="string", length=39, nullable=true) */
+	#[ORM\Column(type: 'string', length: 39, nullable: true)]
 	private string $ip;
 
-	/** @ORM\Column(type="string", length=128, nullable=true) */
+	#[ORM\Column(type: 'string', length: 128, nullable: true)]
 	private ?string $hostname;
 
-	/** @ORM\Column(type="string", nullable=true) */
+	#[ORM\Column(type: 'string', length: 255, nullable: true)]
 	private ?string $userAgent;
 
-	/** @ORM\Column(type="datetime") */
-	private \DateTime $loginDatetime;
+	#[ORM\Column(type: 'datetime')]
+	private \DateTimeInterface $loginDatetime;
 
 
 	public function __construct(User $user)
@@ -40,7 +38,7 @@ class UserLogin
 		$this->ip = Helpers::userIp();
 		$this->hostname = $_SERVER['HTTP_HOST'] ?? null;
 		$this->userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
-		$this->loginDatetime = DateTime::from('now');
+		$this->loginDatetime = new \DateTime;
 	}
 
 
@@ -68,7 +66,7 @@ class UserLogin
 	}
 
 
-	public function getLoginDatetime(): \DateTime
+	public function getLoginDatetime(): \DateTimeInterface
 	{
 		return $this->loginDatetime;
 	}

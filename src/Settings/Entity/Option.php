@@ -9,33 +9,31 @@ use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Doctrine\ORM\Mapping as ORM;
 use Nette\Utils\DateTime;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="core__option")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'core__option')]
 class Option
 {
 	use IdentifierUnsigned;
 
-	/** @ORM\Column(type="string", name="`key`", length=128, unique=true) */
+	#[ORM\Column(name: '`key`', type: 'string', length: 128, unique: true)]
 	private string $key;
 
-	/** @ORM\Column(type="text") */
+	#[ORM\Column(type: 'text')]
 	private string $value;
 
 	/**
 	 * Last non empty values.
 	 *
 	 * @var string[]
-	 * @ORM\Column(type="json")
 	 */
+	#[ORM\Column(type: 'json')]
 	private array $oldValues = [];
 
-	/** @ORM\Column(type="datetime") */
-	private \DateTime $insertedDate;
+	#[ORM\Column(type: 'datetime')]
+	private \DateTimeInterface $insertedDate;
 
-	/** @ORM\Column(type="datetime", nullable=true) */
-	private ?\DateTime $updatedDate = null;
+	#[ORM\Column(type: 'datetime', nullable: true)]
+	private ?\DateTimeInterface $updatedDate = null;
 
 
 	public function __construct(string $key, string $value)
@@ -86,13 +84,13 @@ class Option
 	}
 
 
-	public function getInsertedDate(): \DateTime
+	public function getInsertedDate(): \DateTimeInterface
 	{
 		return $this->insertedDate;
 	}
 
 
-	public function getUpdatedDate(): ?\DateTime
+	public function getUpdatedDate(): ?\DateTimeInterface
 	{
 		return $this->updatedDate;
 	}
