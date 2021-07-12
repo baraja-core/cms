@@ -19,6 +19,7 @@ use Baraja\Localization\Localization;
 use Baraja\Plugin\Component\PluginComponent;
 use Baraja\Plugin\Plugin;
 use Baraja\Plugin\PluginManager;
+use DeviceDetector\DeviceDetector;
 use Nette\Http\Request;
 use Nette\Http\Response;
 use Nette\Security\User;
@@ -157,6 +158,16 @@ final class Context
 	public function getSettings(): Settings
 	{
 		return $this->settings;
+	}
+
+
+	public function getDeviceDetector(): DeviceDetector
+	{
+		$dd = new DeviceDetector($_SERVER['HTTP_USER_AGENT'] ?? '');
+		$dd->skipBotDetection();
+		$dd->parse();
+
+		return $dd;
 	}
 
 
