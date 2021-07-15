@@ -8,7 +8,6 @@ namespace Baraja\Cms;
 use Baraja\PhoneNumber\PhoneNumberFormatter;
 use Baraja\Url\Url;
 use Latte\Engine;
-use Nette\Http\Request;
 use Nette\Utils\Strings;
 use Tracy\Debugger;
 
@@ -18,16 +17,6 @@ final class Helpers
 	public function __construct()
 	{
 		throw new \Error('Class ' . self::class . ' is static and cannot be instantiated.');
-	}
-
-
-	/**
-	 * Return current API path by current HTTP URL.
-	 * In case of CLI return empty string.
-	 */
-	public static function processPath(Request $httpRequest): string
-	{
-		return trim(str_replace(rtrim($httpRequest->getUrl()->withoutUserInfo()->getBaseUrl(), '/'), '', Url::get()->getCurrentUrl()), '/');
 	}
 
 
