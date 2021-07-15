@@ -39,7 +39,7 @@ final class Helpers
 				$ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
 			} elseif (isset($_SERVER['REMOTE_ADDR']) === true) {
 				$ip = $_SERVER['REMOTE_ADDR'];
-				if ($ip === '127.0.0.1') {
+				if (preg_match('/^(?:127|10)\.0\.0\.[12]?\d{1,2}$/', $ip)) {
 					if (isset($_SERVER['HTTP_X_REAL_IP'])) {
 						$ip = $_SERVER['HTTP_X_REAL_IP'];
 					} elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
