@@ -26,6 +26,7 @@ use Baraja\Plugin\Component\VueComponent;
 use Baraja\Plugin\PluginComponentExtension;
 use Baraja\Plugin\PluginLinkGenerator;
 use Baraja\Plugin\PluginManager;
+use Baraja\Url\Url;
 use Nette\Application\Application;
 use Nette\Bridges\ApplicationLatte\LatteFactory;
 use Nette\DI\CompilerExtension;
@@ -277,8 +278,8 @@ final class CmsExtension extends CompilerExtension
 		}
 		$class->getMethod('initialize')->addBody(
 			'// admin (cms).' . "\n"
-			. '(function () {' . "\n"
-			. "\t" . 'if (preg_match(?, $this->getService(\'http.request\')->getUrl()->getRelativeUrl(), $parser)) {' . "\n"
+			. '(function (): void {' . "\n"
+			. "\t" . 'if (preg_match(?, ' . Url::class . '::get()->getRelativeUrl(), $parser)) {' . "\n"
 			. "\t\t" . '$this->getService(?)->onStartup[] = function(' . Application::class . ' $a) use ($parser): void {' . "\n"
 			. "\t\t\t" . 'try {' . "\n"
 			. "\t\t\t\t" . '$this->getService(?)->run($parser[\'locale\'] \?: null, $parser[\'path\']);' . "\n"
