@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Instalace projektu | Baraja admin</title>
+	<title>Installation process | Baraja admin</title>
 	<meta charset="utf-8">
 	<meta name="description" content="Baraja administration">
 	<meta name="author" content="Baraja.cz">
@@ -15,7 +15,7 @@
 	</script>
 </head>
 
-<body>
+<body style="background:#f3f2ee">
 <noscript>
 	<div class="container">
 		<div class="row my-5">
@@ -48,84 +48,82 @@
 	<b-container>
 		<b-row align-h="center">
 			<b-col class="py-5" cols="8">
-				<b-card :title="isBusy ? '' : 'Vítá Vás instalace nového projektu'">
+				<b-card :title="isBusy ? '' : 'Welcome to the installation of the new project'">
 					<div v-if="isBusy" class="text-center text-primary my-5">
 						<b-spinner class="align-middle mr-3"></b-spinner>
-						<strong>Vytvářím projekt...</strong>
+						<strong>Creating...</strong>
 					</div>
 					<template v-else>
 						<p>
-							Vítejte v&nbsp;instalačním procesu pro založení nového webu nebo e-shopu.
-							Než se budeme moci naplno pustit do správy webu, potřebujeme vyplnit základní informace.
+							Welcome to the installation process for setting up a&nbsp;new website or e-shop.
+							Before we can get started with the site administration, we need to fill in some basic information.
 						</p>
 						<b-alert n:if="$isLocalhost" show variant="warning">
-							<b>Upozornění:</b>
-							Pokoušíte se projekt nainstalovat na lokální server ve Vašem počítači.
-							Po nahrání souborů na webový server bude potřeba upřesnit konfiguraci URL adres,
-							e&#8209;mailového serveru a&nbsp;další nastavení v&nbsp;závislosti na vaší konfiguraci.
+							<b>Warning:</b>
+							You are trying to install the project on a&nbsp;local server on your computer.
+							After uploading the files to the web server, you will need to specify the URL configuration,
+							e&#8209;mail server and other settings depending on your configuration.
 						</b-alert>
 						{include form}
 					</template>
 				</b-card>
 				<div v-if="isBusy === false" class="text-right">
-					<b-link class="btn-sm" v-b-modal.security-info>Informace o&nbsp;zabezpečení</b-link>
-					<b-link class="btn-sm" v-b-modal.not-admin>Nejsem správce webu</b-link>
+					<b-link class="btn-sm" v-b-modal.security-info>Security information</b-link>
+					<b-link class="btn-sm" v-b-modal.not-admin>I&nbsp;am not a&nbsp;webmaster</b-link>
 				</div>
 			</b-col>
 		</b-row>
 	</b-container>
 
-	<b-modal id="not-admin" size="lg" title="Nejsem správce tohoto webu">
+	<b-modal id="not-admin" size="lg" title="I am not a webmaster" hide-footer>
 		<p>
-			Tato stránka slouží <b>pouze pro majitele a&nbsp;správce tohoto webového projektu</b>
-			a&nbsp;zobrazí se jen v&nbsp;případě, když web čeká na dokončení konfigurace.
+			This page is <b>only for the owners and administrators of this web project</b>
+			and will only be displayed when the site is waiting for configuration to complete.
 		</p>
 		<p>
-			Pokud můžete, kontaktujte správce webu, aby dokončil celý proces registrace, což způsobí spuštění webu.
+			If you can, contact the site administrator to complete the entire registration process, which will cause the site to launch.
 		</p>
 		<p n:if="$isBarajaCz">
-			Správcem tohoto webu je společnost Baraja.cz.
+			The administrator of this website is the company Baraja.cz.
 		</p>
 		<p n:if="$isLocalhost">
-			Projekt je nainstalován lokálně, proto je správce majitel tohoto zařízení.
+			The project is installed locally, therefore the administrator is the owner of this device.
 		</p>
 	</b-modal>
-
-	<b-modal id="security-info" size="lg" title="Informace o zabezpečení a ochraně osobních údajů">
+	<b-modal id="security-info" size="lg" title="Security information and data protection" hide-footer>
 		<p>
-			Vítejte v&nbsp;nápovědě o&nbsp;zabezpečení a&nbsp;ochraně osobních údajů.
+			Welcome to help about security and privacy.
 		</p>
 		<p>
-			Bezpečnost je&nbsp;pro nás <b>na&nbsp;prvním místě</b>, proto jsme rádi, že se&nbsp;můžeme podělit o&nbsp;způsob,
-			jak s&nbsp;daty nakládáme.
+			Safety is our <b>first priority</b>, so we're happy to share the way, how we handle data.
 		</p>
 		<p>
-			Všechna vložená data jsou <b>maximálně důvěrná</b> a&nbsp;slouží pro správný běh Vašeho webu.
-			Data budou fyzicky uložena na stejném webovém serveru, jako tento web, pokud vysloveně nepožádáte jinak.
-			Pro uložení základní konfigurace používáme specializované databázové tabulky, které transparentním
-			způsobem zobrazují všechna data, která systém zná a&nbsp;používá.
+			All data entered is <b>maximally confidential</b> and is used for the proper running of your website.
+			The data will be physically stored on the same web server as this site unless you specifically request otherwise.
+			We use specialized database tables to store the basic configuration, which transparently
+			display all the data that the system knows and uses in a transparent way.
 		</p>
 		<p>
-			Hesla a&nbsp;další extrémně citlivá data před uložením
-			<a href="https://php.baraja.cz/hashovani" target="_blank">hashujeme</a> algoritmem BCRYPT.
+			Passwords and other extremely sensitive data before storage
+			We <a href="https://php.baraja.cz/hashovani" target="_blank">hash</a> with the BCRYPT algorithm.
 		</p>
 		<p>
-			Pokud během používání aplikace propojíte Váš web s&nbsp;některou ze služeb společnosti Baraja.cz,
-			budeme s&nbsp;daty nakládat podle
-			<a href="https://baraja.cz/vseobecne-obchodni-podminky" target="_blank">Všeobecných obchodních podmínek</a>.
-			Informace o&nbsp;zabezpečení a&nbsp;způsobu použití dat naleznete na stránce
+			If you link your website to one of Baraja.cz's services while using the application,
+			we will treat the data according to
+			<a href="https://baraja.cz/vseobecne-obchodni-podminky" target="_blank">General Terms and Conditions</a>.
+			For information on security and how to use the data, please visit
 			<a href="https://baraja.cz/gdpr-ochrana-a-zpracovani-osobnich-udaju" target="_blank"
-			>Ochrana a&nbsp;zpracování osobních údajů v&nbsp;souladu s&nbsp;GDPR</a>.
+			>Protection and processing of personal data in compliance with&nbsp;GDPR</a>.
 		</p>
 		<p>
-			Za bezpečnost zpracování dat na serverech baraja.cz ručí Jan Barášek.
-			Uvedené zabezpečení platí pouze v&nbsp;případě, když pro hosting webu používáte oficiální servery Baraja.cz,
-			nebo našich certifikovaných partnerů. V&nbsp;ostatních případech mohou na zabezpečení existovat další vlivy,
-			které nemůžeme ohlídat.
+			Jan Barášek is responsible for the security of data processing on the baraja.cz servers.
+			This security applies only if you use the official Baraja.cz servers for hosting the website,
+			or our certified partners. In&nbsp;other cases, there may be other influences on the security,
+			that we cannot control.
 		</p>
 		<p>
-			Pokud potřebujete více informací, neváhejte
-			<a href="https://baraja.cz/kontakt" target="_blank">kontaktovat zákaznickou podporu</a>.
+			If you need more information, please do not hesitate
+			<a href="https://baraja.cz/kontakt" target="_blank">contact customer support</a>.
 		</p>
 	</b-modal>
 {/define}
@@ -135,13 +133,13 @@
 		<b-row align-h="center">
 			<b-col class="py-5" cols="8">
 				<b-card title="Vítejte!">
-					<p>Instalace projektu byla úspěšně dokončena.</p>
+					<p>The installation of the project was successfully completed.</p>
 					<p>
-						Podrobné pokyny, jak administraci používat a&nbsp;kde se příště přihlásit,
-						vám byly odeslány na uvedený e-mail.
+						Detailed instructions on how to use the administration and&nbsp;where to log in next time,
+						have been sent to the e-mail address provided.
 					</p>
 					<b-button variant="primary" href="{$basePath}/admin">
-						Přejít do administrace
+						Go to administration
 					</b-button>
 				</b-card>
 			</b-col>
@@ -151,11 +149,11 @@
 
 {define form}
 	<b-alert v-if="errorSamePassword" show variant="danger" class="mb-3">
-		Hesla se musí shodovat!
+		Passwords must match!
 	</b-alert>
 
 	<b-alert v-if="serverErrors.length > 0" show variant="danger" class="mb-3">
-		<p>Prosím, nejprve vyřešte tyto chyby:</p>
+		<p>Please resolve these errors first:</p>
 		<ul>
 			<li v-for="serverError in serverErrors">{{ serverError }}</li>
 		</ul>
@@ -167,20 +165,20 @@
 					icon="question-circle-fill"
 					variant="info"
 					v-b-tooltip.hover
-					title="Název webu slouží pro vaši lepší orientaci v projektech a bude se zobrazovat jako výchozí název ve vyhledávačích, titulku stránek a předmětech e-mailů. Název můžete později změnit v nastavení systému. Název nemusí být stejný jako doména, kde bude web dostupný.">
+					title="The site name is used to help you navigate your projects and will appear as the default name in search engines, page headers and email subject lines. You can change the name later in the system settings. The name does not have to be the same as the domain where the site will be available.">
 			</b-icon>
-			<label for="name">Název webu:</label>
-			<b-form-input id="name" v-model="form.name" type="text" placeholder="Například název firmy, blogu, e-shopu, společnosti, ..." required></b-form-input>
+			<label for="name">Project name:</label>
+			<b-form-input id="name" v-model="form.name" type="text" placeholder="For example, the name of a business, blog, e-shop, company, ..." required></b-form-input>
 		</b-form-group>
 
 		<b-row>
 			<b-col>
-				<b-form-group label="Jméno správce:" label-for="firstName">
+				<b-form-group label="Admin firstname:" label-for="firstName">
 					<b-form-input id="firstName" v-model="form.firstName" type="text" required></b-form-input>
 				</b-form-group>
 			</b-col>
 			<b-col>
-				<b-form-group label="Příjmení správce:" label-for="lastName">
+				<b-form-group label="Admin lastname:" label-for="lastName">
 					<b-form-input id="lastName" v-model="form.lastName" type="text" required></b-form-input>
 				</b-form-group>
 			</b-col>
@@ -191,9 +189,9 @@
 					icon="question-circle-fill"
 					variant="info"
 					v-b-tooltip.hover
-					title="Tento e-mail musí existovat a musí ho číst odpovědná osoba vzhledem k tomuto projektu. Na e-mail budeme pravidelně zasílat všechna důležitá oznámení, informace o technickém stavu a report chyb. Z tohoto e-mailu můžete také zasílat autorizované požadavky na placenou technickou podporu.">
+					title="This email must exist and be read by the person responsible for this project. We will regularly send all important notifications, technical status information and bug reports to this email. You can also send authorized requests for paid technical support from this email.">
 			</b-icon>
-			<label for="mail">E-mail správce:</label>
+			<label for="mail">Contact e-mail:</label>
 			<b-form-input id="mail" v-model="form.mail" type="email" required></b-form-input>
 		</b-form-group>
 
@@ -202,9 +200,9 @@
 					icon="question-circle-fill"
 					variant="info"
 					v-b-tooltip.hover
-					title="Po dokončení instalace vám bude vytvořen uživatelský účet s tímto přihlašovacím jménem. Tento účet bude označen jako systémový a bude mít nastaveno nejvyšší možné oprávnění.">
+					title="Once the installation is complete, a user account will be created for you with this login name. This account will be marked as a system account and will have the highest possible permissions set.">
 			</b-icon>
-			<label for="username">Uživatelské jméno správce:</label>
+			<label for="username">Admin username:</label>
 			<b-form-input id="username" v-model="form.username" type="text" required></b-form-input>
 		</b-form-group>
 
@@ -213,27 +211,27 @@
 					icon="question-circle-fill"
 					variant="info"
 					v-b-tooltip.hover
-					title="Heslo bude uloženo pouze v hashované podobě (bezpečným algoritmem Bcrypt) v lokální databázi tohoto projektu. Heslo nikdy nepřenášíme na vzdálené servery a znáte ho pouze vy. Heslo nikdy neposíláme e-mailem a nikde neexistuje jeho člověkem čitelná verze.">
+					title="The password will be stored only in hashed form (using the secure Bcrypt algorithm) in the local database of this project. We never transmit the password to remote servers and only you know it. We never send the password via email and there is no human readable version of the password anywhere.">
 			</b-icon>
-			<label for="password">Heslo:</label>
+			<label for="password">Password:</label>
 			<b-form-input id="password" v-model="form.password" type="password" required @input="validatePassword()"></b-form-input>
 			<b-progress :value="passwordStrength" max="5" class="mb-3" show-value v-b-tooltip
-						title="Vyjadřuje bezpečnost hesla. Hlavní administrátor musí mít bezpečnost aspoň na úrovni 4. Body získáváte za použití malých a velkých písmen, číslic a speciálních znaků."></b-progress>
+						title="Expresses the security of the password. The master administrator must have at least level 4 security. Points are earned for the use of upper and lower case letters, numbers and special characters."></b-progress>
 		</b-form-group>
 
-		<b-form-group label="Heslo znovu:" label-for="passwordVerify">
+		<b-form-group label="Password again:" label-for="passwordVerify">
 			<b-form-input id="passwordVerify" v-model="form.passwordVerify" type="password" required @input="onInputPassword()"></b-form-input>
 		</b-form-group>
 
 		<b-form-group label-for="vop">
 			<b-form-checkbox id="vop" v-model="form.vop" :value="true" :unchecked-value="false">
-				<span v-b-tooltip title="Veškerá zadaná data do tohoto formuláře i získaná později v administraci zpracováváme v souladu s GDPR. Pokud potřebujete více informací, klikněte na odkaz 'Informace o zabezpečení' na konci této stránky.">
-					Souhlasím se <a href="https://baraja.cz/vseobecne-obchodni-podminky" target="_blank">Všeobecnými podmínkami služby</a> a&nbsp;<a href="https://baraja.cz/gdpr-ochrana-a-zpracovani-osobnich-udaju" target="_blank">zpracováním osobních údajů</a>.
+				<span v-b-tooltip title="We process all data entered into this form and later obtained in the administration in accordance with GDPR. If you need more information, please click on the 'Security Information' link at the bottom of this page.">
+					I agree to the <a href="https://baraja.cz/vseobecne-obchodni-podminky" target="_blank">General Terms of Service</a> and <a href="https://baraja.cz/gdpr-ochrana-a-zpracovani-osobnich-udaju" target="_blank">Privacy Policy</a>.
 				</span>
 			</b-form-checkbox>
 		</b-form-group>
 
-		<b-button type="submit" variant="primary">Pokračovat</b-button>
+		<b-button type="submit" variant="primary">Continue</b-button>
 	</b-form>
 {/define}
 
@@ -268,11 +266,11 @@
 
 					if (this.isFormOk === false) {
 						if (this.passwordStrength < 4) {
-							alert('Pro zajištění maximální bezpečnosti musí administrátorské heslo získat aspoň 4 body.');
+							alert('For maximum security, the administrator password must score at least 4 points.');
 						} else if (this.form.vop === false) {
-							alert('Musíte souhlasit s podmínkami služby.');
+							alert('You must agree to the terms of service.');
 						} else {
-							alert('Opravte formulářová pole. Všechna pole jsou povinná, hesla se musí shodovat a musíte souhlasit s podmínkami služby.');
+							alert('Correct the form fields. All fields are required, passwords must match and you must agree to the terms of service.');
 						}
 					} else {
 						this.isBusy = true;
