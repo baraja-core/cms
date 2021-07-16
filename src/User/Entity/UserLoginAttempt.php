@@ -43,7 +43,7 @@ class UserLoginAttempt
 	public function __construct(?User $user, string $username)
 	{
 		$this->user = $user;
-		$this->username = Strings::substring($username, 0, 64);
+		$this->username = Strings::lower(Strings::substring(trim($username), 0, 64));
 		$this->ip = PHP_SAPI === 'cli' ? 'cli' : Helpers::userIp();
 		$this->insertedDateTime = DateTime::from('now');
 		$this->setLoginUrl();
