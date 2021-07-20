@@ -128,7 +128,8 @@ final class UserEndpoint extends BaseEndpoint
 			$return[] = [
 				'id' => $user['id'],
 				'name' => (static function () use ($user): ?string {
-					if (($return = trim($user['firstName'] . ' ' . $user['lastName']) ?: null) === null) {
+					$return = trim($user['firstName'] . ' ' . $user['lastName']) ?: null;
+					if ($return === null) {
 						$return = explode('@', $user['emails'][0] ?? '')[0] ?? null;
 					}
 
@@ -140,6 +141,7 @@ final class UserEndpoint extends BaseEndpoint
 				'avatarUrl' => 'https://cdn.baraja.cz/avatar/' . md5($user['email']) . '.png',
 				'registerDate' => $user['registerDate'],
 				'options' => [
+					'title' => null,
 					'active' => $user['active'],
 					'2fa' => $user['otpCode'] !== null,
 					'verifying' => $user['password'] === '---empty-password---',
