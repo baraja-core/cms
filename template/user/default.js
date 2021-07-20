@@ -25,7 +25,7 @@ Vue.component('user-default', {
 							E-mail <span class="text-danger">*</span>
 						</div>
 						<div class="col text-right text-secondary">
-							<small><i>The e-mail must be working.</i></small>
+							<small><i>Contact e-mail must be real.</i></small>
 						</div>
 					</div>
 					<b-form-input v-model="user.form.email" :class="[errors.isEmailValid ? '' : 'is-invalid']" @input="checkMailDuplication()" required autocomplete="off" pattern="^([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$" type="email" trim></b-form-input>
@@ -57,8 +57,10 @@ Vue.component('user-default', {
 				</b-form-group>
 				<div v-else class="text-secondary mt-2">
 					<i>
-						We do not set a&nbsp;password for the user,
-						instead we send an e-mail with a&nbsp;link to set the first password.
+						<small>
+							We do not set a&nbsp;password for the user,
+							instead we send an e-mail with a&nbsp;link to set the first password.
+						</small>
 					</i>
 				</div>
 			</b-form>
@@ -113,12 +115,19 @@ Vue.component('user-default', {
 			</div>
 			<template v-else>
 				<b-alert :show="isCurrentUserUsing2fa === false" variant="warning">
-					<h4 class="alert-heading">Security warning for your account!</h4>
-					<p class="mb-0">
-						<b>Your user account does not use 2-step authentication.</b><br>
-						If an attacker reveals your password, he can impersonate you.
-						If you set up 2-step login authentication, an attacker will still need to obtain your cell phone.
-					</p>
+					<table class="w-100">
+						<tr>
+							<td>
+								<h4 class="alert-heading">Please enable 2-Step Verification</h4>
+								<p class="mb-0">
+									A second step after entering your password verifies it's you signing in.
+								</p>
+							</td>
+							<td class="text-right">
+								<a :href="link('User:me')" class="btn btn-warning btn-sm">Setup</a>
+							</td>
+						</tr>
+					</table>
 				</b-alert>
 				<div v-if="user.items.length === 0" class="text-center my-5">
 					User list is empty.
@@ -140,9 +149,10 @@ Vue.component('user-default', {
 								<a :href="link('User:detail', {id: item.id})">{{ item.name }}</a>
 								<div v-if="item.options['2fa']" class="badge badge-pill badge-primary" v-b-tooltip title="This user is using 2-step login authentication (better security).">2FA</div>
 								<div v-if="item.id === currentUserId" class="badge badge-pill badge-primary" v-b-tooltip title="This is your account.">You</div>
-								<div v-if="item.options.online" class="badge badge-pill badge-success" v-b-tooltip title="This is online.">Online</div>
+								<div v-if="item.options.online" class="badge badge-pill badge-success" v-b-tooltip title="User is online.">Online</div>
 								<div v-if="item.options.verifying" class="badge badge-pill badge-secondary" v-b-tooltip title="We are awaiting user authentication and password entry for this account.">Verifying</div>
 								<div v-if="item.options.blocked" class="badge badge-pill badge-danger" v-b-tooltip :title="'The user has been permanently blocked by the administrator.' + (item.options.blockedReason ? ' (Reason: ' + item.options.blockedReason + ')' : '')">Blocked</div>
+								<small v-if="item.options.title" class="text-secondary">{{ item.options.title }}</small>
 							</td>
 							<td>{{ item.email }}</td>
 							<td>
