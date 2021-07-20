@@ -75,6 +75,18 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 	}
 
 
+	public function actionMe(): void
+	{
+		$identity = $this->userManager->getIdentity();
+		if ($identity !== null) {
+			$this->redirect($this->link('User:detail', [
+				'id' => $identity->getId(),
+			]));
+		}
+		$this->redirect(Url::get()->getBaseUrl() . '/admin');
+	}
+
+
 	public function actionLoginAs(int $id): void
 	{
 		try {
