@@ -19,17 +19,30 @@ Vue.component('user-security', {
 			</b-card>
 		</b-col>
 		<b-col lg="6">
-			<h2 class="h3">Two-step verification</h2>
+			<h2 class="h3">2-Step Verification</h2>
 			<b-spinner v-if="isOAuth === null"></b-spinner>
-			<b-alert v-else variant="danger" :show="!isOAuth">
-				<p>Two-step verification is not active.</p>
-				<b-btn v-if="!isOAuth" variant="secondary" title="Set two-step verification" v-b-modal.modal-two-step-verification>
-					Set verification
+			<template v-else>
+				<b-card v-if="!isOAuth">
+					<p>
+						With 2-Step Verification (also known as two-factor authentication),
+						you add an extra layer of security to your account in case your password is stolen.
+						After you set up 2-Step Verification, you’ll sign in to your account in two steps using:
+					</p>
+					<ul>
+						<li>Something you know, like your password</li>
+						<li>Something you have, like your phone</li>
+					</ul>
+					<b-alert variant="danger" :show="true">
+						<p>2-Step Verification verification is not active.</p>
+						<b-btn v-if="!isOAuth" variant="secondary" title="Set two-step verification" v-b-modal.modal-two-step-verification>
+							Set verification
+						</b-btn>
+					</b-alert>
+				</b-card>
+				<b-btn v-else variant="danger" size="sm" class="mt-4" title="Disable two-step verification" v-b-modal.disable-auth>
+					Disable Verification
 				</b-btn>
-			</b-alert>
-			<b-btn v-if="isOAuth" variant="danger" size="sm" class="mt-4" title="Disable two-step verification" v-b-modal.disable-auth>
-				Disable Verification
-			</b-btn>
+			</template>
 		</b-col>
 	</b-row>
 	<div v-if="options === null" class="text-center my-4">
@@ -58,8 +71,8 @@ Vue.component('user-security', {
 			</b-alert>
 		</b-col>
 	</b-row>
-	<b-modal id="disable-auth" title="Disable Two-Step Verification">
-		<p>Are you sure you want to remove Two-Step Verification?</p>
+	<b-modal id="disable-auth" title="Disable 2-Step Verification">
+		<p>Are you sure you want to remove 2-Step Verification?</p>
 		<template v-slot:modal-footer>
 			<b-btn size="sm" variant="white" @click="$bvModal.hide('disable-auth')">Close</b-btn>
 			<b-btn v-if="!isDisabling" size="sm" variant="danger" @click="disableAuth">Disable</b-btn>
@@ -266,7 +279,7 @@ Vue.component('modal-generate-password', {
 Vue.component('modal-two-step-verification', {
 	props: ['id'],
 	template: `<div>
-		<b-modal id="modal-two-step-verification" title="Two-step verification" @shown="fetchQR" hide-footer>
+		<b-modal id="modal-two-step-verification" title="2-Step Verification" @shown="fetchQR" hide-footer>
 			<div v-if="loading.global" class="text-center py-5">
 				<b-spinner></b-spinner>
 			</div>
@@ -375,7 +388,6 @@ Vue.component('modal-two-step-verification', {
 			console.log(codeForm.checkValidity());
 			if (!codeForm.checkValidity()) {
 				codeForm.classList.add('was-validated');
-				return;
 			} else {
 				axiosApi.post('user/set-auth', {
 					id: this.id,
