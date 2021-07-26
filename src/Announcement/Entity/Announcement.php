@@ -137,7 +137,7 @@ class Announcement
 	}
 
 
-	public function setActive(bool $active): void
+	public function setActive(bool $active = true): void
 	{
 		$this->active = $active;
 	}
