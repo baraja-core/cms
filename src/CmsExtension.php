@@ -70,6 +70,7 @@ final class CmsExtension extends CompilerExtension
 	{
 		PluginComponentExtension::defineBasicServices($builder = $this->getContainerBuilder());
 		OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\Cms\User\Entity', __DIR__ . '/User/Entity');
+		OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\Cms\Announcement\Entity', __DIR__ . '/Announcement');
 		OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\DoctrineConfiguration', __DIR__ . '/Settings/Entity');
 
 		// linkGenerator
