@@ -7,6 +7,7 @@ namespace Baraja\Cms;
 
 use Baraja\Plugin\PluginLinkGenerator;
 use Baraja\Url\Url;
+use Nette\Utils\Strings;
 
 final class LinkGenerator implements PluginLinkGenerator
 {
@@ -41,8 +42,10 @@ final class LinkGenerator implements PluginLinkGenerator
 				. ($view !== 'default' ? '/' . Helpers::formatPresenterNameToUri($view) : '');
 		}
 
-		return Url::get()->getBaseUrl() . '/admin' . ($path !== '' ? '/' . $path : '')
-			. ($params !== [] ? '?' . http_build_query($params) : '');
+		return Strings::toAscii(
+			Url::get()->getBaseUrl() . '/admin' . ($path !== '' ? '/' . $path : '')
+			. ($params !== [] ? '?' . http_build_query($params) : '')
+		);
 	}
 
 
