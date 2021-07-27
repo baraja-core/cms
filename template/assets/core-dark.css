@@ -1,0 +1,96 @@
+#app-cms {
+	background: rgb(45, 45, 45);
+	color: rgb(231, 232, 235);;
+}
+
+h1 {
+	color: #ccc !important;
+}
+
+a {
+	color: white !important;
+}
+
+.alert-warning {
+	background: #726029;
+	border: 1px solid #53461b;
+}
+
+.badge-success {
+	background: #1a6b2c;
+}
+
+.tracy-panel {
+	background: #999 !important;
+	color: white !important;
+}
+
+.cms-menu-container {
+	background: #222;
+	-webkit-box-shadow: 0 5px 16px 0 rgba(0, 0, 0, 0.5);
+	box-shadow: 0 5px 16px 0 rgba(0, 0, 0, 0.5);
+}
+
+#cms-menu .cms-menu-item {
+	color: #999 !important;
+}
+
+#cms-menu .cms-menu-item-selected, #cms-menu .cms-menu-item:hover, .pagination * {
+	background: black !important;
+	color: white !important;
+}
+
+.pagination .active button {
+	background: #007bff !important;
+}
+
+.breadcrumb {
+	background: #111;
+}
+
+.card, .modal-content, .list-group-item {
+	background: #111;
+	color: white !important;
+	border: 1px solid #555;
+}
+
+.card-header {
+	background: #333 !important;
+	border-bottom: 1px solid #555 !important;
+}
+
+.bg-light {
+	background: #444 !important;
+}
+
+.modal-header .close {
+	color: white !important;
+}
+
+.nav-pills .nav-item .active, .nav-tabs .nav-item .active {
+	background: #111 !important;
+	color: white !important;
+	border: 1px solid #999 !important;
+}
+
+.nav-tabs .nav-item .active {
+	border-bottom: 0 !important;
+}
+
+input, textarea, select, .form-control, .custom-file-label {
+	background: black !important;
+	color: white !important;
+}
+
+table tr th {
+	color: #b38304 !important;
+}
+
+table tr td {
+	color: white !important;
+}
+
+.cms-footer {
+	background: #333;
+	border-top: 1px solid black;
+}

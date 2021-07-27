@@ -31,6 +31,7 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.min.css">
 	<link type="text/css" rel="stylesheet" href="<?= Helpers::escapeHtmlAttr($basePath . '/admin/assets/core.css') ?>">
 	<link rel="shortcut icon" type="image/x-icon" href="<?= Helpers::escapeHtmlAttr($basePath . '/admin/assets/favicon.ico') ?>">
+	<div id="app-header"></div>
 	<?php
 	foreach ($staticAssets as $staticAsset) {
 		if ($staticAsset->getFormat() === 'css') {
@@ -134,6 +135,10 @@ foreach ($staticAssets as $staticAsset) {
             window.addEventListener('online',  this.updateOnlineStatus);
             window.addEventListener('offline', this.updateOnlineStatus);
             setInterval(this.keepConnection, 5000);
+            this.updateDarkMode();
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                this.updateDarkMode();
+            });
         },
         methods: {
             updateOnlineStatus(event) {
@@ -145,6 +150,10 @@ foreach ($staticAssets as $staticAsset) {
                         toaster: 'b-toaster-bottom-left'
                     })
                 }
+            },
+            updateDarkMode() {
+                let is = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.getElementById('app-header').innerHTML = '<link type="text/css" rel="stylesheet" href="<?= Helpers::escapeHtmlAttr($basePath . '/admin/assets/core-dark.css') ?>">';
             },
             keepConnection() {
                 if (this.isOnline === false) {
