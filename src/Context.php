@@ -26,7 +26,6 @@ use Nette\Http\Request;
 use Nette\Http\Response;
 use Nette\Security\User;
 use Nette\Utils\FileSystem;
-use Tracy\Debugger;
 
 final class Context
 {
