@@ -47,7 +47,7 @@ final class AdminBarBridge
 		}
 
 		$menu->addLink('Settings', $this->linkGenerator->link('Settings:default'), 'ui');
-		$menu->addLink('Sign out', $this->linkGenerator->link('Cms:signOut'), 'ui');
+		$menu->addLink('Sign out', $this->linkGenerator->link('Cms:signOut', nonce: true), 'ui');
 
 		if ($this->user->getIdentity() instanceof AdminIdentity) {
 			if (Session::get(Session::LAST_IDENTITY_ID) !== null) {

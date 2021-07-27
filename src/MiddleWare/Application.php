@@ -8,6 +8,7 @@ namespace Baraja\Cms\MiddleWare;
 use Baraja\AdminBar\AdminBar;
 use Baraja\Cms\Context;
 use Baraja\Cms\Helpers;
+use Baraja\Cms\LinkGenerator;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Proxy\Proxy;
 use Baraja\Cms\Search\SearchAdminBarPlugin;
@@ -107,8 +108,27 @@ final class Application
 
 	private function trySystemWorkflow(string $plugin, string $path, string $locale): void
 	{
+		LinkGenerator::setupNonce();
 		if ($this->context->isBot()) {
-			$this->terminate('The entry for robots is blocked.');
+			$this->terminate('<div style="margin:8em auto;max-width:800px">The entry for robots is blocked.</div>');
+		}
+		if (
+			isset($_GET[LinkGenerator::NONCE_QUERY_PARAM]) === true
+			&& (
+				LinkGenerator::verifyNonce() === false
+				|| $this->context->getRequest()->isSameSite() === false
+			)
+		) {
+			$this->terminate(
+				'<div style="margin:8em auto;max-width:800px">'
+				. '<h1>Bad request</h1>'
+				. '<p>This request has been blocked by security reason. Correct nonce required.</p>'
+				. ($_POST === []
+					? '<p>If you really want to process this request, you can click the button:</p>'
+					. '<a href="' . LinkGenerator::getSafeUrlForCallAgain() . '" rel="nofollow"><button>Process again</button></a>'
+					: ''
+				) . '</div>',
+			);
 		}
 		if ($this->context->getSettings()->isOk() === false) { // route installation workflow
 			if ($path !== '') { // canonize configuration request to base admin URL
