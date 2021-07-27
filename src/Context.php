@@ -12,6 +12,7 @@ use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManagerAccessor;
 use Baraja\Cms\Translator\TranslatorFilter;
 use Baraja\Cms\User\UserManagerAccessor;
 use Baraja\Cms\User\UserMetaManager;
+use Baraja\Doctrine\Cache\FilesystemCache;
 use Baraja\Doctrine\EntityManager;
 use Baraja\DynamicConfiguration\Configuration;
 use Baraja\DynamicConfiguration\ConfigurationSection;
@@ -19,10 +20,13 @@ use Baraja\Localization\Localization;
 use Baraja\Plugin\Component\PluginComponent;
 use Baraja\Plugin\Plugin;
 use Baraja\Plugin\PluginManager;
+use DeviceDetector\Cache\DoctrineBridge;
 use DeviceDetector\DeviceDetector;
 use Nette\Http\Request;
 use Nette\Http\Response;
 use Nette\Security\User;
+use Nette\Utils\FileSystem;
+use Tracy\Debugger;
 
 final class Context
 {
@@ -33,6 +37,7 @@ final class Context
 
 
 	public function __construct(
+		private string $tempDir,
 		private Request $request,
 		private Response $response,
 		private EntityManager $entityManager,
@@ -161,9 +166,40 @@ final class Context
 	}
 
 
+	public function getTempDir(): string
+	{
+		static $checked = false;
+		if ($checked === false) {
+			if (is_dir($this->tempDir) === false) {
+				FileSystem::createDir($this->tempDir);
+			}
+			$checked = true;
+		}
+
+		return $this->tempDir;
+	}
+
+
+	public function isBot(): bool
+	{
+		$isBot = Session::get(Session::WORKFLOW_IS_BOT);
+		$cacheUserAgent = Session::get(Session::WORKFLOW_USER_AGENT);
+		$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+		if ($isBot !== null && $cacheUserAgent === $userAgent) {
+			return (bool) $isBot;
+		}
+		$isBot = $this->getDeviceDetector()->isBot();
+		Session::set(Session::WORKFLOW_USER_AGENT, $userAgent);
+		Session::set(Session::WORKFLOW_IS_BOT, $isBot);
+
+		return $isBot;
+	}
+
+
 	public function getDeviceDetector(): DeviceDetector
 	{
 		$dd = new DeviceDetector($_SERVER['HTTP_USER_AGENT'] ?? '');
+		$dd->setCache(new DoctrineBridge(new FilesystemCache($this->getTempDir() . '/device-detector')));
 		$dd->skipBotDetection();
 		$dd->parse();
 

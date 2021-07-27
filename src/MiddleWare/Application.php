@@ -107,7 +107,7 @@ final class Application
 
 	private function trySystemWorkflow(string $plugin, string $path, string $locale): void
 	{
-		if ($this->context->getDeviceDetector()->isBot()) {
+		if ($this->context->isBot()) {
 			$this->terminate('The entry for robots is blocked.');
 		}
 		if ($this->context->getSettings()->isOk() === false) { // route installation workflow

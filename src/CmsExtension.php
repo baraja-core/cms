@@ -22,6 +22,9 @@ use Baraja\Cms\User\UserManager;
 use Baraja\Cms\User\UserManagerAccessor;
 use Baraja\Cms\User\UserMetaManager;
 use Baraja\Doctrine\ORM\DI\OrmAnnotationsExtension;
+use Baraja\PathResolvers\Resolvers\RootDirResolver;
+use Baraja\PathResolvers\Resolvers\TempDirResolver;
+use Baraja\PathResolvers\Resolvers\VendorResolver;
 use Baraja\Plugin\Component\VueComponent;
 use Baraja\Plugin\PluginComponentExtension;
 use Baraja\Plugin\PluginLinkGenerator;
@@ -37,6 +40,7 @@ use Nette\PhpGenerator\ClassType;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Nette\Security\User;
+use Nette\Utils\FileSystem;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
@@ -90,8 +94,13 @@ final class CmsExtension extends CompilerExtension
 			->setFactory(Admin::class);
 
 		// context
+		$tempDir = (new TempDirResolver(new RootDirResolver(new VendorResolver)))->get('baraja.cms');
+		if (is_dir($tempDir) === false) {
+			FileSystem::createDir($tempDir);
+		}
 		$context = $builder->addDefinition($this->prefix('context'))
-			->setFactory(Context::class);
+			->setFactory(Context::class)
+			->setArgument('tempDir', $tempDir);
 
 		$builder->addAccessorDefinition($this->prefix('contextAccessor'))
 			->setImplement(ContextAccessor::class);
