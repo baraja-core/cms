@@ -227,7 +227,7 @@ Vue.component('cms-search', {
 
 Vue.component('cms-default', {
 	props: ['card', 'title', 'subtitle', 'buttons', 'breadcrumb', 'contextMenu'],
-	template: `<div>
+	template: `<div class="container-fluid my-3">
 		<div v-if="breadcrumb" class="mb-2">
 			<breadcrumb :items="breadcrumb"></breadcrumb>
 		</div>
