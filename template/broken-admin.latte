@@ -15,7 +15,7 @@
 	</script>
 </head>
 
-<body>
+<body style="background:#f3f2ee">
 <noscript>
 	<div class="container">
 		<div class="row my-5">
@@ -43,11 +43,20 @@
 <b-container class="mt-5">
 	<b-row align-h="center">
 		<b-col class="py-5" cols="8">
-			<b-card title="Administration is broken">
-				<b-alert show variant="danger">
-					<b>A serious problem:</b><br>
-					There was a serious problem with the start of the administration, which caused its malfunction.
-				</b-alert>
+			<b-card title="Internal administration error">
+				<table class="w-100">
+					<tr>
+						<td valign="top" class="text-center px-3">
+							<img src="https://cdn.baraja.cz/icon/warning-triangle.png" alt="Error triangle">
+						</td>
+						<td>
+							<b-alert show variant="danger">
+								<b>A serious problem:</b><br>
+								There was a serious problem with the start of the administration, which caused its malfunction.
+							</b-alert>
+						</td>
+					</tr>
+				</table>
 				<p>
 					The problem with starting the administration is often caused by&nbsp;a&nbsp;corrupted configuration
 					or&nbsp;a&nbsp;broken connection to&nbsp;the database.
@@ -57,15 +66,22 @@
 				<div n:if="$isDebug === true && $exception !== null">
 					<h2 class="h5">The captured exception</h2>
 					<p>This error is for your technical administrator:</p>
-					<b-alert show variant="danger">
+					<b-alert show variant="secondary">
 						{$exception->getMessage()}
 					</b-alert>
-					<p>File: <b>{$exception->getFile()}</b> (on line <b>{$exception->getLine()}</b>).</p>
+					<p>File:<br><code>{$exception->getFile()}:{$exception->getLine()}</code></p>
 				</div>
 			</b-card>
-			<p class="text-right text-secondary">
-				Error was logged to Tracy, please check the <b>log</b> directory.
-			</p>
+			<table class="w-100">
+				<tr>
+					<td class="text-secondary">
+						Server time:&nbsp;{date('Y-m-d H:i:s')}
+					</td>
+					<td class="text-right text-secondary">
+						Error was logged to Tracy, please check the <b>log</b> directory.
+					</td>
+				</tr>
+			</table>
 		</b-col>
 	</b-row>
 </b-container>
