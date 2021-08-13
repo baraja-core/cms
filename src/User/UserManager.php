@@ -67,6 +67,12 @@ final class UserManager implements Authenticator
 	}
 
 
+	public function getUserMetaManager(): UserMetaManager
+	{
+		return $this->userMetaManager;
+	}
+
+
 	public function getIdentity(): ?IIdentity
 	{
 		return $this->userStorage->getState()[1];

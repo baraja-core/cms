@@ -14,6 +14,7 @@ final class Session
 		WORKFLOW_IS_BOT = 'workflow-is-bot',
 		WORKFLOW_USER_AGENT = 'workflow-user-agent',
 		WORKFLOW_NONCE = 'workflow-nonce',
+		WORKFLOW_SETTINGS = 'workflow-settings',
 		LAST_IDENTITY_ID = 'last-identity-id';
 
 	private const PREFIX = '__BRJ_CMS';

@@ -6,6 +6,8 @@ namespace Baraja\Cms;
 
 
 use Baraja\BarajaCloud\CloudManager;
+use Baraja\Cms\Settings\SystemInfo;
+use Baraja\Cms\User\UserManagerAccessor;
 use Baraja\Doctrine\EntityManager;
 use Baraja\DoctrineConfiguration\Option;
 use Baraja\DynamicConfiguration\Configuration;
@@ -26,11 +28,18 @@ final class Settings
 		private EntityManager $entityManager,
 		private Localization $localization,
 		private CloudManager $cloudManager,
+		private UserManagerAccessor $userManager,
 		Storage $storage,
 		Configuration $configuration,
 	) {
 		$this->cache = new Cache($storage, 'cms-settings');
 		$this->config = new ConfigurationSection($configuration, 'core');
+	}
+
+
+	public function getSystemInfo(): SystemInfo
+	{
+		return new SystemInfo($this->entityManager, $this->config, $this->userManager);
 	}
 
 

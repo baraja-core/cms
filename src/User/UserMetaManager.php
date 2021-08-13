@@ -29,6 +29,8 @@ final class UserMetaManager
 		/** @var UserMeta[] $metas */
 		$metas = $this->entityManager->getRepository(UserMeta::class)
 			->createQueryBuilder('meta')
+			->select('meta, PARTIAL user.{id}')
+			->leftJoin('meta.user', 'user')
 			->where('meta.user = :userId')
 			->setParameter('userId', $userId)
 			->getQuery()
