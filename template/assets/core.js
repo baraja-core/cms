@@ -69,6 +69,19 @@ Vue.component('cms-footer', {
 </footer>`
 });
 
+Vue.component('cms-settings', {
+	template: `<b-modal id="modal-cms-settings" size="lg" hide-header hide-footer body-class="p-0">
+	<div>
+		<div class="my-4 text-center">Settings is coming soon.</div>
+	</div>
+</b-modal>`,
+	mounted() {
+		eventBus.$on('cms-settings-open', () => {
+			this.$bvModal.show('modal-cms-settings');
+		});
+	}
+});
+
 Vue.component('cms-card', {
 	template: `<div class="card p-3 cms-card">
 	<slot></slot>
@@ -227,7 +240,7 @@ Vue.component('cms-search', {
 
 Vue.component('cms-default', {
 	props: ['card', 'title', 'subtitle', 'buttons', 'breadcrumb', 'contextMenu'],
-	template: `<div class="container-fluid my-3">
+	template: `<div>
 		<div v-if="breadcrumb" class="mb-2">
 			<breadcrumb :items="breadcrumb"></breadcrumb>
 		</div>

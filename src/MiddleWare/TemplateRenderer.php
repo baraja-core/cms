@@ -9,10 +9,10 @@ use Baraja\AdminBar\AdminBar;
 use Baraja\Cms\Admin;
 use Baraja\Cms\Context;
 use Baraja\Cms\Helpers;
-use Baraja\Cms\LinkGenerator;
 use Baraja\Cms\MenuManager;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Proxy\GlobalAsset\CmsSimpleStaticAsset;
+use Baraja\Cms\Settings;
 use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\UserResetPasswordRequest;
 use Baraja\Plugin\BasePlugin;
@@ -33,7 +33,8 @@ final class TemplateRenderer
 		private string $cacheDir,
 		private Context $context,
 		private CmsPluginPanel $panel,
-		private MenuManager $menuManager
+		private MenuManager $menuManager,
+		private Settings $settings,
 	) {
 	}
 
@@ -64,6 +65,7 @@ final class TemplateRenderer
 			'globalSettings' => [
 				'startWeekday' => 0,
 			],
+			'settings' => $this->settings->getSystemInfo()->toArray(),
 		];
 
 		/** @phpstan-ignore-next-line */
@@ -90,7 +92,7 @@ final class TemplateRenderer
 	</div>
 	<p>To visit this page, you must first verify through 2-step verification.</p>
 	<p class="text-secondary">That’s all we know.</p>
-	<p><a href="' . LinkGenerator::generateInternalLink('Cms:signOut', nonce: true) . '" class="btn btn-primary">Sign out</a></p>
+	<p><a href="' . Url::get()->getBaseUrl() . '/admin/cms/sign-out" class="btn btn-primary">Sign out</a></p>
 </div>';
 	}
 
@@ -106,7 +108,7 @@ final class TemplateRenderer
 		</div>
 		<p>Open this page is not permitted for your account.</p>
 		<p class="text-secondary">That’s all we know.</p>
-		<p><a href="' . LinkGenerator::generateInternalLink('Cms:signOut', nonce: true) . '" class="btn btn-primary">Sign out</a></p>
+		<p><a href="' . Url::get()->getBaseUrl() . '/admin/cms/sign-out" class="btn btn-primary">Sign out</a></p>
 	</div>
 </div>';
 	}

@@ -7,6 +7,7 @@ namespace Baraja\Cms\MiddleWare\Bridge;
 
 use Baraja\AdminBar\AdminBar;
 use Baraja\AdminBar\User\AdminIdentity;
+use Baraja\Cms\Admin;
 use Baraja\Cms\LinkGenerator;
 use Baraja\Cms\MenuAuthorizatorAccessor;
 use Baraja\Cms\Session;
@@ -46,7 +47,9 @@ final class AdminBarBridge
 			);
 		}
 
-		$menu->addLink('Settings', $this->linkGenerator->link('Settings:default'), 'ui');
+		if (Admin::isAdminRequest()) {
+			$menu->addEvent('Settings', 'cms-settings-open', 'ui');
+		}
 		$menu->addLink('Sign out', $this->linkGenerator->link('Cms:signOut', nonce: true), 'ui');
 
 		if ($this->user->getIdentity() instanceof AdminIdentity) {
