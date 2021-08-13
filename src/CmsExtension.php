@@ -11,7 +11,6 @@ use Baraja\Cms\MiddleWare\Bridge\AdminBarBridge;
 use Baraja\Cms\Plugin\CommonSettingsPlugin;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Plugin\HomepagePlugin;
-use Baraja\Cms\Plugin\SettingsPlugin;
 use Baraja\Cms\Plugin\UserPlugin;
 use Baraja\Cms\Proxy\GlobalAsset\CmsSimpleStaticAsset;
 use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManager;
@@ -257,17 +256,6 @@ final class CmsExtension extends CompilerExtension
 			'source' => __DIR__ . '/../template/vue/common-settings.js',
 			'position' => 100,
 			'tab' => 'Common settings',
-			'params' => [],
-		]]);
-		$pluginManager->addSetup('?->addComponent(?)', ['@self', [
-			'key' => 'cmsSettingsDefault',
-			'name' => 'cms-settings-default',
-			'implements' => SettingsPlugin::class,
-			'componentClass' => VueComponent::class,
-			'view' => 'default',
-			'source' => __DIR__ . '/../template/vue/settings.js',
-			'position' => 100,
-			'tab' => 'Settings',
 			'params' => [],
 		]]);
 	}
