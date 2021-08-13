@@ -36,12 +36,12 @@ final class Admin
 			context: $context,
 			panel: $panel,
 			templateRenderer: new TemplateRenderer(
-			cacheDir: $cacheDir,
-			context: $context,
-			panel: $panel,
-			menuManager: $menuManager,
-			settings: $this->context->getSettings(),
-		),
+				cacheDir: $cacheDir,
+				context: $context,
+				panel: $panel,
+				menuManager: $menuManager,
+				settings: $this->context->getSettings(),
+			),
 		);
 		Debugger::getBar()->addPanel($panel);
 		(new SentryBridge($context->getUser()))->register();
