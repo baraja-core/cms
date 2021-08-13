@@ -10,6 +10,7 @@ use Baraja\Cms\MiddleWare\Bridge\SentryBridge;
 use Baraja\Cms\MiddleWare\TemplateRenderer;
 use Baraja\PathResolvers\Resolvers\TempDirResolver;
 use Baraja\Plugin\CmsPluginPanel;
+use Baraja\Url\Url;
 use Nette\Application\Responses\VoidResponse;
 use Nette\Http\IResponse;
 use Nette\Utils\FileSystem;
@@ -32,17 +33,26 @@ final class Admin
 		$cacheDir = $tempDirResolver->get('cache/baraja.cms');
 		FileSystem::createDir($cacheDir);
 		$this->application = new Application(
-			$context,
-			$panel,
-			new TemplateRenderer(
-				$cacheDir,
-				$context,
-				$panel,
-				$menuManager,
-			),
+			context: $context,
+			panel: $panel,
+			templateRenderer: new TemplateRenderer(
+			cacheDir: $cacheDir,
+			context: $context,
+			panel: $panel,
+			menuManager: $menuManager,
+			settings: $this->context->getSettings(),
+		),
 		);
 		Debugger::getBar()->addPanel($panel);
 		(new SentryBridge($context->getUser()))->register();
+	}
+
+
+	public static function isAdminRequest(): bool
+	{
+		$relativeUrl = Url::get()->getRelativeUrl(false);
+
+		return $relativeUrl === 'admin' || str_starts_with($relativeUrl, 'admin/');
 	}
 
 
@@ -50,6 +60,9 @@ final class Admin
 	{
 		if (PHP_SAPI === 'cli') {
 			throw new \RuntimeException('CMS is not available in CLI.');
+		}
+		if (self::isAdminRequest() === false) {
+			return;
 		}
 
 		$path = trim((string) preg_replace('/^\/?([a-zA-Z0-9-.\/]+).*$/', '$1', $path), '/');
@@ -75,7 +88,7 @@ final class Admin
 		} catch (\Throwable $e) {
 			try {
 				Debugger::log($e, ILogger::CRITICAL);
-			} catch (\Throwable $e) {
+			} catch (\Throwable) {
 				// Silence is golden.
 			}
 			Helpers::brokenAdmin($e);
