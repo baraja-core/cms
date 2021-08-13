@@ -15,6 +15,7 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
  * @var string $content
  * @var mixed[] $menu
  * @var bool $isDebug
+ * @var array<string, mixed> $settings
  */
 
 ?>
@@ -30,6 +31,11 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap@4.6.0/dist/css/bootstrap.min.css">
 	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.min.css">
 	<link type="text/css" rel="stylesheet" href="<?= Helpers::escapeHtmlAttr($basePath . '/admin/assets/core.css') ?>">
+	<?php
+		if (($settings['user']['theme'] ?? '') !== 'light') {
+			echo '<link type="text/css" rel="stylesheet" href="' . Helpers::escapeHtmlAttr($basePath . '/admin/assets/core-' . $settings['user']['theme']. '.css') . '">';
+		}
+	?>
 	<link rel="shortcut icon" type="image/x-icon" href="<?= Helpers::escapeHtmlAttr($basePath . '/admin/assets/favicon.ico') ?>">
 	<div id="app-header"></div>
 	<?php
@@ -73,6 +79,7 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 		</div>
 	</div>
 	<support-chat></support-chat>
+	<cms-settings></cms-settings>
 	<cms-footer :year="<?=date('Y')?>"></cms-footer>
 </div>
 <script src="<?= $isDebug ? 'https://unpkg.com/vue@2.6.11/dist/vue.js' : 'https://unpkg.com/vue@2.6.11/dist/vue.min.js' ?>"></script>
@@ -135,10 +142,6 @@ foreach ($staticAssets as $staticAsset) {
             window.addEventListener('online',  this.updateOnlineStatus);
             window.addEventListener('offline', this.updateOnlineStatus);
             setInterval(this.keepConnection, 5000);
-            this.updateDarkMode();
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-                this.updateDarkMode();
-            });
         },
         methods: {
             updateOnlineStatus(event) {
@@ -150,10 +153,6 @@ foreach ($staticAssets as $staticAsset) {
                         toaster: 'b-toaster-bottom-left'
                     })
                 }
-            },
-            updateDarkMode() {
-                let is = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                document.getElementById('app-header').innerHTML = '<link type="text/css" rel="stylesheet" href="<?= Helpers::escapeHtmlAttr($basePath . '/admin/assets/core-dark.css') ?>">';
             },
             keepConnection() {
                 if (this.isOnline === false) {
