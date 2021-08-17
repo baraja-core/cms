@@ -41,7 +41,9 @@ Vue.component('cms-footer', {
 			<div class="row">
 				<div class="col-sm-7">
 					<p>
-						<a href="https://baraja.cz/cms" target="_blank" style="text-decoration:underline">Baraja CMS</a>
+						<a href="https://baraja.cz/cms" target="_blank">
+							&lt;/BRJ&gt;
+						</a>
 						©&nbsp;2009-{{ year }}
 						|&nbsp;<a href="https://help.baraja.cz" target="_blank">Help</a>
 						|&nbsp;<a href="https://baraja.cz/kontakt" target="_blank">Support</a>
