@@ -14,7 +14,7 @@
 		"baraja-core/dynamic-configuration": "^2.1",
 		"baraja-core/doctrine": "^3.0",
 		"baraja-core/structured-api": "^3.0 >=3.0.6",
-		"baraja-core/admin-bar": "^2.2",
+		"baraja-core/admin-bar": "^2.3",
 		"baraja-core/plugin-system": "^2.0",
 		"baraja-core/localization": "^2.0",
 		"baraja-core/baraja-cloud": "^2.0",
