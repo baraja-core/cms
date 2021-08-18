@@ -118,7 +118,7 @@ class User implements CmsUser
 	}
 
 
-	public function injectDefault(string $username, string $password, string $email, string $role = self::ROLE_USER)
+	public function injectDefault(string $username, string $password, string $email, string $role = self::ROLE_USER): void
 	{
 		$this->username = trim(Strings::lower($username));
 		$this->password = $password
