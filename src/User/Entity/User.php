@@ -113,6 +113,13 @@ class User implements CmsUser
 
 	public function __construct(string $username, string $password, string $email, string $role = CmsUser::ROLE_USER)
 	{
+		// back compatibility
+		$this->injectDefault($username, $password, $email, $role);
+	}
+
+
+	public function injectDefault(string $username, string $password, string $email, string $role = self::ROLE_USER)
+	{
 		$this->username = trim(Strings::lower($username));
 		$this->password = $password
 			? (new Passwords)->hash($password)

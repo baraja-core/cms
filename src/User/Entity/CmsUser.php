@@ -11,7 +11,10 @@ interface CmsUser extends IIdentity
 {
 	public const ROLE_USER = 'user';
 
-	public function __construct(string $username, string $password, string $email, string $role = self::ROLE_USER);
+	// Constructor will be reverted in Doctrine 3.0
+	// public function __construct(string $username, string $password, string $email, string $role = self::ROLE_USER);
+
+	public function injectDefault(string $username, string $password, string $email, string $role = self::ROLE_USER);
 
 	/**
 	 * @return string[]
