@@ -32,7 +32,7 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.min.css">
 	<link type="text/css" rel="stylesheet" href="<?= Helpers::escapeHtmlAttr($basePath . '/admin/assets/core.css') ?>">
 	<?php
-		if (($settings['user']['theme'] ?? '') !== 'light') {
+		if (($settings['user']['theme'] ?? '') !== '' && ($settings['user']['theme'] ?? '') !== 'light') {
 			echo '<link type="text/css" rel="stylesheet" href="' . Helpers::escapeHtmlAttr($basePath . '/admin/assets/core-' . $settings['user']['theme']. '.css') . '">';
 		}
 	?>
