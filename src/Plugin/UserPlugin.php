@@ -48,6 +48,12 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 	}
 
 
+	public function actionDefault(): void
+	{
+		$this->setTitle('User manager');
+	}
+
+
 	public function actionDetail(int $id): void
 	{
 		try {
