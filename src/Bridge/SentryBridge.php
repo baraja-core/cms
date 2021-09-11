@@ -6,7 +6,7 @@ namespace Baraja\Cms\MiddleWare\Bridge;
 
 
 use Baraja\AdminBar\User\AdminIdentity;
-use Baraja\Cms\Helpers;
+use Baraja\Network\Ip;
 use Baraja\TracySentryBridge\SentryLogger;
 use Nette\Security\User;
 use function Sentry\configureScope;
@@ -39,7 +39,7 @@ final class SentryBridge
 					$scope->setUser(
 						[
 							'id' => $identity->getId(),
-							'ip_address' => Helpers::userIp(),
+							'ip_address' => Ip::get(),
 							'username' => $identity->getName(),
 							'roles' => $identity->getRoles(),
 						]

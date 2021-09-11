@@ -6,7 +6,6 @@ namespace Baraja\Cms\User;
 
 
 use Baraja\AdminBar\User\AdminIdentity;
-use Baraja\Cms\Helpers;
 use Baraja\Cms\Session;
 use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\User;
@@ -14,6 +13,7 @@ use Baraja\Cms\User\Entity\UserLogin;
 use Baraja\Cms\User\Entity\UserLoginAttempt;
 use Baraja\Doctrine\EntityManager;
 use Baraja\DynamicConfiguration\Configuration;
+use Baraja\Network\Ip;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Nette\Security\AuthenticationException;
@@ -303,7 +303,7 @@ final class UserManager implements Authenticator
 			->andWhere('login.insertedDateTime >= :intervalDate')
 			->andWhere('login.password = FALSE')
 			->setParameter('username', $username)
-			->setParameter('ip', $ip ?? Helpers::userIp())
+			->setParameter('ip', $ip ?? Ip::get())
 			->setParameter('intervalDate', DateTime::from('now - ' . $blockInterval))
 			->setMaxResults(((int) $blockCount) * 2)
 			->getQuery()

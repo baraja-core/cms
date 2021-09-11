@@ -21,6 +21,7 @@
 		"baraja-core/url": "^1.1",
 		"baraja-core/path-resolvers": "^1.0",
 		"baraja-core/phone-number": "^1.0",
+		"baraja-core/network": "^1.0",
 		"nette/di": "^3.0",
 		"latte/latte": "^2.5",
 		"nette/security": "^3.1",

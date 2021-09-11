@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Baraja\Cms\User\Entity;
 
 
-use Baraja\Cms\Helpers;
 use Baraja\Doctrine\Identifier\IdentifierUnsigned;
+use Baraja\Network\Ip;
 use Baraja\PhoneNumber\PhoneNumberFormatter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -130,7 +130,7 @@ class User implements CmsUser
 			: '---empty-password---';
 		$this->setEmail($email);
 		$this->addRole(trim($role));
-		$this->registerIp = Helpers::userIp();
+		$this->registerIp = Ip::get();
 		$this->registerDate = DateTime::from('now');
 		$this->createDate = DateTime::from('now');
 		$this->metas = new ArrayCollection;

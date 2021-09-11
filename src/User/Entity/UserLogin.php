@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Baraja\Cms\User\Entity;
 
 
-use Baraja\Cms\Helpers;
 use Baraja\Doctrine\Identifier\IdentifierUnsigned;
+use Baraja\Network\Ip;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -34,7 +34,7 @@ class UserLogin
 	public function __construct(User $user)
 	{
 		$this->user = $user;
-		$this->ip = Helpers::userIp();
+		$this->ip = Ip::get();
 		$this->hostname = $_SERVER['HTTP_HOST'] ?? null;
 		$this->userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
 		$this->loginDatetime = new \DateTime;
