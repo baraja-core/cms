@@ -4,7 +4,7 @@ Vue.component('cms-editor', {
 	},
 	props: ['value', 'rows', 'label'],
 	template: `<div>
-	<label :for="labelId">{{ label }}</label>
+	<label v-if="label" :for="labelId">{{ label }}</label>
 	<b-card no-body>
 		<b-tabs card>
 			<b-tab title="Editor" lazy active class="p-0">
