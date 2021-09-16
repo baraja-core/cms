@@ -9,6 +9,7 @@ use Baraja\AssetsLoader\Minifier\DefaultJsMinifier;
 use Baraja\Cms\Context;
 use Baraja\Cms\Helpers;
 use Baraja\Plugin\Plugin;
+use Baraja\Url\Url;
 
 /**
  * Smart proxy service for render all plugin components to single javascript.
@@ -33,6 +34,23 @@ final class Proxy
 	public function __construct(
 		private Context $context
 	) {
+	}
+
+
+	public static function getUrl(string $file): string
+	{
+		if (str_contains($file, '..')) {
+			throw new \LogicException('File path "' . $file . '" is not safe.');
+		}
+		$diskPath = __DIR__ . '/../../template/assets/' . $file;
+		if (is_file($diskPath) === false) {
+			throw new \InvalidArgumentException(
+				'Static file "' . $file . '" does not exist. '
+				. 'Path "' . $diskPath . '" given.',
+			);
+		}
+
+		return Url::get()->getBaseUrl() . '/admin/assets/' . $file;
 	}
 
 
