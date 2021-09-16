@@ -56,6 +56,7 @@ final class TemplateRenderer
 			]),
 			'title' => $plugin instanceof BasePlugin ? $plugin->getTitle() : null,
 			'content' => $this->renderContentCode($plugin, $pluginName, $view, $components),
+			'locale' => $this->context->getLocale(),
 			'menu' => [
 				'dashboardLink' => $baseUrl . '/admin',
 				'isDashboard' => $pluginName === 'Homepage' && $view === 'default',
