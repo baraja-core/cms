@@ -45,8 +45,8 @@ Vue.component('cms-footer', {
 							&lt;/BRJ&gt;
 						</a>
 						©&nbsp;2009-{{ year }}
-						|&nbsp;<a href="https://help.baraja.cz" target="_blank">Help</a>
-						|&nbsp;<a href="https://baraja.cz/kontakt" target="_blank">Support</a>
+						|&nbsp;<a href="https://brj.cz/help" target="_blank">Help</a>
+						|&nbsp;<a href="https://brj.cz/support" target="_blank">Support</a>
 					</p>
 				</div>
 				<div class="col text-right">
