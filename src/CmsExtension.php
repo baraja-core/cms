@@ -12,6 +12,7 @@ use Baraja\Cms\Plugin\CommonSettingsPlugin;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Plugin\HomepagePlugin;
 use Baraja\Cms\Plugin\UserPlugin;
+use Baraja\Cms\Proxy\GlobalAsset\CmsEditorAsset;
 use Baraja\Cms\Proxy\GlobalAsset\CmsSimpleStaticAsset;
 use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManager;
 use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManagerAccessor;
@@ -343,5 +344,8 @@ final class CmsExtension extends CompilerExtension
 				$url,
 			]);
 		}
+		$globalAssetManager->addSetup('?->addAsset(new ' . CmsEditorAsset::class . ')', [
+			'@self',
+		]);
 	}
 }

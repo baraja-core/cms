@@ -6,6 +6,7 @@ namespace Baraja\Cms;
 
 
 use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
+use Baraja\Cms\Proxy\Proxy;
 
 /**
  * @var string $basePath
@@ -13,6 +14,7 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
  * @var mixed[] $globalSettings
  * @var string|null $title
  * @var string $content
+ * @var string $locale
  * @var mixed[] $menu
  * @var bool $isDebug
  * @var array<string, mixed> $settings
@@ -20,7 +22,7 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 
 ?>
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="<?= Helpers::escapeHtmlAttr($locale) ?>">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -30,13 +32,13 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 	<title><?= $title ? htmlspecialchars((string) $title) . ' | ' : '' ?>Admin</title>
 	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap@4.6.0/dist/css/bootstrap.min.css">
 	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.min.css">
-	<link type="text/css" rel="stylesheet" href="<?= Helpers::escapeHtmlAttr($basePath . '/admin/assets/core.css') ?>">
+	<link type="text/css" rel="stylesheet" href="<?= Helpers::escapeHtmlAttr(Proxy::getUrl('core.css')) ?>">
 	<?php
 		if (($settings['user']['theme'] ?? '') !== '' && ($settings['user']['theme'] ?? '') !== 'light') {
-			echo '<link type="text/css" rel="stylesheet" href="' . Helpers::escapeHtmlAttr($basePath . '/admin/assets/core-' . $settings['user']['theme']. '.css') . '">';
+			echo '<link type="text/css" rel="stylesheet" href="' . Helpers::escapeHtmlAttr(Proxy::getUrl('core-' . $settings['user']['theme'] . '.css')) . '">';
 		}
 	?>
-	<link rel="shortcut icon" type="image/x-icon" href="<?= Helpers::escapeHtmlAttr($basePath . '/admin/assets/favicon.ico') ?>">
+	<link rel="shortcut icon" type="image/x-icon" href="<?= Helpers::escapeHtmlAttr(Proxy::getUrl('favicon.ico')) ?>">
 	<div id="app-header"></div>
 	<?php
 	foreach ($staticAssets as $staticAsset) {

@@ -15,6 +15,7 @@ use Baraja\Cms\User\Entity\User;
 use Baraja\Cms\User\Entity\UserResetPasswordRequest;
 use Baraja\Cms\User\UserManager;
 use Baraja\Doctrine\EntityManager;
+use Baraja\Markdown\CommonMarkRenderer;
 use Baraja\StructuredApi\Attributes\PublicEndpoint;
 use Baraja\StructuredApi\BaseEndpoint;
 use Baraja\Url\Url;
@@ -34,6 +35,7 @@ final class CmsEndpoint extends BaseEndpoint
 		private Settings $settings,
 		private EntityManager $entityManager,
 		private ContextAccessor $contextAccessor,
+		private CommonMarkRenderer $commonMarkRenderer,
 	) {
 	}
 
@@ -258,5 +260,15 @@ final class CmsEndpoint extends BaseEndpoint
 		}
 		$this->entityManager->flush();
 		$this->sendOk();
+	}
+
+
+	public function postRenderEditorPreview(string $haystack): void
+	{
+		$this->sendJson(
+			[
+				'html' => $this->commonMarkRenderer->render($haystack),
+			]
+		);
 	}
 }
