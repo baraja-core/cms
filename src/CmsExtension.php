@@ -42,6 +42,7 @@ use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Nette\Security\User;
 use Nette\Utils\FileSystem;
+use Nette\Utils\Validators;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
@@ -338,14 +339,41 @@ final class CmsExtension extends CompilerExtension
 					. 'Did you set "url" and "format"?',
 				);
 			}
+			$finalUrl = null;
+			if (Validators::isUrl($url)) {
+				$finalUrl = $url;
+			} elseif (is_file($url)) {
+				if (FileSystem::isAbsolute($url) === false) {
+					throw new \InvalidArgumentException('Asset disk path "' . $url . '" must be absolute.');
+				}
+				$finalUrl = $this->createUrlFromAssetPath($globalAssetManager, $url, $format);
+			} else {
+				throw new \InvalidArgumentException('URL "' . $url . '" is in invalid format.');
+			}
 			$globalAssetManager->addSetup('?->addAsset(new ' . CmsSimpleStaticAsset::class . '(?, ?))', [
 				'@self',
 				$format,
-				$url,
+				$finalUrl,
 			]);
 		}
 		$globalAssetManager->addSetup('?->addAsset(new ' . CmsEditorAsset::class . ')', [
 			'@self',
 		]);
+	}
+
+
+	private function createUrlFromAssetPath(
+		ServiceDefinition $globalAssetManager,
+		string $path,
+		string $format
+	): string {
+		$hash = md5($path . '.' . $format);
+		$globalAssetManager->addSetup('?->addDiskPath(?, ?)', [
+			'@self',
+			$hash,
+			$path,
+		]);
+
+		return Url::get()->getBaseUrl() . '/admin/assets/static-file-proxy/' . $hash . '.' . $format;
 	}
 }

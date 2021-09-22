@@ -276,6 +276,15 @@ final class Context
 
 
 	/**
+	 * @return array<string, string> (hash => path)
+	 */
+	public function getCustomGlobalAssetMap(): array
+	{
+		return $this->customGlobalAssetManager->get()->getDiskPathsMap();
+	}
+
+
+	/**
 	 * @internal
 	 */
 	public function setCustomAssetPath(string $type, string $path): void

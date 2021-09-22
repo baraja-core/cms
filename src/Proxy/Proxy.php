@@ -123,7 +123,29 @@ final class Proxy
 
 	private function responseStaticAsset(string $path): void
 	{
-		if (preg_match('/^assets\/(?<filename>([a-z0-9\/\-]+)\.(?<extension>[^.]+))$/', $path, $pathParser)) {
+		if (
+			preg_match(
+				'/^assets\/static-file-proxy\/(?<hash>[a-f0-9]{32})\.(?<extension>[^.]+)$/',
+				$path,
+				$pathParser,
+			) === 1
+		) {
+			$hash = $pathParser['hash'] ?? '';
+			$fileName = '';
+			$extension = $pathParser['extension'] ?? throw new \LogicException('Format does not exist.');
+			$assetMap = $this->context->getCustomGlobalAssetMap();
+			if (isset($assetMap[$hash])) {
+				$assetPath = $assetMap[$hash];
+			} else {
+				return;
+			}
+		} elseif (
+			preg_match(
+				'/^assets\/(?<filename>([a-z0-9\/\-]+)\.(?<extension>[^.]+))$/',
+				$path,
+				$pathParser,
+			) === 1
+		) {
 			$extension = $pathParser['extension'] ?? throw new \LogicException('Format does not exist.');
 			$fileName = $pathParser['filename'] ?? throw new \LogicException('Filename does not exist.');
 			$assetPath = __DIR__ . '/../../template/assets/' . $fileName;
