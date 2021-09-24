@@ -343,6 +343,9 @@ final class CmsExtension extends CompilerExtension
 			if (Validators::isUrl($url)) {
 				$finalUrl = $url;
 			} elseif (is_file($url)) {
+				if (PHP_SAPI === 'cli') {
+					continue;
+				}
 				if (FileSystem::isAbsolute($url) === false) {
 					throw new \InvalidArgumentException('Asset disk path "' . $url . '" must be absolute.');
 				}
