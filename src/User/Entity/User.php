@@ -6,6 +6,7 @@ namespace Baraja\Cms\User\Entity;
 
 
 use Baraja\Doctrine\Identifier\IdentifierUnsigned;
+use Baraja\EmailType\Email;
 use Baraja\Network\Ip;
 use Baraja\PhoneNumber\PhoneNumberFormatter;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -349,6 +350,12 @@ class User implements CmsUser
 	}
 
 
+	public function getEmailEntity(): Email
+	{
+		return new Email($this->email);
+	}
+
+
 	/**
 	 * Return primary user e-mail.
 	 */
@@ -360,10 +367,7 @@ class User implements CmsUser
 
 	public function setEmail(string $email): void
 	{
-		if (Validators::isEmail($email) === false) {
-			throw new \InvalidArgumentException('Invalid user email "' . $email . '".');
-		}
-		$this->email = $email;
+		$this->email = (new Email($email))->getValue();
 	}
 
 
@@ -372,7 +376,7 @@ class User implements CmsUser
 	 */
 	public function getEmails(): array
 	{
-		return array_unique(array_merge([$this->email], $this->emails));
+		return array_unique(array_merge([$this->getEmail()], $this->emails));
 	}
 
 
