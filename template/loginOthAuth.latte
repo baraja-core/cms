@@ -214,22 +214,34 @@
 						</template>
 					</div>
 				</div>
-				<div class="card-body py-4">
-					<form ref="otpAuth" id="otpAuth">
-						<b-form-group :label="translator[locale].otp.authCode" label-for="otpAuth">
-							<b-form-input ref="otpInput" type="text" maxlength="7" minlength="6" v-model="form.code" id="otpAuth" autocomplete="one-time-code" required></b-form-input>
+				<div v-if="isLoading" class="py-5 text-center">
+					<b-spinner></b-spinner>
+				</div>
+				<div v-else class="card-body py-4">
+					<form>
+						<div class="text-center" style="font-size:16pt">
+							📱 {{ translator[locale].otp.authCode }}
+						</div>
+						<b-form-group label-for="otpAuth">
+							<input
+								v-model="form.code"
+								id="otpAuth"
+								autocomplete="one-time-code"
+								class="form-control text-center my-3"
+								type="number"
+								pattern="[0-9]{6}"
+								maxlength="6"
+								placeholder="******"
+								style="font-size:24pt;letter-spacing:.25em"
+								:disabled="form.code.length >= 6"
+								required>
 							<div class="invalid-feedback">
 								{{ translator[locale].otp.invalidCode }}
 							</div>
 							<small>{{ translator[locale].otp.info }}</small>
 						</b-form-group>
 						<button type="submit" @click.prevent="verifyOAuth()" :disabled="form.code.length < 6" class="btn btn-block btn-primary">
-							<template v-if="isLoading">
-								<b-spinner small></b-spinner>
-							</template>
-							<template v-else>
-								{{ translator[locale].otp.submit }}
-							</template>
+							{{ translator[locale].otp.submit }}
 						</button>
 					</form>
 				</div>
@@ -248,7 +260,7 @@
 				translator: {
 					en: {
 						otp: {
-							authCode: 'Authentication code:',
+							authCode: 'Authentication code',
 							invalidCode: 'The entered code does not correspond to the real one.',
 							info: 'Enter the code from your 2-step verification application.',
 							submit: 'Submit'
@@ -256,7 +268,7 @@
 					},
 					cs: {
 						otp: {
-							authCode: 'Ověřovací kód:',
+							authCode: 'Ověřovací kód',
 							invalidCode: 'Zadaný kód neodpovídá reálnému.',
 							info: 'Zadejte kód z vaší aplikace pro dvoufázové ověřování.',
 							submit: 'Odeslat'
@@ -273,6 +285,14 @@
 				nLang = 'en';
 			}
 			this.locale = nLang;
+			this.setFocus();
+		},
+		watch: {
+			'form.code': function () {
+				if (this.form.code.length === 6) {
+					this.verifyOAuth();
+				}
+			}
 		},
 		methods: {
 			verifyOAuth() {
@@ -293,7 +313,16 @@
 						} else {
 							window.location.href = this.redirect;
 						}
-					}).finally(json => this.isLoading = false)
+					})
+					.finally(json => {
+						this.isLoading = false;
+						this.setFocus();
+					});
+			},
+			setFocus() {
+				setTimeout(function () {
+					document.getElementById('otpAuth').focus();
+				}, 100);
 			}
 		}
 	});
