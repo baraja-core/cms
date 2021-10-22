@@ -8,6 +8,7 @@ namespace Baraja\Cms;
 use Baraja\PathResolvers\Resolvers\RootDirResolver;
 use Baraja\PathResolvers\Resolvers\VendorResolver;
 use Nette\Utils\FileSystem;
+use Tracy\Debugger;
 
 /**
  * This is the entity for defining the general global configuration of the CMS.
@@ -28,6 +29,8 @@ final class Configuration
 	/** @var array<int, string> */
 	private array $supportedLocales = ['cs', 'en'];
 
+	private bool $debugMode;
+
 
 	private function __construct()
 	{
@@ -37,6 +40,7 @@ final class Configuration
 		$this->wwwDir = $this->rootDir . '/www';
 		FileSystem::createDir($this->tempDir);
 		FileSystem::createDir($this->cacheDir);
+		$this->debugMode = class_exists(Debugger::class) && Debugger::isEnabled();
 	}
 
 
@@ -146,5 +150,17 @@ final class Configuration
 	public function setSupportedLocales(array $supportedLocales): void
 	{
 		$this->supportedLocales = $supportedLocales;
+	}
+
+
+	public function isDebugMode(): bool
+	{
+		return $this->debugMode;
+	}
+
+
+	public function setDebugMode(bool $debugMode): void
+	{
+		$this->debugMode = $debugMode;
 	}
 }

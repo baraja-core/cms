@@ -24,8 +24,6 @@ use Baraja\Url\Url;
 use Nette\Application\Responses\TextResponse;
 use Nette\Application\Responses\VoidResponse;
 use Nette\Http\IResponse;
-use Tracy\Debugger;
-use Tracy\ILogger;
 
 final class Application
 {
@@ -70,8 +68,8 @@ final class Application
 				$this->terminate($this->templateRenderer->renderPermissionDenied());
 			}
 		} catch (\RuntimeException | \InvalidArgumentException $e) {
-			if ($e->getCode() !== 404 && class_exists(Debugger::class)) {
-				Debugger::log($e, ILogger::EXCEPTION);
+			if ($e->getCode() !== 404) {
+				$this->context->getContainer()->getLogger()->warning($e->getMessage(), ['exception' => $e]);
 			}
 			$pluginService = $this->context->getPluginByType(ErrorPlugin::class);
 		}
@@ -84,7 +82,12 @@ final class Application
 
 			$actionMethod = 'action' . $view;
 			if (\method_exists($pluginService, $actionMethod) === true) {
-				(new ServiceMethodInvoker)->invoke($pluginService, $actionMethod, $this->context->getRequest()->getUrl()->getQueryParameters());
+				(new ServiceMethodInvoker)
+					->invoke(
+						service: $pluginService,
+						methodName: $actionMethod,
+						params: $this->context->getRequest()->getUrl()->getQueryParameters(),
+					);
 			}
 
 			$pluginService->afterRender();

@@ -77,8 +77,12 @@
 					<td class="text-secondary">
 						Server time:&nbsp;{date('Y-m-d H:i:s')}
 					</td>
-					<td class="text-right text-secondary">
-						Error was logged to Tracy, please check the <b>log</b> directory.
+					<td class="text-right">
+						{if $isLogged}
+							<span class="text-secondary">Error was logged, please check your Logger.</span>
+						{else}
+							<span class="text-danger">Error can not be logged, because your Logger is broken.</span>
+						{/if}
 					</td>
 				</tr>
 			</table>

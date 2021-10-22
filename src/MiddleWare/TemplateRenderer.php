@@ -24,8 +24,6 @@ use Baraja\Url\Url;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Latte\Engine;
-use Tracy\Debugger;
-use Tracy\ILogger;
 
 final class TemplateRenderer
 {
@@ -289,7 +287,7 @@ final class TemplateRenderer
 			return '<!-- component ' . Helpers::escapeHtmlComment($component->getKey()) . ' -->' . "\n"
 				. $component->render($this->context->getRequest(), $plugin);
 		} catch (\Throwable $e) {
-			Debugger::log($e, ILogger::CRITICAL);
+			$this->context->getContainer()->getLogger()->critical($e->getMessage(), ['exception' => $e]);
 
 			return '<!-- can not render component! -->'
 				. '<div class="alert alert-danger">'

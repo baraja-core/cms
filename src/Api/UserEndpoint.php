@@ -7,6 +7,7 @@ namespace Baraja\Cms\Api;
 
 use Baraja\BarajaCloud\CloudManager;
 use Baraja\Cms\Configuration;
+use Baraja\Cms\Context;
 use Baraja\Cms\Helpers;
 use Baraja\Cms\Settings;
 use Baraja\Cms\User\Entity\CmsUser;
@@ -30,8 +31,6 @@ use Nette\Utils\DateTime;
 use Nette\Utils\Paginator;
 use Nette\Utils\Random;
 use Nette\Utils\Strings;
-use Tracy\Debugger;
-use Tracy\ILogger;
 
 final class UserEndpoint extends BaseEndpoint
 {
@@ -42,6 +41,7 @@ final class UserEndpoint extends BaseEndpoint
 		private CloudManager $cloudManager,
 		private PluginManager $pluginManager,
 		private Settings $settings,
+		private Context $context,
 	) {
 	}
 
@@ -202,9 +202,7 @@ final class UserEndpoint extends BaseEndpoint
 					role: CmsUser::ROLE_USER,
 				);
 			} catch (\Throwable $e) {
-				if (class_exists(Debugger::class)) {
-					Debugger::log($e, ILogger::CRITICAL);
-				}
+				$this->context->getContainer()->getLogger()->critical($e->getMessage(), ['exception' => $e]);
 				$this->sendError('Can not create user because user storage is broken.');
 			}
 			$user->setPhone($phone);
@@ -787,7 +785,7 @@ final class UserEndpoint extends BaseEndpoint
 				}
 			);
 		} catch (\RuntimeException $e) {
-			Debugger::log($e, ILogger::CRITICAL);
+			$this->context->getContainer()->getLogger()->critical($e->getMessage(), ['exception' => $e]);
 			$this->sendError('Can not upload avatar to CDN server: ' . $e->getMessage());
 		}
 		if (str_starts_with($apiResponse, '{')) {

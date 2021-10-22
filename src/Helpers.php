@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Baraja\Cms;
 
 
+use Baraja\Cms\Container\Container;
 use Baraja\Network\Ip;
 use Baraja\PhoneNumber\PhoneNumberFormatter;
 use Baraja\Url\Url;
 use Latte\Engine;
 use Nette\Utils\Strings;
-use Tracy\Debugger;
 
 final class Helpers
 {
@@ -227,6 +227,16 @@ final class Helpers
 
 	public static function brokenAdmin(\Throwable $e): void
 	{
+		$logged = false;
+		$container = Container::getSingleton();
+		if ($container !== null) {
+			try {
+				$container->getLogger()->debug($e->getMessage(), ['exception' => $e]);
+				$logged = true;
+			} catch (\Throwable) {
+				// Silence is golden.
+			}
+		}
 		for ($ttl = 10; $ttl > 0; $ttl--) {
 			if (ob_end_clean() === true) {
 				break;
@@ -236,7 +246,8 @@ final class Helpers
 			->renderToString(__DIR__ . '/../template/broken-admin.latte', [
 				'basePath' => Url::get()->getBaseUrl(),
 				'exception' => $e,
-				'isDebug' => Debugger::isEnabled(),
+				'isLogged' => $logged,
+				'isDebug' => Configuration::get()->isDebugMode(),
 			]));
 	}
 }

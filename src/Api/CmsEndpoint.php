@@ -24,8 +24,6 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Nette\Security\AuthenticationException;
 use Nette\Security\Authenticator;
-use Tracy\Debugger;
-use Tracy\ILogger;
 
 #[PublicEndpoint]
 final class CmsEndpoint extends BaseEndpoint
@@ -78,7 +76,7 @@ final class CmsEndpoint extends BaseEndpoint
 				$this->sendError('Wrong username or password.');
 			}
 		} catch (\Throwable $e) {
-			Debugger::log($e, ILogger::CRITICAL);
+			$this->contextAccessor->get()->getContainer()->getLogger()->critical($e->getMessage(), ['exception' => $e]);
 			$this->sendError('Internal authentication error. Your account has been broken. Please contact your administrator or Baraja support team.');
 		}
 

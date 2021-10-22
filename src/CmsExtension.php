@@ -43,8 +43,6 @@ use Nette\Schema\Schema;
 use Nette\Security\User;
 use Nette\Utils\FileSystem;
 use Nette\Utils\Validators;
-use Tracy\Debugger;
-use Tracy\ILogger;
 
 final class CmsExtension extends CompilerExtension
 {
@@ -296,7 +294,7 @@ final class CmsExtension extends CompilerExtension
 			. "\t\t\t" . 'try {' . "\n"
 			. "\t\t\t\t" . '$this->getService(?)->run($parser[\'locale\'] \?: null, $parser[\'path\']);' . "\n"
 			. "\t\t\t" . '} catch (\Throwable $e) {' . "\n"
-			. "\t\t\t\t" . Debugger::class . '::log($e, \'' . ILogger::DEBUG . '\'); ' . Helpers::class . '::brokenAdmin($e); die;' . "\n"
+			. "\t\t\t\t" . Helpers::class . '::brokenAdmin($e); die;' . "\n"
 			. "\t\t\t" . '}' . "\n"
 			. "\t\t" . '};' . "\n"
 			. "\t" . '}' . "\n"

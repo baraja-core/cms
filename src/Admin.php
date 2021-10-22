@@ -9,7 +9,6 @@ use Baraja\Cms\MiddleWare\AdminBusinessLogicControlException;
 use Baraja\Cms\MiddleWare\Application;
 use Baraja\Cms\MiddleWare\Bridge\SentryBridge;
 use Baraja\Cms\MiddleWare\TemplateRenderer;
-use Baraja\Plugin\CmsPluginPanel;
 use Baraja\Url\Url;
 use Nette\Application\Responses\VoidResponse;
 use Nette\Http\IResponse;
@@ -27,22 +26,21 @@ final class Admin
 	public function __construct(
 		private Context $context,
 		MenuManager $menuManager,
-		CmsPluginPanel $panel,
 	) {
 		$templateRenderer = new TemplateRenderer(
 			cacheDir: Configuration::get()->getCacheDir(),
 			context: $context,
-			panel: $panel,
+			panel: $context->getContainer()->getPluginPanel(),
 			menuManager: $menuManager,
 			settings: $this->context->getSettings(),
 		);
 		$this->application = new Application(
 			context: $context,
-			panel: $panel,
+			panel: $context->getContainer()->getPluginPanel(),
 			templateRenderer: $templateRenderer,
 		);
 		if (class_exists(Debugger::class)) {
-			Debugger::getBar()->addPanel($panel);
+			Debugger::getBar()->addPanel($context->getContainer()->getPluginPanel());
 		}
 		if (function_exists('Sentry\configureScope')) {
 			(new SentryBridge($context->getUserManager()->get()))->register();

@@ -7,6 +7,7 @@ namespace Baraja\Cms\Container;
 
 use Baraja\Cms\Configuration;
 use Baraja\Cms\LinkGenerator;
+use Baraja\Plugin\CmsPluginPanel;
 use Nette\Caching\Storage;
 use Nette\Caching\Storages\FileStorage;
 use Psr\Container\ContainerInterface;
@@ -18,11 +19,15 @@ use Tracy\Debugger;
 
 final class Container implements ContainerInterface
 {
+	private static ?self $singleton = null;
+
 	private Configuration $configuration;
 
 	private ?LoggerInterface $logger = null;
 
 	private ?LinkGenerator $linkGenerator = null;
+
+	private ?CmsPluginPanel $pluginPanel = null;
 
 	/** @var array<string, string> */
 	private array $map = [
@@ -32,6 +37,7 @@ final class Container implements ContainerInterface
 
 	public function __construct()
 	{
+		self::$singleton = $this;
 		$this->configuration = Configuration::get();
 	}
 
@@ -48,6 +54,13 @@ final class Container implements ContainerInterface
 	public function has(string $id): bool
 	{
 		return isset($this->map[$id]);
+	}
+
+
+	/** @internal */
+	public static function getSingleton(): ?self
+	{
+		return self::$singleton;
 	}
 
 
@@ -84,6 +97,16 @@ final class Container implements ContainerInterface
 
 	public function getResponse(): ResponseInterface
 	{
+	}
+
+
+	public function getPluginPanel(): CmsPluginPanel
+	{
+		if ($this->pluginPanel === null) {
+			$this->pluginPanel = new CmsPluginPanel;
+		}
+
+		return $this->pluginPanel;
 	}
 
 
