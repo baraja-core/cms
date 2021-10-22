@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Baraja\Cms;
 
 
+use Baraja\Cms\MiddleWare\AdminBusinessLogicControlException;
 use Nette\Utils\Validators;
 
-final class AdminRedirect extends \RuntimeException
+final class AdminRedirect extends \RuntimeException implements AdminBusinessLogicControlException
 {
 	private string $url;
 
@@ -30,7 +31,7 @@ final class AdminRedirect extends \RuntimeException
 
 
 	/**
-	 * @param mixed[] $params
+	 * @param array<string, mixed> $params
 	 */
 	public static function link(string $route, array $params = []): void
 	{

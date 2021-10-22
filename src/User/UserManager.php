@@ -19,7 +19,6 @@ use Doctrine\ORM\NoResultException;
 use Nette\Security\AuthenticationException;
 use Nette\Security\Authenticator;
 use Nette\Security\IIdentity;
-use Nette\Security\Passwords;
 use Nette\Security\UserStorage;
 use Nette\Utils\DateTime;
 
@@ -44,6 +43,12 @@ final class UserManager implements Authenticator
 		}
 		$this->defaultEntity = $userEntity;
 		$this->userMetaManager = new UserMetaManager($this->entityManager, $this);
+	}
+
+
+	public function isLoggedIn(): bool
+	{
+		return $this->userStorage->getState()[0] ?? false;
 	}
 
 
@@ -201,7 +206,7 @@ final class UserManager implements Authenticator
 	 */
 	public function getUserById(int $id): CmsUser
 	{
-		/** @var CmsUser[] $cache */
+		/** @var array<int, CmsUser> $cache */
 		static $cache = [];
 
 		return $cache[$id] ?? $cache[$id] = $this->entityManager->getRepository($this->defaultEntity)
@@ -368,7 +373,7 @@ final class UserManager implements Authenticator
 		if ($user->passwordVerify($password) === false) {
 			throw new AuthenticationException('The password is incorrect. Username "' . $username . '" given.');
 		}
-		if ((new Passwords)->needsRehash($hash)) {
+		if (password_needs_rehash($hash, PASSWORD_DEFAULT)) {
 			try {
 				$user->setPassword($password);
 			} catch (\InvalidArgumentException) {

@@ -6,9 +6,9 @@ namespace Baraja\Cms\MiddleWare\Bridge;
 
 
 use Baraja\AdminBar\User\AdminIdentity;
+use Baraja\Cms\User\UserManager;
 use Baraja\Network\Ip;
 use Baraja\TracySentryBridge\SentryLogger;
-use Nette\Security\User;
 use function Sentry\configureScope;
 
 use Sentry\State\Scope;
@@ -16,7 +16,7 @@ use Sentry\State\Scope;
 final class SentryBridge
 {
 	public function __construct(
-		private User $user,
+		private UserManager $userManager,
 	) {
 	}
 
@@ -31,14 +31,14 @@ final class SentryBridge
 		}
 		configureScope(
 			function (Scope $scope): void {
-				if ($this->user->isLoggedIn() === false) {
+				if ($this->userManager->isLoggedIn() === false) {
 					return;
 				}
-				$identity = $this->user->getIdentity();
-				if ($identity instanceof AdminIdentity) {
+				$identity = $this->userManager->getCmsIdentity();
+				if ($identity !== null) {
 					$scope->setUser(
 						[
-							'id' => $identity->getId(),
+							'id' => (int) $identity->getId(),
 							'ip_address' => Ip::get(),
 							'username' => $identity->getName(),
 							'roles' => $identity->getRoles(),

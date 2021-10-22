@@ -6,7 +6,6 @@ namespace Baraja\Cms\User\Entity;
 
 
 use Baraja\Doctrine\Identifier\IdentifierUnsigned;
-use Baraja\EmailType\Email;
 use Baraja\Network\Ip;
 use Baraja\PhoneNumber\PhoneNumberFormatter;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -148,7 +147,7 @@ class User implements CmsUser
 
 
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	public function getRoles(): array
 	{
@@ -187,7 +186,7 @@ class User implements CmsUser
 
 
 	/**
-	 * @return string[]
+	 * @return array<string, string>
 	 */
 	public function getData(): array
 	{
@@ -336,7 +335,7 @@ class User implements CmsUser
 	 */
 	public function getPrivileges(): array
 	{
-		return array_filter($this->privileges ?? [], fn(string $item): bool => trim($item) !== '');
+		return array_filter($this->privileges ?? [], static fn(string $item): bool => trim($item) !== '');
 	}
 
 
@@ -347,12 +346,6 @@ class User implements CmsUser
 		}
 		$this->privileges[] = $permission;
 		$this->privileges = \array_unique($this->privileges);
-	}
-
-
-	public function getEmailEntity(): Email
-	{
-		return new Email($this->email);
 	}
 
 
@@ -367,7 +360,10 @@ class User implements CmsUser
 
 	public function setEmail(string $email): void
 	{
-		$this->email = (new Email($email))->getValue();
+		if (Validators::isEmail($email) === false) {
+			throw new \InvalidArgumentException('Invalid user email "' . $email . '".');
+		}
+		$this->email = $email;
 	}
 
 
@@ -376,7 +372,7 @@ class User implements CmsUser
 	 */
 	public function getEmails(): array
 	{
-		return array_unique(array_merge([$this->getEmail()], $this->emails));
+		return array_unique(array_merge([$this->email], $this->emails));
 	}
 
 
@@ -441,7 +437,7 @@ class User implements CmsUser
 
 
 	/**
-	 * @return string[]
+	 * @return array<string, string>
 	 */
 	public function getMetaData(): array
 	{

@@ -124,7 +124,7 @@ final class Helpers
 	 * Advance function for parsing real user full name.
 	 * Accept name in format "Doc. Ing. Jan Barášek, PhD."
 	 *
-	 * @return string[]|null[]
+	 * @return array{firstName: string|null, lastName: string|null, degreeBefore: string|null, degreeAfter: string|null}
 	 */
 	public static function nameParser(string $name): array
 	{

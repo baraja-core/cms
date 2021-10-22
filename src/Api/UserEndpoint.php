@@ -6,6 +6,7 @@ namespace Baraja\Cms\Api;
 
 
 use Baraja\BarajaCloud\CloudManager;
+use Baraja\Cms\Configuration;
 use Baraja\Cms\Helpers;
 use Baraja\Cms\Settings;
 use Baraja\Cms\User\Entity\CmsUser;
@@ -221,8 +222,12 @@ final class UserEndpoint extends BaseEndpoint
 			'domain' => Url::get()->getNetteUrl()->getDomain(3),
 			'locale' => 'cs',
 			'email' => $email,
-			'setPasswordUrl' => $password ? null : Url::get()->getBaseUrl() . '/admin/set-user-password?userId=' . $user->getId(),
-			'loginUrl' => Url::get()->getBaseUrl() . '/admin',
+			'setPasswordUrl' => $password
+				? null
+				: Url::get()->getBaseUrl()
+				. '/' . Configuration::get()->getBaseUri()
+				. '/set-user-password?userId=' . $user->getId(),
+			'loginUrl' => Url::get()->getBaseUrl() . '/' . Configuration::get()->getBaseUri(),
 		], 'POST');
 
 		$this->sendOk([
@@ -571,8 +576,8 @@ final class UserEndpoint extends BaseEndpoint
 
 
 	/**
-	 * @param string[] $roles
-	 * @param mixed[] $permissions
+	 * @param array<int, string> $roles
+	 * @param array<int, mixed> $permissions
 	 */
 	public function postSavePermissions(int $id, array $roles, array $permissions): void
 	{
@@ -585,7 +590,7 @@ final class UserEndpoint extends BaseEndpoint
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 		}
-		$roles = array_map(fn(string $role): string => strtolower($role), $roles);
+		$roles = array_map(static fn(string $role): string => strtolower($role), $roles);
 		if ($user->isAdmin() === false && \in_array('admin', $roles, true) === true) {
 			$this->sendError('You cannot set the administrator role manually. To maintain security, use the "Set as admin" button.');
 		}
@@ -864,15 +869,15 @@ final class UserEndpoint extends BaseEndpoint
 
 
 	/**
-	 * @return string[]
+	 * @return array<string, string>
 	 */
 	private function getAllRoles(): array
 	{
 		$roles = [];
 		$countTypes = [];
 		foreach ($this->getAllUsers() as $user) {
-			foreach ($user['roles'] ?? [] as $role) {
-				$roles[$role = (string) $role] = true;
+			foreach ($user['roles'] as $role) {
+				$roles[$role] = true;
 				if (isset($countTypes[$role]) === false) {
 					$countTypes[$role] = 1;
 				} else {
@@ -906,7 +911,7 @@ final class UserEndpoint extends BaseEndpoint
 
 
 	/**
-	 * @return mixed[][]
+	 * @return array<int, array{id: int, roles: array<int, string>, active: bool}>
 	 */
 	private function getAllUsers(): array
 	{

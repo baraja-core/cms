@@ -6,7 +6,7 @@ namespace Baraja\Cms\MiddleWare;
 
 
 use Baraja\AdminBar\AdminBar;
-use Baraja\Cms\Admin;
+use Baraja\Cms\Configuration;
 use Baraja\Cms\Context;
 use Baraja\Cms\Helpers;
 use Baraja\Cms\MenuManager;
@@ -43,22 +43,24 @@ final class TemplateRenderer
 	{
 		$components = $this->context->getComponents($plugin, $plugin instanceof ErrorPlugin ? 'default' : $view);
 		$this->panel->setRenderedComponents($components);
+		$baseUrl = Url::get()->getBaseUrl();
+		$baseUrlPrefix = $baseUrl . '/' . Configuration::get()->getBaseUriEscaped();
 
 		ob_start(static function () {
 		});
 
 		$args = [
 			'isDebug' => AdminBar::getBar()->isDebugMode(),
-			'basePath' => $baseUrl = Url::get()->getBaseUrl(),
+			'basePath' => $baseUrl,
 			'staticAssets' => array_merge($this->context->getCustomGlobalAssetPaths(), [
-				new CmsSimpleStaticAsset('js', $baseUrl . '/admin/cms-web-loader/' . $this->context->getPluginNameByType($plugin) . '.js'),
-				new CmsSimpleStaticAsset('js', $baseUrl . '/admin/assets/core.js'),
+				new CmsSimpleStaticAsset('js', $baseUrlPrefix . '/cms-web-loader/' . $this->context->getPluginNameByType($plugin) . '.js'),
+				new CmsSimpleStaticAsset('js', $baseUrlPrefix . '/assets/core.js'),
 			]),
 			'title' => $plugin instanceof BasePlugin ? $plugin->getTitle() : null,
 			'content' => $this->renderContentCode($plugin, $pluginName, $view, $components),
 			'locale' => $this->context->getLocale(),
 			'menu' => [
-				'dashboardLink' => $baseUrl . '/admin',
+				'dashboardLink' => $this->context->getContainer()->getLinkGenerator()->linkHomepage(),
 				'isDashboard' => $pluginName === 'Homepage' && $view === 'default',
 				'structure' => $this->menuManager->getItems(),
 				'activeKey' => $this->context->getPluginKey($plugin),
@@ -93,7 +95,7 @@ final class TemplateRenderer
 	</div>
 	<p>To visit this page, you must first verify through 2-step verification.</p>
 	<p class="text-secondary">That’s all we know.</p>
-	<p><a href="' . Url::get()->getBaseUrl() . '/admin/cms/sign-out" class="btn btn-primary">Sign out</a></p>
+	<p><a href="' . $this->context->getContainer()->getLinkGenerator()->link('Cms:signOut') . '" class="btn btn-primary">Sign out</a></p>
 </div>';
 	}
 
@@ -109,7 +111,7 @@ final class TemplateRenderer
 		</div>
 		<p>Open this page is not permitted for your account.</p>
 		<p class="text-secondary">That’s all we know.</p>
-		<p><a href="' . Url::get()->getBaseUrl() . '/admin/cms/sign-out" class="btn btn-primary">Sign out</a></p>
+		<p><a href="' . $this->context->getContainer()->getLinkGenerator()->link('Cms:signOut') . '" class="btn btn-primary">Sign out</a></p>
 	</div>
 </div>';
 	}
@@ -124,7 +126,7 @@ final class TemplateRenderer
 				__DIR__ . '/../../template/login.latte',
 				[
 					'basePath' => Url::get()->getBaseUrl(),
-					'availableLocales' => Admin::SUPPORTED_LOCALES,
+					'availableLocales' => Configuration::get()->getSupportedLocales(),
 					'projectName' => $this->context->getConfiguration()->get('name'),
 					'locale' => $locale,
 				],
@@ -141,7 +143,7 @@ final class TemplateRenderer
 				__DIR__ . '/../../template/loginOthAuth.latte',
 				[
 					'basePath' => Url::get()->getBaseUrl(),
-					'availableLocales' => Admin::SUPPORTED_LOCALES,
+					'availableLocales' => Configuration::get()->getSupportedLocales(),
 					'projectName' => $this->context->getConfiguration()->get('name'),
 					'locale' => $locale,
 				],
@@ -177,7 +179,7 @@ final class TemplateRenderer
 				__DIR__ . '/../../template/reset-password.latte',
 				[
 					'basePath' => Url::get()->getBaseUrl(),
-					'loginUrl' => Url::get()->getBaseUrl() . '/admin',
+					'loginUrl' => $this->context->getContainer()->getLinkGenerator()->linkHomepage(),
 					'locale' => $locale,
 					'username' => $request->getUser()->getUsername(),
 					'token' => $request->getToken(),
@@ -211,7 +213,7 @@ final class TemplateRenderer
 				__DIR__ . '/../../template/set-user-password.latte',
 				[
 					'basePath' => Url::get()->getBaseUrl(),
-					'loginUrl' => Url::get()->getBaseUrl() . '/admin',
+					'loginUrl' => $this->context->getContainer()->getLinkGenerator()->linkHomepage(),
 					'locale' => $locale,
 					'userId' => $user->getId(),
 					'username' => $user->getUsername(),
@@ -221,7 +223,7 @@ final class TemplateRenderer
 
 
 	/**
-	 * @param PluginComponent[] $components
+	 * @param array<int, PluginComponent> $components
 	 */
 	private function renderContentCode(Plugin $plugin, string $pluginName, string $view, array $components): string
 	{
@@ -304,7 +306,7 @@ final class TemplateRenderer
 
 
 	/**
-	 * @param SimpleComponent[] $simpleComponents
+	 * @param array<int, SimpleComponent> $simpleComponents
 	 */
 	private function renderSimpleComponents(array $simpleComponents): string
 	{
@@ -313,6 +315,6 @@ final class TemplateRenderer
 			$return[] = $component->toArray();
 		}
 
-		return (string) json_encode($return);
+		return (string) json_encode($return, JSON_THROW_ON_ERROR);
 	}
 }

@@ -47,7 +47,9 @@ final class LinkGenerator implements PluginLinkGenerator
 	public static function generateInternalLink(string $route, array $params = [], bool $nonce = false): string
 	{
 		if (($route[0] ?? '') === ':') {
-			throw new \InvalidArgumentException('Route "' . $route . '" can not be absolute. Please remove the starting colon.');
+			throw new \InvalidArgumentException(
+				'Route "' . $route . '" can not be absolute. Please remove the starting colon.'
+			);
 		}
 
 		[$plugin, $view] = explode(':', trim($route) . ':');
@@ -59,7 +61,9 @@ final class LinkGenerator implements PluginLinkGenerator
 			$view = 'default';
 		}
 		if ($plugin === 'Admin') {
-			throw new \InvalidArgumentException('Route "' . $route . '" is potentially bug (because it\'s just the logic of administration). Did you mean "Homepage:default"?');
+			throw new \InvalidArgumentException(
+				'Route "' . $route . '" is potentially bug (because it\'s just the logic of administration). Did you mean "Homepage:default"?'
+			);
 		}
 
 		$path = '';
@@ -77,7 +81,9 @@ final class LinkGenerator implements PluginLinkGenerator
 		}
 
 		return Strings::toAscii(
-			Url::get()->getBaseUrl() . '/admin' . ($path !== '' ? '/' . $path : '')
+			Url::get()->getBaseUrl()
+			. '/' . Configuration::get()->getBaseUriEscaped()
+			. ($path !== '' ? '/' . $path : '')
 			. ($params !== [] ? '?' . http_build_query($params) : '')
 		);
 	}
@@ -150,5 +156,11 @@ final class LinkGenerator implements PluginLinkGenerator
 	public function link(string $route, array $params = [], bool $nonce = false): string
 	{
 		return self::generateInternalLink($route, $params, $nonce);
+	}
+
+
+	public function linkHomepage(bool $nonce = false): string
+	{
+		return $this->link('Homepage:default', [], $nonce);
 	}
 }

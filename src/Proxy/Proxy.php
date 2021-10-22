@@ -6,6 +6,7 @@ namespace Baraja\Cms\Proxy;
 
 
 use Baraja\AssetsLoader\Minifier\DefaultJsMinifier;
+use Baraja\Cms\Configuration;
 use Baraja\Cms\Context;
 use Baraja\Cms\Helpers;
 use Baraja\Plugin\Plugin;
@@ -50,7 +51,7 @@ final class Proxy
 			);
 		}
 
-		return Url::get()->getBaseUrl() . '/admin/assets/' . $file;
+		return Url::get()->getBaseUrl() . '/' . Configuration::get()->getBaseUriEscaped() . '/assets/' . $file;
 	}
 
 

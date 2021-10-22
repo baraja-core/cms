@@ -6,6 +6,7 @@ namespace Baraja\Cms\MiddleWare;
 
 
 use Baraja\AdminBar\AdminBar;
+use Baraja\Cms\Configuration;
 use Baraja\Cms\Context;
 use Baraja\Cms\Helpers;
 use Baraja\Cms\LinkGenerator;
@@ -92,7 +93,11 @@ final class Application
 			if (str_starts_with($redirectPath, 'http')) {
 				$this->redirect($redirectPath);
 			}
-			$this->redirect(Url::get()->getBaseUrl() . '/admin' . ($redirectPath === '' ? '' : '/' . $redirectPath));
+			$this->redirect(
+				Url::get()->getBaseUrl()
+				. '/' . Configuration::get()->getBaseUriEscaped()
+				. ($redirectPath === '' ? '' : '/' . $redirectPath)
+			);
 		} catch (PluginTerminateException) {
 			$this->terminate();
 		} catch (PluginUserErrorException $e) {
@@ -131,8 +136,8 @@ final class Application
 			);
 		}
 		if ($this->context->getSettings()->isOk() === false) { // route installation workflow
-			if ($path !== '') { // canonize configuration request to base admin URL
-				$this->redirect(Url::get()->getBaseUrl() . '/admin');
+			if ($path !== '') { // canonize configuration request to homepage URL
+				$this->redirect($this->context->getContainer()->getLinkGenerator()->linkHomepage());
 			}
 			$this->terminate($this->context->getSettings()->runInstallProcess());
 		}

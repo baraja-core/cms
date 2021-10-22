@@ -54,14 +54,14 @@ final class MenuManager
 					'key' => $plugin['service'],
 					'title' => $plugin['label'],
 					'priority' => $plugin['priority'],
-					'link' => 'admin/' . $route,
+					'link' => Configuration::get()->getBaseUri() . '/' . $route,
 					'icon' => $plugin['icon'] ?? null,
 					'child' => [],
 				];
 			}
 		}
 
-		usort($return, fn(array $a, array $b): int => $a['priority'] < $b['priority'] ? 1 : -1);
+		usort($return, static fn(array $a, array $b): int => $a['priority'] < $b['priority'] ? 1 : -1);
 
 		return $return;
 	}

@@ -22,7 +22,7 @@ interface CmsUser extends IIdentity
 	): void;
 
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	public function getRoles(): array;
 
@@ -31,7 +31,7 @@ interface CmsUser extends IIdentity
 	public function containPrivilege(string $privilege): bool;
 
 	/**
-	 * @return string[]
+	 * @return array<string, string>
 	 */
 	public function getData(): array;
 
@@ -60,7 +60,7 @@ interface CmsUser extends IIdentity
 	public function resetPrivileges(): void;
 
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	public function getPrivileges(): array;
 
@@ -91,7 +91,7 @@ interface CmsUser extends IIdentity
 	public function setCreateDate(\DateTime $createDate): void;
 
 	/**
-	 * @return string[]
+	 * @return array<string, string>
 	 */
 	public function getMetaData(): array;
 

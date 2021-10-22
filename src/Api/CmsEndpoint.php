@@ -6,6 +6,7 @@ namespace Baraja\Cms\Api;
 
 
 use Baraja\BarajaCloud\CloudManager;
+use Baraja\Cms\Configuration;
 use Baraja\Cms\ContextAccessor;
 use Baraja\Cms\Helpers;
 use Baraja\Cms\Session;
@@ -168,7 +169,7 @@ final class CmsEndpoint extends BaseEndpoint
 					'locale' => $locale,
 					'username' => $user->getUsername(),
 					'email' => $user->getEmail(),
-					'loginUrl' => Url::get()->getBaseUrl() . '/admin',
+					'loginUrl' => Url::get()->getBaseUrl() . '/' . Configuration::get()->getBaseUri(),
 				]);
 			} catch (NoResultException | NonUniqueResultException) {
 				// Silence is golden.

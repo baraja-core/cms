@@ -49,7 +49,7 @@ use Tracy\ILogger;
 final class CmsExtension extends CompilerExtension
 {
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	public static function mustBeDefinedBefore(): array
 	{
