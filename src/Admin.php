@@ -10,7 +10,6 @@ use Baraja\Cms\MiddleWare\Application;
 use Baraja\Cms\MiddleWare\Bridge\SentryBridge;
 use Baraja\Cms\MiddleWare\TemplateRenderer;
 use Baraja\Url\Url;
-use Nette\Application\Responses\VoidResponse;
 use Nette\Http\IResponse;
 use Psr\Log\LogLevel;
 use Tracy\Debugger;
@@ -57,13 +56,63 @@ final class Admin
 	}
 
 
-	public function run(?string $locale, string $path): void
+	/**
+	 * @return never-return
+	 */
+	public function run(?string $locale = null, ?string $path = null): void
 	{
 		if (PHP_SAPI === 'cli') {
 			throw new \RuntimeException('CMS is not available in CLI.');
 		}
+		if ($locale !== null) {
+			trigger_error('Argument $locale is deprecated. Please remove it from your implementation.');
+		}
+		if ($path !== null) {
+			trigger_error('Argument $path is deprecated. Please remove it from your implementation.');
+		} else {
+			$path = Url::get()->getRelativeUrl();
+		}
 		if (self::isAdminRequest() === false) {
-			return;
+			throw new \LogicException(sprintf('Path "%s" is not a admin request.', $path));
+		}
+
+		$route = $this->route($path);
+		try {
+			$this->runApplication(
+				plugin: $route['plugin'],
+				view: $route['view'],
+				locale: $route['locale'] ?? $this->context->getLocale(),
+				path: $route['path'],
+			);
+		} catch (\Throwable $e) {
+			Helpers::brokenAdmin($e);
+		}
+		die;
+	}
+
+
+	/**
+	 * @return array{plugin: string, view: string, locale: string|null, path: string}
+	 */
+	private function route(string $path): array
+	{
+		$config = Configuration::get();
+		$pattern = sprintf(
+			'/^%s(?:\/+(?<locale>%s))?(?<path>\/.*|\?.*|)$/',
+			$config->getBaseUri(),
+			implode('|', $config->getSupportedLocales()),
+		);
+
+		$locale = null;
+		if (preg_match($pattern, $path, $parser) === 1) {
+			if (isset($parser['locale']) && is_string($parser['locale']) && $parser['locale'] !== '') {
+				$locale = $parser['locale'];
+			}
+			if (isset($parser['path']) && is_string($parser['path'])) {
+				$path = $parser['path'];
+			} else {
+				throw new \LogicException(sprintf('Path can not be parsed, but "%s" given.', $path));
+			}
 		}
 
 		$path = trim((string) preg_replace('/^\/?([a-zA-Z0-9-.\/]+).*$/', '$1', $path), '/');
@@ -76,11 +125,22 @@ final class Admin
 			$plugin = Helpers::formatPresenterNameByUri(explode('?', $plugin)[0]) ?: null;
 		}
 
+		return [
+			'plugin' => $plugin ?: 'Homepage',
+			'view' => $view ?: 'default',
+			'locale' => $locale,
+			'path' => $path,
+		];
+	}
+
+
+	private function runApplication(string $plugin, string $view, string $locale, string $path): void
+	{
 		try {
 			$this->application->run(
 				plugin: $plugin ?: 'Homepage',
 				view: $view ?: 'default',
-				locale: $locale ?? $this->context->getLocale(),
+				locale: $locale,
 				path: $path,
 			);
 		} catch (AdminBusinessLogicControlException $controlException) {
@@ -95,17 +155,17 @@ final class Admin
 			} catch (\Throwable) {
 				// Silence is golden.
 			}
-			Helpers::brokenAdmin($e);
 		}
-		die;
 	}
 
 
+	/**
+	 * @return never-return
+	 */
 	private function processBusinessLogic(AdminBusinessLogicControlException $e): void
 	{
 		if ($e instanceof AdminRedirect) {
 			$this->context->getResponse()->redirect($e->getUrl(), IResponse::S302_FOUND);
-			(new VoidResponse)->send($this->context->getRequest(), $this->context->getResponse());
 			die;
 		}
 		throw new \LogicException('Implementation for control exception "' . $e::class . '" has not implemented.');

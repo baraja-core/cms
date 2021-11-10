@@ -23,9 +23,6 @@ use Baraja\Cms\User\UserManager;
 use Baraja\Cms\User\UserManagerAccessor;
 use Baraja\Cms\User\UserMetaManager;
 use Baraja\Doctrine\ORM\DI\OrmAnnotationsExtension;
-use Baraja\PathResolvers\Resolvers\RootDirResolver;
-use Baraja\PathResolvers\Resolvers\TempDirResolver;
-use Baraja\PathResolvers\Resolvers\VendorResolver;
 use Baraja\Plugin\Component\VueComponent;
 use Baraja\Plugin\PluginComponentExtension;
 use Baraja\Plugin\PluginLinkGenerator;
@@ -94,13 +91,8 @@ final class CmsExtension extends CompilerExtension
 			->setFactory(Admin::class);
 
 		// context
-		$tempDir = (new TempDirResolver(new RootDirResolver(new VendorResolver)))->get('baraja.cms');
-		if (is_dir($tempDir) === false) {
-			FileSystem::createDir($tempDir);
-		}
 		$context = $builder->addDefinition($this->prefix('context'))
-			->setFactory(Context::class)
-			->setArgument('tempDir', $tempDir);
+			->setFactory(Context::class);
 
 		$builder->addAccessorDefinition($this->prefix('contextAccessor'))
 			->setImplement(ContextAccessor::class);
@@ -289,20 +281,15 @@ final class CmsExtension extends CompilerExtension
 		$class->getMethod('initialize')->addBody(
 			'// admin (cms).' . "\n"
 			. '(function (): void {' . "\n"
-			. "\t" . 'if (preg_match(?, ' . Url::class . '::get()->getRelativeUrl(), $parser)) {' . "\n"
-			. "\t\t" . '$this->getService(?)->onStartup[] = function(' . Application::class . ' $a) use ($parser): void {' . "\n"
-			. "\t\t\t" . 'try {' . "\n"
-			. "\t\t\t\t" . '$this->getService(?)->run($parser[\'locale\'] \?: null, $parser[\'path\']);' . "\n"
-			. "\t\t\t" . '} catch (\Throwable $e) {' . "\n"
-			. "\t\t\t\t" . Helpers::class . '::brokenAdmin($e); die;' . "\n"
-			. "\t\t\t" . '}' . "\n"
+			. "\t" . 'if (' . Admin::class . '::isAdminRequest()) {' . "\n"
+			. "\t\t" . '$this->getService(?)->onStartup[] = function(' . Application::class . ' $a): void {' . "\n"
+			. "\t\t\t" . '$this->getService(?)->run();' . "\n"
 			. "\t\t" . '};' . "\n"
 			. "\t" . '}' . "\n"
 			. "\t" . AdminBar::class . '::getBar()->setUser(new ' . AdminBarUser::class . '($this->getService(?)));' . "\n"
 			. "\t" . '$this->getService(?)->setup();' . "\n"
 			. '})();',
 			[
-				'/^admin(?:\/+(?<locale>' . implode('|', Admin::SUPPORTED_LOCALES) . '))?(?<path>\/.*|\?.*|)$/',
 				$application->getName(),
 				$admin->getName(),
 				$netteUser->getName(),

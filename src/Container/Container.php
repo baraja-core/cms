@@ -8,6 +8,7 @@ namespace Baraja\Cms\Container;
 use Baraja\Cms\Configuration;
 use Baraja\Cms\LinkGenerator;
 use Baraja\Plugin\CmsPluginPanel;
+use Baraja\Plugin\PluginManager;
 use Nette\Caching\Storage;
 use Nette\Caching\Storages\FileStorage;
 use Psr\Container\ContainerInterface;
@@ -29,16 +30,19 @@ final class Container implements ContainerInterface
 
 	private ?CmsPluginPanel $pluginPanel = null;
 
+	private PluginManager $pluginManager;
+
 	/** @var array<string, string> */
 	private array $map = [
 		'storage' => 'getCacheStorage',
 	];
 
 
-	public function __construct()
+	public function __construct(PluginManager $pluginManager)
 	{
 		self::$singleton = $this;
 		$this->configuration = Configuration::get();
+		$this->pluginManager = $pluginManager;
 	}
 
 
@@ -92,18 +96,20 @@ final class Container implements ContainerInterface
 
 	public function getRequest(): RequestInterface
 	{
+		throw new \LogicException('Method has not been implemented.');
 	}
 
 
 	public function getResponse(): ResponseInterface
 	{
+		throw new \LogicException('Method has not been implemented.');
 	}
 
 
 	public function getPluginPanel(): CmsPluginPanel
 	{
 		if ($this->pluginPanel === null) {
-			$this->pluginPanel = new CmsPluginPanel;
+			$this->pluginPanel = new CmsPluginPanel($this->pluginManager);
 		}
 
 		return $this->pluginPanel;

@@ -21,8 +21,6 @@ use Baraja\Plugin\Exception\PluginUserErrorException;
 use Baraja\Search\Search;
 use Baraja\ServiceMethodInvoker;
 use Baraja\Url\Url;
-use Nette\Application\Responses\TextResponse;
-use Nette\Application\Responses\VoidResponse;
 use Nette\Http\IResponse;
 
 final class Application
@@ -48,6 +46,8 @@ final class Application
 	 * 7. Verification of access rights to the plugin and action
 	 * 8. Processing of internal logic of the plugin
 	 * 9. Render the template and end the request
+	 *
+	 * @return never-return
 	 */
 	public function run(string $plugin, string $view, string $locale, string $path): void
 	{
@@ -180,21 +180,24 @@ final class Application
 	}
 
 
+	/**
+	 * @return never-return
+	 */
 	private function terminate(?string $haystack = null): void
 	{
-		if ($haystack === null) {
-			$response = new VoidResponse;
-		} else {
+		if ($haystack !== null) {
 			if (AdminBar::getBar()->isDebugMode() === false) { // minify HTML in production mode
 				$haystack = Helpers::minifyHtml($haystack);
 			}
-			$response = new TextResponse($haystack);
+			echo $haystack;
 		}
-		$response->send($this->context->getRequest(), $this->context->getResponse());
 		die;
 	}
 
 
+	/**
+	 * @return never-return
+	 */
 	private function redirect(string $url, int $httpCode = IResponse::S302_FOUND): void
 	{
 		$this->context->getResponse()->redirect($url, $httpCode);

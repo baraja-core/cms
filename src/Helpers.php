@@ -225,6 +225,9 @@ final class Helpers
 	}
 
 
+	/**
+	 * @return never-return
+	 */
 	public static function brokenAdmin(\Throwable $e): void
 	{
 		$logged = false;
@@ -249,5 +252,6 @@ final class Helpers
 				'isLogged' => $logged,
 				'isDebug' => Configuration::get()->isDebugMode(),
 			]));
+		die;
 	}
 }
