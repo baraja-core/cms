@@ -49,6 +49,7 @@ final class Container implements ContainerInterface
 	public function get(string $id): object
 	{
 		if (isset($this->map[$id])) {
+			/** @phpstan-ignore-next-line */
 			return $this->{$this->map[$id]}();
 		}
 		throw new ServiceDoesNotExistException('Service "' . $id . '" does not exist.');

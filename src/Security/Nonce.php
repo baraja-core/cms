@@ -25,6 +25,7 @@ final class Nonce
 		if (headers_sent() === true) {
 			throw new \LogicException('HTTP headers can not be sent before setup nonce.');
 		}
+		/** @phpstan-ignore-next-line */
 		self::$lastNonce = (array) (Session::get(Session::WORKFLOW_NONCE) ?? []);
 		if (count(self::$lastNonce) > 32 && mt_rand() / mt_getrandmax() < 0.01) { // gc
 			$minAllowedTime = $this->getMinimalAllowedTime();

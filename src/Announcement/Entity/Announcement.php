@@ -50,7 +50,7 @@ class Announcement
 	public function __construct(User $user, ?string $locale, string $message, ?self $parent = null)
 	{
 		$this->user = $user;
-		$this->locale = $locale ? Localization::normalize($locale) : null;
+		$this->locale = $locale !== null ? Localization::normalize($locale) : null;
 		$this->setMessage($message);
 		$this->parent = $parent;
 		$this->showSince = new \DateTime;

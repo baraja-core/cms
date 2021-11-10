@@ -20,12 +20,12 @@ use Nette\Security\AuthenticationException;
 use Nette\Security\Authenticator;
 use Nette\Security\IIdentity;
 use Nette\Security\UserStorage;
-use Nette\Utils\DateTime;
 
 final class UserManager implements Authenticator
 {
 	private ?AuthenticationService $authenticationService = null;
 
+	/** @var class-string<CmsUser> */
 	private string $defaultEntity;
 
 	private UserMetaManager $userMetaManager;
@@ -39,7 +39,7 @@ final class UserManager implements Authenticator
 	) {
 		$userEntity ??= User::class;
 		if (is_subclass_of($userEntity, CmsUser::class) === false) {
-			throw new \InvalidArgumentException('User entity "' . $userEntity . '" must implements "' . CmsUser::class . '" interface.');
+			throw new \InvalidArgumentException(sprintf('User entity "%s" must implements "%s" interface.', $userEntity, CmsUser::class));
 		}
 		$this->defaultEntity = $userEntity;
 		$this->userMetaManager = new UserMetaManager($this->entityManager, $this);
@@ -48,7 +48,7 @@ final class UserManager implements Authenticator
 
 	public function isLoggedIn(): bool
 	{
-		return $this->userStorage->getState()[0] ?? false;
+		return $this->userStorage->getState()[0];
 	}
 
 
@@ -78,42 +78,52 @@ final class UserManager implements Authenticator
 	}
 
 
-	public function getIdentity(): ?IIdentity
+	public function getIdentity(): ?CmsUser
 	{
-		return $this->userStorage->getState()[1];
-	}
-
-
-	public function getCmsIdentity(): ?CmsUser
-	{
-		$identity = $this->getIdentity();
-		if ($identity !== null) {
-			return $this->getUserById($identity->getId());
+		$identity = $this->userStorage->getState()[1];
+		$identifier = $identity !== null ? $identity->getId() : null;
+		if (is_int($identifier) || is_string($identifier)) {
+			return $this->getUserById((int) $identifier);
 		}
 
 		return null;
 	}
 
 
+	/**
+	 * @deprecated since 2021-11-10, use getIdentity() instead.
+	 */
+	public function getCmsIdentity(): ?CmsUser
+	{
+		return $this->getIdentity();
+	}
+
+
+	/**
+	 * @return class-string<CmsUser>
+	 */
 	public function getDefaultEntity(): string
 	{
 		return $this->defaultEntity;
 	}
 
 
-	public function createIdentity(IIdentity $user, string $expiration = '2 hours'): IIdentity
+	public function createLoginIdentity(IIdentity $user, string $expiration = '2 hours'): AdminIdentity
 	{
-		$name = null;
-		$avatarUrl = null;
-		if ($user instanceof CmsUser) {
-			$name = $user->getName();
-			$avatarUrl = $user->getAvatarUrl();
-			if ($user->getOtpCode() !== null) { // need OTP authentication
-				Session::set(Session::WORKFLOW_NEED_OTP_AUTH, true);
-			}
+		if (!$user instanceof CmsUser) {
+			throw new \LogicException(sprintf('User identity must be instance of "%s", but "%s" given.', CmsUser::class, $user::class));
+		}
+		if ($user->getOtpCode() !== null) { // need OTP authentication
+			Session::set(Session::WORKFLOW_NEED_OTP_AUTH, true);
 		}
 
-		$identity = new AdminIdentity($user->getId(), $user->getRoles(), [], $name, $avatarUrl);
+		$identity = new AdminIdentity(
+			id: $user->getId(),
+			roles: $user->getRoles(),
+			data: [],
+			name: $user->getName(),
+			avatarUrl: $user->getAvatarUrl(),
+		);
 		$this->userStorage->saveAuthentication($identity);
 		$this->userStorage->setExpiration($expiration, false);
 
@@ -151,12 +161,12 @@ final class UserManager implements Authenticator
 				$identity = $this->authenticationService->authentication($username, $password);
 				$this->logLoginAttempt($attempt, $identity);
 
-				return $this->createIdentity($identity, $expiration);
+				return $this->createLoginIdentity($identity, $expiration);
 			} catch (\Throwable $serviceException) {
 				try {
 					return $this->fallbackAuthenticate($attempt, $username, $password, $expiration);
 				} catch (\Throwable) {
-					throw new AuthenticationException($serviceException->getMessage(), $serviceException->getCode(), $serviceException);
+					throw new AuthenticationException($serviceException->getMessage(), 500, $serviceException);
 				}
 			}
 		}
@@ -191,6 +201,7 @@ final class UserManager implements Authenticator
 	 */
 	public function getUserByUsername(string $username): CmsUser
 	{
+		/** @phpstan-ignore-next-line */
 		return $this->entityManager->getRepository($this->defaultEntity)
 			->createQueryBuilder('user')
 			->where('user.username = :username')
@@ -209,12 +220,19 @@ final class UserManager implements Authenticator
 		/** @var array<int, CmsUser> $cache */
 		static $cache = [];
 
-		return $cache[$id] ?? $cache[$id] = $this->entityManager->getRepository($this->defaultEntity)
+		$find = function (int $id): CmsUser {
+			/** @var CmsUser $entity */
+			$entity = $this->entityManager->getRepository($this->defaultEntity)
 				->createQueryBuilder('user')
 				->where('user.id = :id')
 				->setParameter('id', $id)
 				->getQuery()
 				->getSingleResult();
+
+			return $entity;
+		};
+
+		return $cache[$id] ?? $cache[$id] = $find($id);
 	}
 
 
@@ -223,7 +241,7 @@ final class UserManager implements Authenticator
 		try {
 			$code = random_bytes(10);
 		} catch (\Exception $e) {
-			throw new \RuntimeException($e->getMessage(), $e->getCode(), $e);
+			throw new \RuntimeException($e->getMessage(), 500, $e);
 		}
 
 		return $code;
@@ -256,7 +274,7 @@ final class UserManager implements Authenticator
 			return false;
 		}
 
-		return DateTime::from($lastActivity)->getTimestamp() + 30 >= time();
+		return (new \DateTime($lastActivity))->getTimestamp() + 30 >= time();
 	}
 
 
@@ -274,7 +292,7 @@ final class UserManager implements Authenticator
 		if (isset($_SESSION) && session_status() === PHP_SESSION_ACTIVE) {
 			Session::set(Session::LAST_IDENTITY_ID, $currentIdentity->getId());
 		}
-		$this->createIdentity($user);
+		$this->createLoginIdentity($user);
 		Session::remove(Session::WORKFLOW_NEED_OTP_AUTH);
 	}
 
@@ -309,7 +327,7 @@ final class UserManager implements Authenticator
 			->andWhere('login.password = FALSE')
 			->setParameter('username', $username)
 			->setParameter('ip', $ip ?? Ip::get())
-			->setParameter('intervalDate', DateTime::from('now - ' . $blockInterval))
+			->setParameter('intervalDate', new \DateTime('now - ' . $blockInterval))
 			->setMaxResults(((int) $blockCount) * 2)
 			->getQuery()
 			->getArrayResult();
@@ -346,7 +364,7 @@ final class UserManager implements Authenticator
 			$user = $this->getUserByUsername($username);
 		} catch (NoResultException | NonUniqueResultException) {
 			throw new AuthenticationException(
-				'The username is incorrect. Username "' . $username . '" given.',
+				sprintf('The username is incorrect. Username "%s" given.', $username),
 				Authenticator::IDENTITY_NOT_FOUND,
 			);
 		}
@@ -355,9 +373,9 @@ final class UserManager implements Authenticator
 		}
 		$this->entityManager->flush();
 
-		if ($this->userMetaManager->get((int) $user->getId(), 'blocked') === 'true') {
+		if ($this->userMetaManager->get($user->getId(), 'blocked') === 'true') {
 			throw new AuthenticationException(
-				$this->userMetaManager->get((int) $user->getId(), 'block-reason') ?? '',
+				$this->userMetaManager->get($user->getId(), 'block-reason') ?? '',
 				Authenticator::NOT_APPROVED,
 			);
 		}
@@ -366,12 +384,12 @@ final class UserManager implements Authenticator
 
 		if ($hash === '---empty-password---') {
 			throw new AuthenticationException(
-				'User password is empty or account is locked, please contact your administrator. Username "' . $username . '" given.',
+				sprintf('User password is empty or account is locked, please contact your administrator. Username "%s" given.', $username),
 				Authenticator::FAILURE,
 			);
 		}
 		if ($user->passwordVerify($password) === false) {
-			throw new AuthenticationException('The password is incorrect. Username "' . $username . '" given.');
+			throw new AuthenticationException(sprintf('The password is incorrect. Username "%s" given.', $username));
 		}
 		if (password_needs_rehash($hash, PASSWORD_DEFAULT)) {
 			try {
@@ -383,6 +401,6 @@ final class UserManager implements Authenticator
 
 		$this->logLoginAttempt($attempt, $user);
 
-		return $this->createIdentity($user, $expiration);
+		return $this->createLoginIdentity($user, $expiration);
 	}
 }

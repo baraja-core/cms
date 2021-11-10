@@ -61,16 +61,16 @@ final class CmsEndpoint extends BaseEndpoint
 			$this->sendError('Empty username or password.');
 		}
 		try {
-			$user = $this->userManager->authenticate($username, $password, $remember);
+			$this->userManager->authenticate($username, $password, $remember);
 		} catch (AuthenticationException $e) {
 			$code = $e->getCode();
 			if (in_array($code, [Authenticator::IDENTITY_NOT_FOUND, Authenticator::INVALID_CREDENTIAL, Authenticator::FAILURE], true)) {
 				$this->sendError($e->getMessage());
 			} elseif ($code === Authenticator::NOT_APPROVED) {
-				$reason = (string) $e->getMessage();
+				$reason = $e->getMessage();
 				$this->sendError(
 					'The user has been assigned a permanent block. Please contact your administrator.'
-					. ($reason !== '' ? ' Reason for blocking: ' . $reason : ''),
+					. ($reason !== '' ? ' Block reason: ' . $reason : ''),
 				);
 			} else {
 				$this->sendError('Wrong username or password.');
@@ -92,6 +92,7 @@ final class CmsEndpoint extends BaseEndpoint
 		if ($userEntity === null) {
 			$this->sendError('User is not logged in.');
 		}
+		assert($userEntity instanceof CmsUser);
 		try {
 			$user = $this->userManager->getUserById($userEntity->getId());
 		} catch (NoResultException | NonUniqueResultException) {
@@ -149,7 +150,7 @@ final class CmsEndpoint extends BaseEndpoint
 
 	public function postForgotUsername(string $locale, string $realName): void
 	{
-		if (preg_match('/^(\S+)\s+(\S+)$/', trim($realName), $parser)) {
+		if (preg_match('/^(\S+)\s+(\S+)$/', trim($realName), $parser) === 1) {
 			try {
 				/** @var CmsUser $user */
 				$user = $this->entityManager->getRepository($this->userManager->getDefaultEntity())

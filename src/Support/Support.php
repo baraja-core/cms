@@ -38,6 +38,7 @@ final class Support
 	 */
 	public function getIssues(): array
 	{
+		/** @phpstan-ignore-next-line */
 		return $this->cloudManager->callRequest('cms-issue', [
 			'domain' => $this->getDomain(),
 		]);

@@ -78,7 +78,7 @@ final class TemplateRenderer
 			return (string) ob_get_clean();
 		} catch (\Throwable $e) {
 			ob_end_clean();
-			throw new \RuntimeException($e->getMessage(), $e->getCode(), $e);
+			throw new \RuntimeException($e->getMessage(), 500, $e);
 		}
 	}
 
@@ -313,6 +313,6 @@ final class TemplateRenderer
 			$return[] = $component->toArray();
 		}
 
-		return (string) json_encode($return, JSON_THROW_ON_ERROR);
+		return json_encode($return, JSON_THROW_ON_ERROR);
 	}
 }

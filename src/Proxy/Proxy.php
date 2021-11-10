@@ -97,7 +97,7 @@ final class Proxy
 	{
 		header('Content-Type: ' . self::CONTENT_TYPES['js']);
 
-		if (preg_match('/^cms-web-loader\/(.+)\.js$/', $path, $parser)) {
+		if (preg_match('/^cms-web-loader\/(.+)\.js$/', $path, $parser) === 1) {
 			$return = '/*' . "\n";
 			$return .= ' * This file is part of Baraja CMS.' . "\n";
 			$return .= ' * Routed by plugin: ' . htmlspecialchars($parser[1]) . "\n";

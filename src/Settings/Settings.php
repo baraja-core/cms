@@ -39,7 +39,7 @@ final class Settings
 
 	public function getSystemInfo(): SystemInfo
 	{
-		return new SystemInfo($this->entityManager, $this->config, $this->userManager);
+		return new SystemInfo($this->userManager);
 	}
 
 

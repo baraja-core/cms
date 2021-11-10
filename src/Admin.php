@@ -120,14 +120,14 @@ final class Admin
 
 		if ($more === '' && $view !== '') { // route plugin request in format "xxx/yyy"
 			$plugin = Helpers::formatPresenterNameByUri($plugin);
-			$view = Helpers::formatActionNameByUri(explode('?', $view)[0]) ?: null;
+			$view = Helpers::formatActionNameByUri(explode('?', $view)[0]);
 		} elseif ($plugin !== '') { // route plugin request in format "xxx"
-			$plugin = Helpers::formatPresenterNameByUri(explode('?', $plugin)[0]) ?: null;
+			$plugin = Helpers::formatPresenterNameByUri(explode('?', $plugin)[0]);
 		}
 
 		return [
-			'plugin' => $plugin ?: 'Homepage',
-			'view' => $view ?: 'default',
+			'plugin' => $plugin !== '' ? $plugin : 'Homepage',
+			'view' => $view !== '' ? $view : 'default',
 			'locale' => $locale,
 			'path' => $path,
 		];
@@ -138,8 +138,8 @@ final class Admin
 	{
 		try {
 			$this->application->run(
-				plugin: $plugin ?: 'Homepage',
-				view: $view ?: 'default',
+				plugin: $plugin,
+				view: $view,
 				locale: $locale,
 				path: $path,
 			);

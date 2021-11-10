@@ -83,7 +83,7 @@ final class CmsExtension extends CompilerExtension
 			$pluginContext = $builder->getDefinitionByType(\Baraja\Plugin\Context::class);
 			$pluginContext->addSetup('?->setLinkGenerator(?)', ['@self', '@' . PluginLinkGenerator::class]);
 		} catch (MissingServiceException $e) {
-			throw new \RuntimeException('Can not compile CMS extension, because service "' . \Baraja\Plugin\Context::class . '" (from package baraja-core/plugin-system) does not exist. Did you register Plugin system extension before CMS?', $e->getCode(), $e);
+			throw new \RuntimeException('Can not compile CMS extension, because service "' . \Baraja\Plugin\Context::class . '" (from package baraja-core/plugin-system) does not exist. Did you register Plugin system extension before CMS?', 500, $e);
 		}
 
 		// admin
@@ -308,13 +308,13 @@ final class CmsExtension extends CompilerExtension
 			$url = null;
 			$format = null;
 			if (is_string($asset)) {
-				if (preg_match('/^(?<name>.+)\.(?<format>[a-zA-Z0-9]+)(?:\?.*)?$/', $asset, $formatParser)) {
+				if (preg_match('/^(?<name>.+)\.(?<format>[a-zA-Z0-9]+)(?:\?.*)?$/', $asset, $formatParser) === 1) {
 					$format = $formatParser['format'] ?? null;
 				} else {
 					throw new \RuntimeException('Invalid asset filename "' . $asset . '". Did you mean "' . $asset . '.js"?');
 				}
 				$url = $asset;
-			} elseif (is_array($asset)) {
+			} else {
 				$url = $asset['url'] ?? null;
 				$format = $asset['format'] ?? null;
 			}

@@ -7,7 +7,6 @@ namespace Baraja\Cms\User\Entity;
 
 use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Doctrine\ORM\Mapping as ORM;
-use Nette\Utils\DateTime;
 use Nette\Utils\Random;
 
 #[ORM\Entity]
@@ -36,8 +35,8 @@ class UserResetPasswordRequest
 	{
 		$this->user = $user;
 		$this->token = Random::generate(40);
-		$this->insertedDate = DateTime::from('now');
-		$this->expireDate = DateTime::from('now + ' . (trim($expireTime) ?: '30 minutes'));
+		$this->insertedDate = new \DateTime('now');
+		$this->expireDate = new \DateTime(sprintf('now + %s', $expireTime));
 	}
 
 

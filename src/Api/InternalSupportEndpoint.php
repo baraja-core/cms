@@ -7,7 +7,6 @@ namespace Baraja\Cms\Api;
 
 use Baraja\Cms\Support\Support;
 use Baraja\StructuredApi\BaseEndpoint;
-use Nette\Utils\DateTime;
 use Nette\Utils\Strings;
 use Nette\Utils\Validators;
 
@@ -52,7 +51,7 @@ final class InternalSupportEndpoint extends BaseEndpoint
 		}
 		$dueDateReal = null;
 		if ($dueDate !== null) {
-			$dueDateReal = DateTime::from($dueDate);
+			$dueDateReal = new \DateTime($dueDate);
 			if ($dueDateReal->getTimestamp() <= time()) {
 				$this->sendError('Ths issue due date cannot be in the past.');
 			}

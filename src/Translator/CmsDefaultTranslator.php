@@ -11,6 +11,7 @@ final class CmsDefaultTranslator implements Translator
 {
 	public function translate($message, ...$parameters): string
 	{
+		/** @phpstan-ignore-next-line */
 		return (string) $message;
 	}
 }

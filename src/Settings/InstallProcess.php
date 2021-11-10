@@ -34,11 +34,14 @@ final class InstallProcess
 		}
 
 		if ($dbOk === false) {
+			/** @var string $host */
+			$host = $this->entityManager->getConnection()->getParams()['host'] ?? '';
+
 			return (new Engine)
 				->renderToString(__DIR__ . '/../../template/install-database.latte', [
 					'basePath' => Url::get()->getBaseUrl(),
 					'locale' => $this->localization->getLocale(),
-					'isCloudHost' => (bool) preg_match('/^.+?\.ondigitalocean\.com$/', $host = $this->entityManager->getConnection()->getParams()['host'] ?? ''),
+					'isCloudHost' => str_ends_with($host, '.ondigitalocean.com'),
 					'host' => $host,
 					'user' => $this->entityManager->getConnection()->getParams()['user'] ?? '?',
 					'exception' => $databaseException,

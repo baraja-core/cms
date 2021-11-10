@@ -130,22 +130,24 @@ final class Helpers
 	{
 		static $degreePattern = '((?:(?:\s*(?:[A-Za-z]{2,8})\.\s*)+))?';
 		$normalized = str_replace(',', '', trim(str_replace('/\s+/', ' ', $name)));
-		$degreeBefore = null;
-		$degreeAfter = null;
+		$degreeBefore = '';
+		$degreeAfter = '';
 
-		if (preg_match('/^' . $degreePattern . '\s*([^.]+?)?\s*' . $degreePattern . '$/', $normalized, $degreeParser)) {
+		if (preg_match('/^' . $degreePattern . '\s*([^.]+?)?\s*' . $degreePattern . '$/', $normalized, $degreeParser) === 1) {
 			$normalized = trim($degreeParser[2] ?? '');
-			$degreeBefore = trim($degreeParser[1] ?? '') ?: null;
-			$degreeAfter = trim($degreeParser[3] ?? '') ?: null;
+			$degreeBefore = trim($degreeParser[1] ?? '');
+			$degreeAfter = trim($degreeParser[3] ?? '');
 		}
 
 		$parts = explode(' ', $normalized, 2);
+		$firstName = Strings::firstUpper($parts[0] ?? '');
+		$lastName = Strings::firstUpper($parts[1] ?? '');
 
 		return [
-			'firstName' => Strings::firstUpper($parts[0] ?? '') ?: null,
-			'lastName' => Strings::firstUpper($parts[1] ?? '') ?: null,
-			'degreeBefore' => $degreeBefore,
-			'degreeAfter' => $degreeAfter,
+			'firstName' => $firstName !== '' ? $firstName : null,
+			'lastName' => $lastName !== '' ? $lastName : null,
+			'degreeBefore' => $degreeBefore !== '' ? $degreeBefore : null,
+			'degreeAfter' => $degreeAfter !== '' ? $degreeAfter : null,
 		];
 	}
 
@@ -197,7 +199,7 @@ final class Helpers
 	 */
 	public static function escapeHtmlComment(string $s): string
 	{
-		if ($s && (str_starts_with($s, '-') || str_starts_with($s, '>') || str_starts_with($s, '!'))) {
+		if ($s !== '' && (str_starts_with($s, '-') || str_starts_with($s, '>') || str_starts_with($s, '!'))) {
 			$s = ' ' . $s;
 		}
 
@@ -214,7 +216,7 @@ final class Helpers
 	{
 		$return = (string) preg_replace_callback(
 			'#[ \t\r\n]+|<(/)?(textarea|pre)(?=\W)#i',
-			static fn(array $match): string => empty($match[2]) ? ' ' : $match[0],
+			static fn(array $match): string => ($match[2] ?? '') === '' ? ' ' : $match[0],
 			$haystack,
 		);
 		$return = (string) preg_replace('/(\w|;)\s+({|})\s+(\w|\.|#)/', '$1$2$3', $return);

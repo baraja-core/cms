@@ -27,6 +27,7 @@ final class DoctrineStorage implements Storage
 	 */
 	public function loadAll(): array
 	{
+		/** @var array<int, array{id: int, key: string, value: string}> $data */
 		$data = $this->entityManager->getRepository(Option::class)
 			->createQueryBuilder('option')
 			->select('PARTIAL option.{id, key, value}')
@@ -35,7 +36,7 @@ final class DoctrineStorage implements Storage
 
 		$return = [];
 		foreach ($data as $item) {
-			$return[(string) $item['key']] = (string) $item['value'];
+			$return[$item['key']] = $item['value'];
 		}
 
 		return $return;
@@ -44,6 +45,7 @@ final class DoctrineStorage implements Storage
 
 	public function get(string $key): ?string
 	{
+		/** @var array<int, array{id: int, value: string|null}> $option */
 		$option = $this->entityManager->getRepository(Option::class)
 			->createQueryBuilder('option')
 			->select('PARTIAL option.{id, value}')
@@ -61,7 +63,7 @@ final class DoctrineStorage implements Storage
 
 	/**
 	 * @param array<int, string> $keys
-	 * @return array<string, string|null>
+	 * @return array<string, string>
 	 */
 	public function getMultiple(array $keys): array
 	{
@@ -69,7 +71,7 @@ final class DoctrineStorage implements Storage
 			return [];
 		}
 
-		/** @var string[][] $options */
+		/** @var array<int, array{key: string, value: string}> $options */
 		$options = $this->entityManager->getRepository(Option::class)
 			->createQueryBuilder('option')
 			->select('PARTIAL option.{id, key, value}')
@@ -80,7 +82,7 @@ final class DoctrineStorage implements Storage
 
 		$return = [];
 		foreach ($options as $option) {
-			$return[$option['key']] = $option['value'] ?: null;
+			$return[$option['key']] = $option['value'];
 		}
 
 		return $return;
@@ -113,7 +115,7 @@ final class DoctrineStorage implements Storage
 			$this->entityManager->flush();
 			$this->entityManager->clear($option);
 		} catch (MappingException $e) {
-			throw new \RuntimeException($e->getMessage(), $e->getCode(), $e);
+			throw new \RuntimeException($e->getMessage(), 500, $e);
 		}
 	}
 
@@ -123,12 +125,15 @@ final class DoctrineStorage implements Storage
 	 */
 	private function getOptionEntity(string $key): Option
 	{
-		return $this->entityManager->getRepository(Option::class)
+		$option = $this->entityManager->getRepository(Option::class)
 			->createQueryBuilder('option')
 			->where('option.key = :key')
 			->setParameter('key', $key)
 			->setMaxResults(1)
 			->getQuery()
 			->getSingleResult();
+		assert($option instanceof Option);
+
+		return $option;
 	}
 }

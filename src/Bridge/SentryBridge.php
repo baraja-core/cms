@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Baraja\Cms\MiddleWare\Bridge;
 
 
-use Baraja\AdminBar\User\AdminIdentity;
 use Baraja\Cms\User\UserManager;
 use Baraja\Network\Ip;
 use Baraja\TracySentryBridge\SentryLogger;
@@ -34,11 +33,11 @@ final class SentryBridge
 				if ($this->userManager->isLoggedIn() === false) {
 					return;
 				}
-				$identity = $this->userManager->getCmsIdentity();
+				$identity = $this->userManager->getIdentity();
 				if ($identity !== null) {
 					$scope->setUser(
 						[
-							'id' => (int) $identity->getId(),
+							'id' => $identity->getId(),
 							'ip_address' => Ip::get(),
 							'username' => $identity->getName(),
 							'roles' => $identity->getRoles(),

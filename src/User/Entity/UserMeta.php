@@ -28,9 +28,10 @@ class UserMeta
 
 	public function __construct(User $user, string $key, ?string $value)
 	{
+		$value = trim($value ?? '');
 		$this->user = $user;
 		$this->key = $key;
-		$this->value = trim($value ?? '') ?: null;
+		$this->value = $value !== '' ? $value : null;
 	}
 
 

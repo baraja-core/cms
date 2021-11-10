@@ -23,11 +23,11 @@ final class BackToLastIdentityPanel implements Panel
 	public function getTab(): string
 	{
 		$userId = Session::get(Session::LAST_IDENTITY_ID);
-		if ($userId === null) {
+		if ($userId === null || is_int($userId) === false) {
 			return '';
 		}
 		try {
-			$user = $this->userManager->get()->getUserById((int) $userId);
+			$user = $this->userManager->get()->getUserById($userId);
 		} catch (NoResultException | NonUniqueResultException) {
 			return '';
 		}

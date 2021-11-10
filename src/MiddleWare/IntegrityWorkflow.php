@@ -27,8 +27,9 @@ final class IntegrityWorkflow
 		if (Session::get(Session::WORKFLOW_NEED_OTP_AUTH) === true) {
 			return false;
 		}
+		/** @var int|null $checkExpiration */
 		$checkExpiration = Session::get(Session::WORKFLOW_CHECK_EXPIRATION);
-		if ($checkExpiration === null || ((int) $checkExpiration) < time()) {
+		if ($checkExpiration === null || $checkExpiration < time()) {
 			self::setExpireCheckSession();
 			return true;
 		}

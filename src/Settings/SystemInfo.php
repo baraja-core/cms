@@ -7,8 +7,6 @@ namespace Baraja\Cms\Settings;
 
 use Baraja\Cms\Session;
 use Baraja\Cms\User\UserManagerAccessor;
-use Baraja\Doctrine\EntityManager;
-use Baraja\DynamicConfiguration\ConfigurationSection;
 
 final class SystemInfo
 {
@@ -19,15 +17,13 @@ final class SystemInfo
 
 
 	public function __construct(
-		private EntityManager $entityManager,
-		private ConfigurationSection $config,
 		private UserManagerAccessor $userManager,
 	) {
 	}
 
 
 	/**
-	 * @return array<string, mixed>
+	 * @return array{user: array<string, string|null>}
 	 */
 	public function toArray(): array
 	{
@@ -37,6 +33,7 @@ final class SystemInfo
 			Session::set(Session::WORKFLOW_SETTINGS, $return);
 		}
 
+		/** @phpstan-ignore-next-line */
 		return $return;
 	}
 
@@ -48,7 +45,7 @@ final class SystemInfo
 
 
 	/**
-	 * @return array<string, mixed>
+	 * @return array{user: array<string, string|null>}
 	 */
 	private function generateStructure(): array
 	{
@@ -59,7 +56,7 @@ final class SystemInfo
 
 
 	/**
-	 * @return array<string, string|int|null>
+	 * @return array<string, string|null>
 	 */
 	private function getUserSettings(): array
 	{
@@ -67,7 +64,7 @@ final class SystemInfo
 		if ($identity === null) {
 			throw new \LogicException('User is not logged in.');
 		}
-		$id = (int) $identity->getId();
+		$id = $identity->getId();
 		$metaManager = $this->userManager->get()->getUserMetaManager();
 		$metaManager->loadAll($id);
 

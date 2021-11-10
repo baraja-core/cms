@@ -9,6 +9,7 @@ use Baraja\AdminBar\AdminBar;
 use Baraja\Cms\Search\SearchablePlugin;
 use Baraja\Cms\Session;
 use Baraja\Cms\User\AdminBar\LoginAsUserPanel;
+use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\UserManager;
 use Baraja\Plugin\BasePlugin;
 use Baraja\Plugin\SimpleComponent\Breadcrumb;
@@ -36,6 +37,9 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 	}
 
 
+	/**
+	 * @return class-string<CmsUser>
+	 */
 	public function getBaseEntity(): string
 	{
 		return $this->userManager->getDefaultEntity();
@@ -68,9 +72,12 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 		}
 
 		$this->setTitle(
-			'(' . $user->getId() . ') '
-			. ($this->userManager->isOnline($id) ? '[ONLINE] ' : '')
-			. $user->getName()
+			sprintf(
+				'(%s) %s %s',
+				(string) $user->getId(),
+				$this->userManager->isOnline($id) ? '[ONLINE]' : '',
+				$user->getName()
+			)
 		);
 		$this->setSubtitle($user->getEmail());
 		$this->setLinkBack($this->link('Article:default'));
@@ -114,7 +121,7 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 	}
 
 
-	/** @return string[] */
+	/** @return array<int, string> */
 	public function getSearchColumns(): array
 	{
 		return [':username(name)', '!firstName', '!lastName', 'nick', 'email'];

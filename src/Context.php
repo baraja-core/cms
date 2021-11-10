@@ -95,6 +95,9 @@ final class Context implements ContainerInterface
 	}
 
 
+	/**
+	 * @param class-string $type
+	 */
 	public function getPluginByType(string $type): Plugin
 	{
 		return $this->pluginManager->getPluginByType($type);
@@ -118,7 +121,7 @@ final class Context implements ContainerInterface
 		$type = $plugin::class;
 		foreach ($this->pluginManager->getPluginInfo() as $info) {
 			if ($info['type'] === $type) {
-				return (string) $info['service'];
+				return $info['service'];
 			}
 		}
 
@@ -235,21 +238,21 @@ final class Context implements ContainerInterface
 		if ($service === null) {
 			$service = new IntegrityWorkflow($this->user);
 			$service->addRunEvent(
-				function (): void
-				{
+				function (): void {
+					$identity = $this->userManager->get()->getIdentity();
+					assert($identity !== null);
 					$metaManager = new UserMetaManager($this->entityManager, $this->userManager->get());
 					$metaManager->set(
-						(int) $this->user->getId(),
+						$identity->getId(),
 						'last-activity',
 						date('Y-m-d H:i:s'),
 					);
 				}
 			);
 			$service->addRunEvent(
-				function (): void
-				{
+				function (): void {
 					$hash = Session::get(Session::WORKFLOW_PASSWORD_HASH);
-					$identity = $this->userManager->get()->getCmsIdentity();
+					$identity = $this->userManager->get()->getIdentity();
 					if ($identity !== null) {
 						$newHash = md5($identity->getPassword());
 						if ($hash === null) {
