@@ -134,16 +134,17 @@ final class CmsInstallEndpoint extends BaseEndpoint
 			$this->sendError('Zadejte vaše reálné jméno, které musí existovat.');
 		}
 
+		/** @var array{token?: string, message?: string} $response */
 		$response = (array) json_decode(
-			@file_get_contents(
+			(string) @file_get_contents(
 				CloudManager::ENDPOINT_URL . '/cloud-status/create-account?domain='
 				. urlencode(Url::get()->getNetteUrl()->getDomain(3))
 				. '&email=' . urlencode($email)
 				. '&password=' . urlencode($password)
 				. '&firstName=' . urlencode($firstName)
 				. '&lastName=' . urlencode($lastName)
-				. ($phone ? '&phone=' . urlencode($phone) : '')
-			) ?: '{}',
+				. ($phone !== null ? '&phone=' . urlencode($phone) : '')
+			),
 			true
 		);
 		if (isset($response['token']) === false) {
@@ -168,13 +169,14 @@ final class CmsInstallEndpoint extends BaseEndpoint
 			$this->sendError('E-mail nemá správný formát.');
 		}
 
+		/** @var array{token?: string, message?: string} $response */
 		$response = (array) json_decode(
-			@file_get_contents(
+			(string) @file_get_contents(
 				CloudManager::ENDPOINT_URL . '/cloud-status/token-by-user?domain='
 				. urlencode(Url::get()->getNetteUrl()->getDomain(3))
 				. '&email=' . urlencode($email)
 				. '&password=' . urlencode($password)
-			) ?: '{}',
+			),
 			true
 		);
 		if (isset($response['token']) === false) {

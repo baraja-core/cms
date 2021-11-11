@@ -28,6 +28,7 @@ final class LinkGenerator implements PluginLinkGenerator
 		if (headers_sent() === true) {
 			throw new \LogicException('HTTP headers can not be sent before setup nonce.');
 		}
+		/** @phpstan-ignore-next-line */
 		self::$lastNonce = (array) (Session::get(Session::WORKFLOW_NONCE) ?? []);
 		if (count(self::$lastNonce) > 32 && mt_rand() / mt_getrandmax() < 0.01) { // gc
 			$minAllowedTime = self::getMinimalAllowedTime();
@@ -42,12 +43,12 @@ final class LinkGenerator implements PluginLinkGenerator
 
 
 	/**
-	 * @param array<string, mixed> $params
+	 * @param mixed[] $params
 	 */
 	public static function generateInternalLink(string $route, array $params = [], bool $nonce = false): string
 	{
 		if (($route[0] ?? '') === ':') {
-			throw new \InvalidArgumentException('Route "' . $route . '" can not be absolute. Please remove the starting colon.');
+			throw new \InvalidArgumentException(sprintf('Route "%s" can not be absolute. Please remove the starting colon.', $route));
 		}
 
 		[$plugin, $view] = explode(':', trim($route) . ':');
@@ -59,7 +60,7 @@ final class LinkGenerator implements PluginLinkGenerator
 			$view = 'default';
 		}
 		if ($plugin === 'Admin') {
-			throw new \InvalidArgumentException('Route "' . $route . '" is potentially bug (because it\'s just the logic of administration). Did you mean "Homepage:default"?');
+			throw new \InvalidArgumentException(sprintf('Route "%s" is potentially bug (because it\'s just the logic of administration). Did you mean "Homepage:default"?', $route));
 		}
 
 		$path = '';
@@ -77,7 +78,9 @@ final class LinkGenerator implements PluginLinkGenerator
 		}
 
 		return Strings::toAscii(
-			Url::get()->getBaseUrl() . '/admin' . ($path !== '' ? '/' . $path : '')
+			Url::get()->getBaseUrl()
+			. '/' . Configuration::get()->getBaseUriEscaped()
+			. ($path !== '' ? '/' . $path : '')
 			. ($params !== [] ? '?' . http_build_query($params) : '')
 		);
 	}
@@ -145,10 +148,16 @@ final class LinkGenerator implements PluginLinkGenerator
 
 
 	/**
-	 * @param array<string, mixed> $params
+	 * @param mixed[] $params
 	 */
 	public function link(string $route, array $params = [], bool $nonce = false): string
 	{
 		return self::generateInternalLink($route, $params, $nonce);
+	}
+
+
+	public function linkHomepage(bool $nonce = false): string
+	{
+		return $this->link('Homepage:default', [], $nonce);
 	}
 }

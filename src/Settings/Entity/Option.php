@@ -7,7 +7,6 @@ namespace Baraja\DoctrineConfiguration;
 
 use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Doctrine\ORM\Mapping as ORM;
-use Nette\Utils\DateTime;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'core__option')]
@@ -40,7 +39,7 @@ class Option
 	{
 		$this->key = $key;
 		$this->value = $value;
-		$this->insertedDate = DateTime::from('now');
+		$this->insertedDate = new \DateTime('now');
 	}
 
 
@@ -69,7 +68,7 @@ class Option
 		}
 
 		$this->value = $value;
-		$this->updatedDate = DateTime::from('now');
+		$this->updatedDate = new \DateTime('now');
 
 		return $this;
 	}

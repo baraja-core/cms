@@ -23,10 +23,9 @@ final class CmsConstantTokenStorage implements TokenStorage
 
 	public function setToken(string $token): void
 	{
-		if (!preg_match('/^[a-f0-9]{32}$/', $token)) {
+		if (preg_match('/^[a-f0-9]{32}$/', $token) !== 1) {
 			throw new \InvalidArgumentException(
-				'API token "' . $token . '" is invalid. '
-				. 'Did you use generated token from Baraja Cloud account?',
+				sprintf('API token "%s" is invalid. Did you use generated token from Baraja Cloud account?', $token),
 			);
 		}
 

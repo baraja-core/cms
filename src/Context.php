@@ -6,6 +6,7 @@ namespace Baraja\Cms;
 
 
 use Baraja\AdminBar\Panel\BasicPanel;
+use Baraja\Cms\Container\Container;
 use Baraja\Cms\MiddleWare\IntegrityWorkflow;
 use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManagerAccessor;
@@ -25,18 +26,19 @@ use DeviceDetector\DeviceDetector;
 use Nette\Http\Request;
 use Nette\Http\Response;
 use Nette\Security\User;
-use Nette\Utils\FileSystem;
+use Psr\Container\ContainerInterface;
 
-final class Context
+final class Context implements ContainerInterface
 {
-	/** @var string[] (type => path) */
+	/** @var array<string, string> (type => path) */
 	private array $customAssets = [];
 
 	private ConfigurationSection $config;
 
+	private Container $container;
+
 
 	public function __construct(
-		private string $tempDir,
 		private Request $request,
 		private Response $response,
 		private EntityManager $entityManager,
@@ -53,6 +55,25 @@ final class Context
 	) {
 		$this->config = new ConfigurationSection($configuration, 'core');
 		$localization->setContextLocale($localization->getDefaultLocale());
+		$this->container = new Container($pluginManager);
+	}
+
+
+	public function get(string $id): object
+	{
+		return $this->container->get($id);
+	}
+
+
+	public function has(string $id): bool
+	{
+		return $this->container->has($id);
+	}
+
+
+	public function getContainer(): Container
+	{
+		return $this->container;
 	}
 
 
@@ -74,6 +95,9 @@ final class Context
 	}
 
 
+	/**
+	 * @param class-string $type
+	 */
 	public function getPluginByType(string $type): Plugin
 	{
 		return $this->pluginManager->getPluginByType($type);
@@ -81,7 +105,7 @@ final class Context
 
 
 	/**
-	 * @return PluginComponent[]
+	 * @return array<int, PluginComponent>
 	 */
 	public function getComponents(Plugin $plugin, string $view): array
 	{
@@ -97,7 +121,7 @@ final class Context
 		$type = $plugin::class;
 		foreach ($this->pluginManager->getPluginInfo() as $info) {
 			if ($info['type'] === $type) {
-				return (string) $info['service'];
+				return $info['service'];
 			}
 		}
 
@@ -165,22 +189,20 @@ final class Context
 	}
 
 
+	/**
+	 * @deprecated since 2021-10-22 use configuration service.
+	 */
 	public function getTempDir(): string
 	{
-		static $checked = false;
-		if ($checked === false) {
-			if (is_dir($this->tempDir) === false) {
-				FileSystem::createDir($this->tempDir);
-			}
-			$checked = true;
-		}
-
-		return $this->tempDir;
+		return $this->container->getConfiguration()->getTempDir();
 	}
 
 
 	public function isBot(): bool
 	{
+		if (PHP_SAPI === 'cli') {
+			return false;
+		}
 		$isBot = Session::get(Session::WORKFLOW_IS_BOT);
 		$cacheUserAgent = Session::get(Session::WORKFLOW_USER_AGENT);
 		$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
@@ -198,7 +220,11 @@ final class Context
 	public function getDeviceDetector(): DeviceDetector
 	{
 		$dd = new DeviceDetector($_SERVER['HTTP_USER_AGENT'] ?? '');
-		$dd->setCache(new DoctrineBridge(new FilesystemCache($this->getTempDir() . '/device-detector')));
+		$dd->setCache(
+			new DoctrineBridge(
+				new FilesystemCache($this->container->getConfiguration()->getTempDir() . '/device-detector')
+			)
+		);
 		$dd->skipBotDetection();
 		$dd->parse();
 
@@ -211,27 +237,33 @@ final class Context
 		static $service;
 		if ($service === null) {
 			$service = new IntegrityWorkflow($this->user);
-			$service->addRunEvent(function (): void {
-				$metaManager = new UserMetaManager($this->entityManager, $this->userManager->get());
-				$metaManager->set(
-					(int) $this->user->getId(),
-					'last-activity',
-					date('Y-m-d H:i:s'),
-				);
-			});
-			$service->addRunEvent(function (): void {
-				$hash = Session::get(Session::WORKFLOW_PASSWORD_HASH);
-				$identity = $this->userManager->get()->getCmsIdentity();
-				if ($identity !== null) {
-					$newHash = md5($identity->getPassword());
-					if ($hash === null) {
-						Session::set(Session::WORKFLOW_PASSWORD_HASH, $newHash);
-					} elseif ($hash !== $newHash) {
-						$this->user->logout(true);
-						Session::removeAll();
+			$service->addRunEvent(
+				function (): void {
+					$identity = $this->userManager->get()->getIdentity();
+					assert($identity !== null);
+					$metaManager = new UserMetaManager($this->entityManager, $this->userManager->get());
+					$metaManager->set(
+						$identity->getId(),
+						'last-activity',
+						date('Y-m-d H:i:s'),
+					);
+				}
+			);
+			$service->addRunEvent(
+				function (): void {
+					$hash = Session::get(Session::WORKFLOW_PASSWORD_HASH);
+					$identity = $this->userManager->get()->getIdentity();
+					if ($identity !== null) {
+						$newHash = md5($identity->getPassword());
+						if ($hash === null) {
+							Session::set(Session::WORKFLOW_PASSWORD_HASH, $newHash);
+						} elseif ($hash !== $newHash) {
+							$this->user->logout(true);
+							Session::removeAll();
+						}
 					}
 				}
-			});
+			);
 		}
 
 		return $service;

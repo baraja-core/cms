@@ -23,9 +23,6 @@ use Baraja\Cms\User\UserManager;
 use Baraja\Cms\User\UserManagerAccessor;
 use Baraja\Cms\User\UserMetaManager;
 use Baraja\Doctrine\ORM\DI\OrmAnnotationsExtension;
-use Baraja\PathResolvers\Resolvers\RootDirResolver;
-use Baraja\PathResolvers\Resolvers\TempDirResolver;
-use Baraja\PathResolvers\Resolvers\VendorResolver;
 use Baraja\Plugin\Component\VueComponent;
 use Baraja\Plugin\PluginComponentExtension;
 use Baraja\Plugin\PluginLinkGenerator;
@@ -43,13 +40,11 @@ use Nette\Schema\Schema;
 use Nette\Security\User;
 use Nette\Utils\FileSystem;
 use Nette\Utils\Validators;
-use Tracy\Debugger;
-use Tracy\ILogger;
 
 final class CmsExtension extends CompilerExtension
 {
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	public static function mustBeDefinedBefore(): array
 	{
@@ -88,7 +83,7 @@ final class CmsExtension extends CompilerExtension
 			$pluginContext = $builder->getDefinitionByType(\Baraja\Plugin\Context::class);
 			$pluginContext->addSetup('?->setLinkGenerator(?)', ['@self', '@' . PluginLinkGenerator::class]);
 		} catch (MissingServiceException $e) {
-			throw new \RuntimeException('Can not compile CMS extension, because service "' . \Baraja\Plugin\Context::class . '" (from package baraja-core/plugin-system) does not exist. Did you register Plugin system extension before CMS?', $e->getCode(), $e);
+			throw new \RuntimeException('Can not compile CMS extension, because service "' . \Baraja\Plugin\Context::class . '" (from package baraja-core/plugin-system) does not exist. Did you register Plugin system extension before CMS?', 500, $e);
 		}
 
 		// admin
@@ -96,13 +91,8 @@ final class CmsExtension extends CompilerExtension
 			->setFactory(Admin::class);
 
 		// context
-		$tempDir = (new TempDirResolver(new RootDirResolver(new VendorResolver)))->get('baraja.cms');
-		if (is_dir($tempDir) === false) {
-			FileSystem::createDir($tempDir);
-		}
 		$context = $builder->addDefinition($this->prefix('context'))
-			->setFactory(Context::class)
-			->setArgument('tempDir', $tempDir);
+			->setFactory(Context::class);
 
 		$builder->addAccessorDefinition($this->prefix('contextAccessor'))
 			->setImplement(ContextAccessor::class);
@@ -291,20 +281,15 @@ final class CmsExtension extends CompilerExtension
 		$class->getMethod('initialize')->addBody(
 			'// admin (cms).' . "\n"
 			. '(function (): void {' . "\n"
-			. "\t" . 'if (preg_match(?, ' . Url::class . '::get()->getRelativeUrl(), $parser)) {' . "\n"
-			. "\t\t" . '$this->getService(?)->onStartup[] = function(' . Application::class . ' $a) use ($parser): void {' . "\n"
-			. "\t\t\t" . 'try {' . "\n"
-			. "\t\t\t\t" . '$this->getService(?)->run($parser[\'locale\'] \?: null, $parser[\'path\']);' . "\n"
-			. "\t\t\t" . '} catch (\Throwable $e) {' . "\n"
-			. "\t\t\t\t" . Debugger::class . '::log($e, \'' . ILogger::DEBUG . '\'); ' . Helpers::class . '::brokenAdmin($e); die;' . "\n"
-			. "\t\t\t" . '}' . "\n"
+			. "\t" . 'if (' . Admin::class . '::isAdminRequest()) {' . "\n"
+			. "\t\t" . '$this->getService(?)->onStartup[] = function(' . Application::class . ' $a): void {' . "\n"
+			. "\t\t\t" . '$this->getService(?)->run();' . "\n"
 			. "\t\t" . '};' . "\n"
 			. "\t" . '}' . "\n"
 			. "\t" . AdminBar::class . '::getBar()->setUser(new ' . AdminBarUser::class . '($this->getService(?)));' . "\n"
 			. "\t" . '$this->getService(?)->setup();' . "\n"
 			. '})();',
 			[
-				'/^admin(?:\/+(?<locale>' . implode('|', Admin::SUPPORTED_LOCALES) . '))?(?<path>\/.*|\?.*|)$/',
 				$application->getName(),
 				$admin->getName(),
 				$netteUser->getName(),
@@ -323,13 +308,13 @@ final class CmsExtension extends CompilerExtension
 			$url = null;
 			$format = null;
 			if (is_string($asset)) {
-				if (preg_match('/^(?<name>.+)\.(?<format>[a-zA-Z0-9]+)(?:\?.*)?$/', $asset, $formatParser)) {
+				if (preg_match('/^(?<name>.+)\.(?<format>[a-zA-Z0-9]+)(?:\?.*)?$/', $asset, $formatParser) === 1) {
 					$format = $formatParser['format'] ?? null;
 				} else {
 					throw new \RuntimeException('Invalid asset filename "' . $asset . '". Did you mean "' . $asset . '.js"?');
 				}
 				$url = $asset;
-			} elseif (is_array($asset)) {
+			} else {
 				$url = $asset['url'] ?? null;
 				$format = $asset['format'] ?? null;
 			}

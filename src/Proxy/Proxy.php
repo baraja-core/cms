@@ -6,6 +6,7 @@ namespace Baraja\Cms\Proxy;
 
 
 use Baraja\AssetsLoader\Minifier\DefaultJsMinifier;
+use Baraja\Cms\Configuration;
 use Baraja\Cms\Context;
 use Baraja\Cms\Helpers;
 use Baraja\Plugin\Plugin;
@@ -50,12 +51,14 @@ final class Proxy
 			);
 		}
 
-		return Url::get()->getBaseUrl() . '/admin/assets/' . $file;
+		return Url::get()->getBaseUrl() . '/' . Configuration::get()->getBaseUriEscaped() . '/assets/' . $file;
 	}
 
 
 	/**
 	 * Render dynamic Vue components to requested file.
+	 *
+	 * @return never-return
 	 */
 	public function run(string $path): void
 	{
@@ -87,11 +90,14 @@ final class Proxy
 	}
 
 
+	/**
+	 * @return never-return
+	 */
 	private function responsePluginJsAsset(string $path): void
 	{
 		header('Content-Type: ' . self::CONTENT_TYPES['js']);
 
-		if (preg_match('/^cms-web-loader\/(.+)\.js$/', $path, $parser)) {
+		if (preg_match('/^cms-web-loader\/(.+)\.js$/', $path, $parser) === 1) {
 			$return = '/*' . "\n";
 			$return .= ' * This file is part of Baraja CMS.' . "\n";
 			$return .= ' * Routed by plugin: ' . htmlspecialchars($parser[1]) . "\n";
@@ -121,6 +127,9 @@ final class Proxy
 	}
 
 
+	/**
+	 * @return never-return
+	 */
 	private function responseStaticAsset(string $path): void
 	{
 		if (
@@ -137,7 +146,7 @@ final class Proxy
 			if (isset($assetMap[$hash])) {
 				$assetPath = $assetMap[$hash];
 			} else {
-				return;
+				die;
 			}
 		} elseif (
 			preg_match(
@@ -150,10 +159,10 @@ final class Proxy
 			$fileName = $pathParser['filename'] ?? throw new \LogicException('Filename does not exist.');
 			$assetPath = __DIR__ . '/../../template/assets/' . $fileName;
 			if (!is_file($assetPath)) {
-				return;
+				die;
 			}
 		} else {
-			return;
+			die;
 		}
 
 		if (isset(self::CONTENT_TYPES[$extension])) {

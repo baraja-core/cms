@@ -13,12 +13,12 @@ final class MenuAuthorizator
 {
 	private const ALWAYS_ALLOWED = ['homepage' => true, 'cms' => true, 'error' => true];
 
-	private ?string $id;
+	private ?int $id;
 
-	/** @var int[] */
+	/** @var array<string, int> */
 	private array $roles;
 
-	/** @var int[] */
+	/** @var array<string, int> */
 	private array $privileges;
 
 
@@ -35,18 +35,18 @@ final class MenuAuthorizator
 			return;
 		}
 
-		/** @var mixed[] $user */
+		/** @var array<int, array{id: int, roles: array<int, string>|null, privileges: array<int, string>|null}> $user */
 		$user = $entityManager->getRepository($userManager->get()->getDefaultEntity())
 			->createQueryBuilder('user')
 			->select('PARTIAL user.{id, roles, privileges}')
 			->where('user.id = :id')
-			->setParameter('id', (string) $userService->getId())
+			->setParameter('id', $userService->getId())
 			->setMaxResults(1)
 			->getQuery()
 			->getArrayResult();
 
 		if (isset($user[0])) {
-			$this->id = (string) ($user[0]['id'] ?? '');
+			$this->id = $user[0]['id'];
 			$this->roles = array_flip($user[0]['roles'] ?? []);
 			$this->privileges = array_flip($user[0]['privileges'] ?? []);
 		} else {
@@ -59,14 +59,14 @@ final class MenuAuthorizator
 	}
 
 
-	public function getId(): ?string
+	public function getId(): ?int
 	{
 		return $this->id;
 	}
 
 
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	public function getRoles(): array
 	{
@@ -75,7 +75,7 @@ final class MenuAuthorizator
 
 
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	public function getPrivileges(): array
 	{
@@ -85,13 +85,17 @@ final class MenuAuthorizator
 
 	public function isAllowedPlugin(string $name): bool
 	{
-		return isset($this->roles['admin']) || isset(self::ALWAYS_ALLOWED[$name]) || isset($this->privileges['plugin-' . $name]);
+		return isset($this->roles['admin'])
+			|| isset(self::ALWAYS_ALLOWED[$name])
+			|| isset($this->privileges['plugin-' . $name]);
 	}
 
 
 	public function isAllowedComponent(string $pluginName, string $componentName): bool
 	{
-		return isset($this->roles['admin']) || isset(self::ALWAYS_ALLOWED[$pluginName]) || ($this->isAllowedPlugin($pluginName) && isset($this->privileges['component-' . $componentName]));
+		return isset($this->roles['admin'])
+			|| isset(self::ALWAYS_ALLOWED[$pluginName])
+			|| ($this->isAllowedPlugin($pluginName) && isset($this->privileges['component-' . $componentName]));
 	}
 
 

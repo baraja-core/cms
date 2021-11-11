@@ -21,8 +21,10 @@ interface CmsUser extends IIdentity
 		string $role = self::ROLE_USER,
 	): void;
 
+	public function getId(): int;
+
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	public function getRoles(): array;
 
@@ -31,7 +33,7 @@ interface CmsUser extends IIdentity
 	public function containPrivilege(string $privilege): bool;
 
 	/**
-	 * @return string[]
+	 * @return array<string, string>
 	 */
 	public function getData(): array;
 
@@ -60,7 +62,7 @@ interface CmsUser extends IIdentity
 	public function resetPrivileges(): void;
 
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	public function getPrivileges(): array;
 
@@ -82,16 +84,16 @@ interface CmsUser extends IIdentity
 	 */
 	public function removeEmail(string $email): bool;
 
-	public function getRegisterDate(): \DateTime;
+	public function getRegisterDate(): \DateTimeImmutable;
 
-	public function setRegisterDate(\DateTime $registerDate): void;
+	public function setRegisterDate(\DateTimeImmutable $registerDate): void;
 
-	public function getCreateDate(): \DateTime;
+	public function getCreateDate(): \DateTimeImmutable;
 
-	public function setCreateDate(\DateTime $createDate): void;
+	public function setCreateDate(\DateTimeImmutable $createDate): void;
 
 	/**
-	 * @return string[]
+	 * @return array<string, string>
 	 */
 	public function getMetaData(): array;
 

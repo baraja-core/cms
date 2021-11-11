@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Baraja\Cms\User\Entity;
 
 
-use Baraja\Doctrine\Identifier\IdentifierUnsigned;
-use Baraja\EmailType\Email;
 use Baraja\Network\Ip;
 use Baraja\PhoneNumber\PhoneNumberFormatter;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -14,7 +12,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 use Nette\Security\Passwords;
-use Nette\Utils\DateTime;
 use Nette\Utils\Strings;
 use Nette\Utils\Validators;
 
@@ -35,7 +32,10 @@ use Nette\Utils\Validators;
 #[Index(columns: ['active'], name: 'core__user_active')]
 class User implements CmsUser
 {
-	use IdentifierUnsigned;
+	#[ORM\Id]
+	#[ORM\Column(type: 'integer', unique: true, options: ['unsigned' => true])]
+	#[ORM\GeneratedValue]
+	protected ?int $id = null;
 
 	#[ORM\Column(type: 'string', length: 64, unique: true)]
 	private string $username;
@@ -63,7 +63,7 @@ class User implements CmsUser
 	#[ORM\Column(type: 'json')]
 	private array $emails = [];
 
-	/** @var string[]|null */
+	/** @var array<int, string>|null */
 	#[ORM\Column(type: 'json')]
 	private ?array $roles = [];
 
@@ -71,7 +71,7 @@ class User implements CmsUser
 	 * Super fast storage of given permissions.
 	 * When we assign a specific role to a user, we automatically insert all his rights as a simple array.
 	 *
-	 * @var string[]|null
+	 * @var array<int, string>|null
 	 */
 	#[ORM\Column(type: 'json')]
 	private ?array $privileges = [];
@@ -82,11 +82,11 @@ class User implements CmsUser
 	#[ORM\Column(type: 'string', length: 39)]
 	private string $registerIp;
 
-	#[ORM\Column(type: 'datetime')]
-	private \DateTime $registerDate;
+	#[ORM\Column(type: 'datetime_immutable')]
+	private \DateTimeImmutable $registerDate;
 
-	#[ORM\Column(type: 'datetime')]
-	private \DateTime $createDate;
+	#[ORM\Column(type: 'datetime_immutable')]
+	private \DateTimeImmutable $createDate;
 
 	#[ORM\Column(type: 'boolean')]
 	private bool $active = true;
@@ -125,15 +125,15 @@ class User implements CmsUser
 		string $email,
 		string $role = self::ROLE_USER,
 	): void {
-		$this->username = trim(Strings::lower($username));
-		$this->password = $password
+		$this->username = Strings::lower(trim($username));
+		$this->password = $password !== ''
 			? (new Passwords)->hash($password)
 			: '---empty-password---';
 		$this->setEmail($email);
 		$this->addRole(trim($role));
 		$this->registerIp = Ip::get();
-		$this->registerDate = DateTime::from('now');
-		$this->createDate = DateTime::from('now');
+		$this->registerDate = new \DateTimeImmutable('now');
+		$this->createDate = new \DateTimeImmutable('now');
 		$this->metas = new ArrayCollection;
 		$this->logins = new ArrayCollection;
 		$this->loginAttempts = new ArrayCollection;
@@ -147,8 +147,18 @@ class User implements CmsUser
 	}
 
 
+	public function getId(): int
+	{
+		if ($this->id === null) {
+			throw new \RuntimeException('User identifier does not exist yet. Did you flush entity first?');
+		}
+
+		return $this->id;
+	}
+
+
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	public function getRoles(): array
 	{
@@ -187,7 +197,7 @@ class User implements CmsUser
 
 
 	/**
-	 * @return string[]
+	 * @return array<string, string>
 	 */
 	public function getData(): array
 	{
@@ -214,14 +224,14 @@ class User implements CmsUser
 
 	public function setFirstName(?string $firstName): void
 	{
-		$firstName = Strings::firstUpper(trim($firstName ?? '')) ?: null;
+		$firstName = Strings::firstUpper(trim($firstName ?? ''));
 		if (
-			$firstName !== null
-			&& !preg_match('/^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.\'-]+$/u', $firstName)
+			$firstName !== ''
+			&& preg_match('/^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.\'-]+$/u', $firstName) !== 1
 		) {
-			throw new \InvalidArgumentException('User first name is not valid, because "' . $firstName . '" given.');
+			throw new \InvalidArgumentException(sprintf('User first name is not valid, because "%s" given.', $firstName));
 		}
-		$this->firstName = $firstName;
+		$this->firstName = $firstName !== '' ? $firstName : null;
 	}
 
 
@@ -233,14 +243,14 @@ class User implements CmsUser
 
 	public function setLastName(?string $lastName): void
 	{
-		$lastName = Strings::firstUpper(trim($lastName ?? '')) ?: null;
+		$lastName = Strings::firstUpper(trim($lastName ?? ''));
 		if (
-			$lastName !== null
-			&& !preg_match('/^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.\'-]+$/u', $lastName)
+			$lastName !== ''
+			&& preg_match('/^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.\'-]+$/u', $lastName) !== 1
 		) {
-			throw new \InvalidArgumentException('User first name is not valid, because "' . $lastName . '" given.');
+			throw new \InvalidArgumentException(sprintf('User last name is not valid, because "%s" given.', $lastName));
 		}
-		$this->lastName = $lastName;
+		$this->lastName = $lastName !== '' ? $lastName : null;
 	}
 
 
@@ -252,7 +262,7 @@ class User implements CmsUser
 
 	public function setUsername(string $username): void
 	{
-		$this->username = Strings::webalize($nick ?? '', '.,-@', false);
+		$this->username = Strings::webalize($username, '.,-@', false);
 	}
 
 
@@ -264,7 +274,11 @@ class User implements CmsUser
 
 	public function setNick(?string $nick): void
 	{
-		$this->nick = Strings::webalize($nick ?? '', '.,-@', false) ?: null;
+		$nick = Strings::webalize($nick ?? '', '.,-@', false);
+		if ($nick === '') {
+			$nick = null;
+		}
+		$this->nick = $nick;
 	}
 
 
@@ -291,12 +305,14 @@ class User implements CmsUser
 	 * Set password as legacy MD5/SHA1 or other crypt.
 	 * Never store passwords in a readable form!
 	 *
-	 * @param string $password
 	 * @internal never use it for new users! Back compatibility only!
 	 */
 	public function setLegacyRawPassword(string $password): void
 	{
-		$this->password = $password ?: '---empty-password---';
+		if (trim($password) === '') {
+			$password = '---empty-password---';
+		}
+		$this->password = $password;
 		throw new \RuntimeException('The password was passed unsafely. Please catch this exception if it was intended.');
 	}
 
@@ -332,11 +348,11 @@ class User implements CmsUser
 
 
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	public function getPrivileges(): array
 	{
-		return array_filter($this->privileges ?? [], fn(string $item): bool => trim($item) !== '');
+		return array_filter($this->privileges ?? [], static fn(string $item): bool => trim($item) !== '');
 	}
 
 
@@ -347,12 +363,6 @@ class User implements CmsUser
 		}
 		$this->privileges[] = $permission;
 		$this->privileges = \array_unique($this->privileges);
-	}
-
-
-	public function getEmailEntity(): Email
-	{
-		return new Email($this->email);
 	}
 
 
@@ -367,7 +377,10 @@ class User implements CmsUser
 
 	public function setEmail(string $email): void
 	{
-		$this->email = (new Email($email))->getValue();
+		if (Validators::isEmail($email) === false) {
+			throw new \InvalidArgumentException('Invalid user email "' . $email . '".');
+		}
+		$this->email = $email;
 	}
 
 
@@ -376,7 +389,7 @@ class User implements CmsUser
 	 */
 	public function getEmails(): array
 	{
-		return array_unique(array_merge([$this->getEmail()], $this->emails));
+		return array_unique(array_merge([$this->email], $this->emails));
 	}
 
 
@@ -416,32 +429,32 @@ class User implements CmsUser
 	}
 
 
-	public function getRegisterDate(): \DateTime
+	public function getRegisterDate(): \DateTimeImmutable
 	{
 		return $this->registerDate;
 	}
 
 
-	public function setRegisterDate(\DateTime $registerDate): void
+	public function setRegisterDate(\DateTimeImmutable $registerDate): void
 	{
 		$this->registerDate = $registerDate;
 	}
 
 
-	public function getCreateDate(): \DateTime
+	public function getCreateDate(): \DateTimeImmutable
 	{
 		return $this->createDate;
 	}
 
 
-	public function setCreateDate(\DateTime $createDate): void
+	public function setCreateDate(\DateTimeImmutable $createDate): void
 	{
 		$this->createDate = $createDate;
 	}
 
 
 	/**
-	 * @return string[]
+	 * @return array<string, string>
 	 */
 	public function getMetaData(): array
 	{
@@ -490,7 +503,7 @@ class User implements CmsUser
 			return (string) stream_get_contents($this->otpCode);
 		}
 
-		return (string) $this->otpCode;
+		return $this->otpCode;
 	}
 
 
@@ -542,7 +555,9 @@ class User implements CmsUser
 
 	public function setPhone(?string $phone, int $region = 420): void
 	{
-		$this->phone = $phone ? PhoneNumberFormatter::fix($phone, $region) : null;
+		$this->phone = $phone !== null && $phone !== ''
+			? PhoneNumberFormatter::fix($phone, $region)
+			: null;
 	}
 
 

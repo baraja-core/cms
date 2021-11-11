@@ -9,7 +9,6 @@ use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Baraja\Network\Ip;
 use Baraja\Url\Url;
 use Doctrine\ORM\Mapping as ORM;
-use Nette\Utils\DateTime;
 use Nette\Utils\Strings;
 
 #[ORM\Entity]
@@ -45,7 +44,7 @@ class UserLoginAttempt
 		$this->user = $user;
 		$this->username = Strings::lower(Strings::substring(trim($username), 0, 64));
 		$this->ip = PHP_SAPI === 'cli' ? 'cli' : Ip::get();
-		$this->insertedDateTime = DateTime::from('now');
+		$this->insertedDateTime = new \DateTime('now');
 		$this->setLoginUrl();
 	}
 

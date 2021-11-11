@@ -6,6 +6,7 @@ namespace Baraja\Cms\MiddleWare;
 
 
 use Baraja\AdminBar\AdminBar;
+use Baraja\Cms\Configuration;
 use Baraja\Cms\Context;
 use Baraja\Cms\Helpers;
 use Baraja\Cms\LinkGenerator;
@@ -20,11 +21,7 @@ use Baraja\Plugin\Exception\PluginUserErrorException;
 use Baraja\Search\Search;
 use Baraja\ServiceMethodInvoker;
 use Baraja\Url\Url;
-use Nette\Application\Responses\TextResponse;
-use Nette\Application\Responses\VoidResponse;
 use Nette\Http\IResponse;
-use Tracy\Debugger;
-use Tracy\ILogger;
 
 final class Application
 {
@@ -49,6 +46,8 @@ final class Application
 	 * 7. Verification of access rights to the plugin and action
 	 * 8. Processing of internal logic of the plugin
 	 * 9. Render the template and end the request
+	 *
+	 * @return never-return
 	 */
 	public function run(string $plugin, string $view, string $locale, string $path): void
 	{
@@ -69,8 +68,8 @@ final class Application
 				$this->terminate($this->templateRenderer->renderPermissionDenied());
 			}
 		} catch (\RuntimeException | \InvalidArgumentException $e) {
-			if ($e->getCode() !== 404 && class_exists(Debugger::class)) {
-				Debugger::log($e, ILogger::EXCEPTION);
+			if ($e->getCode() !== 404) {
+				$this->context->getContainer()->getLogger()->warning($e->getMessage(), ['exception' => $e]);
 			}
 			$pluginService = $this->context->getPluginByType(ErrorPlugin::class);
 		}
@@ -83,7 +82,12 @@ final class Application
 
 			$actionMethod = 'action' . $view;
 			if (\method_exists($pluginService, $actionMethod) === true) {
-				(new ServiceMethodInvoker)->invoke($pluginService, $actionMethod, $this->context->getRequest()->getUrl()->getQueryParameters());
+				(new ServiceMethodInvoker)
+					->invoke(
+						service: $pluginService,
+						methodName: $actionMethod,
+						params: $this->context->getRequest()->getUrl()->getQueryParameters(),
+					);
 			}
 
 			$pluginService->afterRender();
@@ -92,7 +96,11 @@ final class Application
 			if (str_starts_with($redirectPath, 'http')) {
 				$this->redirect($redirectPath);
 			}
-			$this->redirect(Url::get()->getBaseUrl() . '/admin' . ($redirectPath === '' ? '' : '/' . $redirectPath));
+			$this->redirect(
+				Url::get()->getBaseUrl()
+				. '/' . Configuration::get()->getBaseUriEscaped()
+				. ($redirectPath === '' ? '' : '/' . $redirectPath)
+			);
 		} catch (PluginTerminateException) {
 			$this->terminate();
 		} catch (PluginUserErrorException $e) {
@@ -131,8 +139,8 @@ final class Application
 			);
 		}
 		if ($this->context->getSettings()->isOk() === false) { // route installation workflow
-			if ($path !== '') { // canonize configuration request to base admin URL
-				$this->redirect(Url::get()->getBaseUrl() . '/admin');
+			if ($path !== '') { // canonize configuration request to homepage URL
+				$this->redirect($this->context->getContainer()->getLinkGenerator()->linkHomepage());
 			}
 			$this->terminate($this->context->getSettings()->runInstallProcess());
 		}
@@ -172,21 +180,24 @@ final class Application
 	}
 
 
+	/**
+	 * @return never-return
+	 */
 	private function terminate(?string $haystack = null): void
 	{
-		if ($haystack === null) {
-			$response = new VoidResponse;
-		} else {
+		if ($haystack !== null) {
 			if (AdminBar::getBar()->isDebugMode() === false) { // minify HTML in production mode
 				$haystack = Helpers::minifyHtml($haystack);
 			}
-			$response = new TextResponse($haystack);
+			echo $haystack;
 		}
-		$response->send($this->context->getRequest(), $this->context->getResponse());
 		die;
 	}
 
 
+	/**
+	 * @return never-return
+	 */
 	private function redirect(string $url, int $httpCode = IResponse::S302_FOUND): void
 	{
 		$this->context->getResponse()->redirect($url, $httpCode);

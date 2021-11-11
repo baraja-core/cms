@@ -67,7 +67,7 @@ final class CmsDashboardEndpoint extends BaseEndpoint
 
 	private function getUserIdentity(): User
 	{
-		$identity = $this->userManager->getCmsIdentity();
+		$identity = $this->userManager->getIdentity();
 		assert($identity instanceof User);
 
 		return $identity;

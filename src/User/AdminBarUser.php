@@ -20,20 +20,18 @@ final class AdminBarUser implements User
 
 	public function getName(): ?string
 	{
-		if ($this->getIdentity() === null) {
+		$identity = $this->getIdentity();
+		if ($identity === null) {
 			return null;
 		}
 		$name = null;
-		if ($this->getIdentity() instanceof AdminIdentity) {
-			$name = $this->getIdentity()->getName();
-			if ($name === null) {
-				$name = 'Admin';
-			}
-		} elseif (method_exists($this->getIdentity(), 'getName')) {
-			$name = (string) $this->getIdentity()->getName() ?: null;
+		if ($identity instanceof AdminIdentity) {
+			$name = $identity->getName();
+		} elseif (method_exists($identity, 'getName')) {
+			$name = (string) $identity->getName();
 		}
 
-		return $name ? Shorts::process($name, 16) : null;
+		return $name !== '' ? Shorts::process($name ?? 'Admin', 16) : null;
 	}
 
 
