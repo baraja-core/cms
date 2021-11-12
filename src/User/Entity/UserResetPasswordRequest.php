@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Baraja\Cms\User\Entity;
 
 
-use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Doctrine\ORM\Mapping as ORM;
 use Nette\Utils\Random;
 
@@ -13,7 +12,10 @@ use Nette\Utils\Random;
 #[ORM\Table(name: 'cms__user_reset_password_request')]
 class UserResetPasswordRequest
 {
-	use IdentifierUnsigned;
+	#[ORM\Id]
+	#[ORM\Column(type: 'integer', unique: true, options: ['unsigned' => true])]
+	#[ORM\GeneratedValue]
+	protected int $id;
 
 	#[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'passwordResets')]
 	private User $user;
@@ -43,6 +45,12 @@ class UserResetPasswordRequest
 	public function __toString(): string
 	{
 		return $this->getToken();
+	}
+
+
+	public function getId(): int
+	{
+		return $this->id;
 	}
 
 

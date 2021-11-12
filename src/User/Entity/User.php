@@ -35,7 +35,7 @@ class User implements CmsUser
 	#[ORM\Id]
 	#[ORM\Column(type: 'integer', unique: true, options: ['unsigned' => true])]
 	#[ORM\GeneratedValue]
-	protected ?int $id = null;
+	protected int $id;
 
 	#[ORM\Column(type: 'string', length: 64, unique: true)]
 	private string $username;
@@ -149,10 +149,6 @@ class User implements CmsUser
 
 	public function getId(): int
 	{
-		if ($this->id === null) {
-			throw new \RuntimeException('User identifier does not exist yet. Did you flush entity first?');
-		}
-
 		return $this->id;
 	}
 

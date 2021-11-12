@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Baraja\Cms\User\Entity;
 
 
-use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Baraja\Network\Ip;
 use Baraja\Url\Url;
 use Doctrine\ORM\Mapping as ORM;
@@ -15,7 +14,10 @@ use Nette\Utils\Strings;
 #[ORM\Table(name: 'cms__user_login_attempt')]
 class UserLoginAttempt
 {
-	use IdentifierUnsigned;
+	#[ORM\Id]
+	#[ORM\Column(type: 'integer', unique: true, options: ['unsigned' => true])]
+	#[ORM\GeneratedValue]
+	protected int $id;
 
 	#[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'loginAttempts')]
 	private ?User $user;
@@ -46,6 +48,12 @@ class UserLoginAttempt
 		$this->ip = PHP_SAPI === 'cli' ? 'cli' : Ip::get();
 		$this->insertedDateTime = new \DateTime('now');
 		$this->setLoginUrl();
+	}
+
+
+	public function getId(): int
+	{
+		return $this->id;
 	}
 
 

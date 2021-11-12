@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Baraja\Cms\User\Entity;
 
 
-use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Baraja\Network\Ip;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -13,7 +12,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'cms__user_login')]
 class UserLogin
 {
-	use IdentifierUnsigned;
+	#[ORM\Id]
+	#[ORM\Column(type: 'integer', unique: true, options: ['unsigned' => true])]
+	#[ORM\GeneratedValue]
+	protected int $id;
 
 	#[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'logins')]
 	private User $user;
@@ -38,6 +40,12 @@ class UserLogin
 		$this->hostname = $_SERVER['HTTP_HOST'] ?? null;
 		$this->userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
 		$this->loginDatetime = new \DateTime;
+	}
+
+
+	public function getId(): int
+	{
+		return $this->id;
 	}
 
 

@@ -6,7 +6,6 @@ namespace Baraja\Cms\Announcement\Entity;
 
 
 use Baraja\Cms\User\Entity\User;
-use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Baraja\Localization\Localization;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -16,7 +15,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'cms__announcement')]
 class Announcement
 {
-	use IdentifierUnsigned;
+	#[ORM\Id]
+	#[ORM\Column(type: 'integer', unique: true, options: ['unsigned' => true])]
+	#[ORM\GeneratedValue]
+	protected int $id;
 
 	#[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'logins')]
 	private User $user;
@@ -55,6 +57,12 @@ class Announcement
 		$this->parent = $parent;
 		$this->showSince = new \DateTime;
 		$this->children = new ArrayCollection;
+	}
+
+
+	public function getId(): int
+	{
+		return $this->id;
 	}
 
 

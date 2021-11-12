@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Baraja\Cms\User\Entity;
 
 
-use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 
@@ -14,7 +13,10 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
 #[UniqueConstraint(name: 'cms__user_meta_user_key', columns: ['user_id', 'key'])]
 class UserMeta
 {
-	use IdentifierUnsigned;
+	#[ORM\Id]
+	#[ORM\Column(type: 'integer', unique: true, options: ['unsigned' => true])]
+	#[ORM\GeneratedValue]
+	protected int $id;
 
 	#[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'metas')]
 	private User $user;
@@ -32,6 +34,12 @@ class UserMeta
 		$this->user = $user;
 		$this->key = $key;
 		$this->value = $value !== '' ? $value : null;
+	}
+
+
+	public function getId(): int
+	{
+		return $this->id;
 	}
 
 

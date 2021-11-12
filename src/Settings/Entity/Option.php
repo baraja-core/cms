@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Baraja\DoctrineConfiguration;
 
 
-use Baraja\Doctrine\Identifier\IdentifierUnsigned;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'core__option')]
 class Option
 {
-	use IdentifierUnsigned;
+	#[ORM\Id]
+	#[ORM\Column(type: 'integer', unique: true, options: ['unsigned' => true])]
+	#[ORM\GeneratedValue]
+	protected int $id;
 
 	#[ORM\Column(name: '`key`', type: 'string', length: 128, unique: true)]
 	private string $key;
@@ -46,6 +48,12 @@ class Option
 	public function __toString(): string
 	{
 		return $this->getValue();
+	}
+
+
+	public function getId(): int
+	{
+		return $this->id;
 	}
 
 
