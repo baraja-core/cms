@@ -8,7 +8,7 @@ namespace Baraja\Cms\User\Entity;
 use Baraja\Network\Ip;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: UserLoginRepository::class)]
 #[ORM\Table(name: 'cms__user_login')]
 class UserLogin
 {

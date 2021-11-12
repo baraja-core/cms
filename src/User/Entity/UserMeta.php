@@ -8,7 +8,7 @@ namespace Baraja\Cms\User\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: UserMetaRepository::class)]
 #[ORM\Table(name: 'cms__user_meta')]
 #[UniqueConstraint(name: 'cms__user_meta_user_key', columns: ['user_id', 'key'])]
 class UserMeta

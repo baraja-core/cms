@@ -7,7 +7,7 @@ namespace Baraja\DoctrineConfiguration;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: OptionRepository::class)]
 #[ORM\Table(name: 'core__option')]
 class Option
 {

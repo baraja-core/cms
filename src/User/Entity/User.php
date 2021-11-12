@@ -27,7 +27,7 @@ use Nette\Utils\Validators;
  * 1. Scalar values set to $data array section with namespace.
  * 2. For complex values create new Doctrine entity with relation here.
  */
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'cms__user')]
 #[Index(columns: ['active'], name: 'core__user_active')]
 class User implements CmsUser

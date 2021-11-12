@@ -10,7 +10,7 @@ use Baraja\Url\Url;
 use Doctrine\ORM\Mapping as ORM;
 use Nette\Utils\Strings;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: UserLoginAttemptRepository::class)]
 #[ORM\Table(name: 'cms__user_login_attempt')]
 class UserLoginAttempt
 {

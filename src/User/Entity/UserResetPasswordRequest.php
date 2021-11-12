@@ -8,7 +8,7 @@ namespace Baraja\Cms\User\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Nette\Utils\Random;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: UserResetPasswordRequestRepository::class)]
 #[ORM\Table(name: 'cms__user_reset_password_request')]
 class UserResetPasswordRequest
 {
