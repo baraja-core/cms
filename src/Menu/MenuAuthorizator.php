@@ -6,7 +6,6 @@ namespace Baraja\Cms;
 
 
 use Baraja\Cms\User\UserManagerAccessor;
-use Baraja\Doctrine\EntityManager;
 use Nette\Security\User as NetteUser;
 
 final class MenuAuthorizator
@@ -23,7 +22,6 @@ final class MenuAuthorizator
 
 
 	public function __construct(
-		EntityManager $entityManager,
 		NetteUser $userService,
 		UserManagerAccessor $userManager,
 	) {
@@ -36,7 +34,7 @@ final class MenuAuthorizator
 		}
 
 		/** @var array<int, array{id: int, roles: array<int, string>|null, privileges: array<int, string>|null}> $user */
-		$user = $entityManager->getRepository($userManager->get()->getDefaultEntity())
+		$user = $userManager->get()->getDefaultUserRepository()
 			->createQueryBuilder('user')
 			->select('PARTIAL user.{id, roles, privileges}')
 			->where('user.id = :id')

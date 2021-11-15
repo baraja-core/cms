@@ -7,7 +7,8 @@ namespace Baraja\Cms\User;
 
 use Baraja\Cms\User\Entity\User;
 use Baraja\Cms\User\Entity\UserMeta;
-use Baraja\Doctrine\EntityManager;
+use Baraja\Cms\User\Entity\UserMetaRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 
@@ -18,7 +19,7 @@ final class UserMetaManager
 
 
 	public function __construct(
-		private EntityManager $entityManager,
+		private EntityManagerInterface $entityManager,
 		private UserManager $userManager,
 	) {
 	}
@@ -26,17 +27,10 @@ final class UserMetaManager
 
 	public function loadAll(int $userId): self
 	{
-		/** @var UserMeta[] $metas */
-		$metas = $this->entityManager->getRepository(UserMeta::class)
-			->createQueryBuilder('meta')
-			->select('meta, PARTIAL user.{id}')
-			->leftJoin('meta.user', 'user')
-			->where('meta.user = :userId')
-			->setParameter('userId', $userId)
-			->getQuery()
-			->getResult();
+		/** @var UserMetaRepository $userMetaRepository */
+		$userMetaRepository = $this->entityManager->getRepository(UserMetaRepository::class);
 
-		foreach ($metas as $meta) {
+		foreach ($userMetaRepository->loadAll($userId) as $meta) {
 			$cacheKey = $this->getCacheKey($userId, $meta->getKey());
 			self::$cache[$cacheKey] = $meta;
 		}
@@ -52,16 +46,9 @@ final class UserMetaManager
 			return self::$cache[$cacheKey]->getValue();
 		}
 		try {
-			/** @var UserMeta $meta */
-			$meta = $this->entityManager->getRepository(UserMeta::class)
-				->createQueryBuilder('meta')
-				->where('meta.user = :userId')
-				->andWhere('meta.key = :key')
-				->setParameter('userId', $userId)
-				->setParameter('key', $key)
-				->setMaxResults(1)
-				->getQuery()
-				->getSingleResult();
+			/** @var UserMetaRepository $userMetaRepository */
+			$userMetaRepository = $this->entityManager->getRepository(UserMetaRepository::class);
+			$meta = $userMetaRepository->load($userId, $key);
 			self::$cache[$cacheKey] = $meta;
 
 			return $meta->getValue();
@@ -83,16 +70,10 @@ final class UserMetaManager
 		}
 		$cacheKey = $this->getCacheKey($user->getId(), $key);
 		try {
+			/** @var UserMetaRepository $userMetaRepository */
+			$userMetaRepository = $this->entityManager->getRepository(UserMetaRepository::class);
 			/** @var UserMeta $meta */
-			$meta = self::$cache[$cacheKey] ?? $this->entityManager->getRepository(UserMeta::class)
-					->createQueryBuilder('meta')
-					->where('meta.user = :userId')
-					->andWhere('meta.key = :key')
-					->setParameter('userId', $user->getId())
-					->setParameter('key', $key)
-					->setMaxResults(1)
-					->getQuery()
-					->getSingleResult();
+			$meta = self::$cache[$cacheKey] ?? $userMetaRepository->load($user->getId(), $key);
 		} catch (NoResultException | NonUniqueResultException) {
 			if ($value === null) {
 				return $this;

@@ -114,7 +114,7 @@ final class CmsEndpoint extends BaseEndpoint
 	{
 		try {
 			/** @var CmsUser $user */
-			$user = $this->entityManager->getRepository($this->userManager->getDefaultEntity())
+			$user = $this->userManager->getDefaultUserRepository()
 				->createQueryBuilder('user')
 				->where('user.username = :username')
 				->orWhere('user.email = :email')
@@ -153,7 +153,7 @@ final class CmsEndpoint extends BaseEndpoint
 		if (preg_match('/^(\S+)\s+(\S+)$/', trim($realName), $parser) === 1) {
 			try {
 				/** @var CmsUser $user */
-				$user = $this->entityManager->getRepository($this->userManager->getDefaultEntity())
+				$user = $this->userManager->getDefaultUserRepository()
 					->createQueryBuilder('user')
 					->where('user.firstName = :firstName')
 					->andWhere('user.lastName = :lastName')
@@ -243,7 +243,7 @@ final class CmsEndpoint extends BaseEndpoint
 	{
 		try {
 			/** @var CmsUser $user */
-			$user = $this->entityManager->getRepository($this->userManager->getDefaultEntity())
+			$user = $this->userManager->getDefaultUserRepository()
 				->createQueryBuilder('user')
 				->where('user.id = :userId')
 				->setParameter('userId', $userId)

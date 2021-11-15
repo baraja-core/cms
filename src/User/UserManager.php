@@ -11,9 +11,10 @@ use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\User;
 use Baraja\Cms\User\Entity\UserLogin;
 use Baraja\Cms\User\Entity\UserLoginAttempt;
-use Baraja\Doctrine\EntityManager;
+use Baraja\Cms\User\Entity\UserLoginAttemptRepository;
 use Baraja\DynamicConfiguration\Configuration;
-use Baraja\Network\Ip;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Nette\Security\AuthenticationException;
@@ -32,14 +33,16 @@ final class UserManager implements Authenticator
 
 
 	public function __construct(
-		private EntityManager $entityManager,
+		private EntityManagerInterface $entityManager,
 		private UserStorage $userStorage,
 		private Configuration $configuration,
 		?string $userEntity = null,
 	) {
 		$userEntity ??= User::class;
 		if (is_subclass_of($userEntity, CmsUser::class) === false) {
-			throw new \InvalidArgumentException(sprintf('User entity "%s" must implements "%s" interface.', $userEntity, CmsUser::class));
+			throw new \InvalidArgumentException(
+				sprintf('User entity "%s" must implements "%s" interface.', $userEntity, CmsUser::class)
+			);
 		}
 		$this->defaultEntity = $userEntity;
 		$this->userMetaManager = new UserMetaManager($this->entityManager, $this);
@@ -90,6 +93,37 @@ final class UserManager implements Authenticator
 	}
 
 
+	public function createUser(
+		string $email,
+		?string $password = null,
+		?string $phone = null,
+		?string $role = null,
+	): CmsUser {
+		if ($this->userExist($email) === true) {
+			throw new \InvalidArgumentException(sprintf('User "%s" already exist.', $email));
+		}
+		$ref = new \ReflectionClass($this->getDefaultEntity());
+		/** @var CmsUser $user */
+		$user = $ref->newInstanceWithoutConstructor();
+		$user->injectDefault(
+			username: $email,
+			password: $password ?? '',
+			email: $email,
+			role: CmsUser::ROLE_USER,
+		);
+		if ($phone !== null) {
+			$user->setPhone($phone);
+		}
+		if ($role !== null) {
+			$user->addRole($role);
+		}
+		$this->entityManager->persist($user);
+		$this->entityManager->flush();
+
+		return $user;
+	}
+
+
 	/**
 	 * @deprecated since 2021-11-10, use getIdentity() instead.
 	 */
@@ -108,10 +142,21 @@ final class UserManager implements Authenticator
 	}
 
 
+	public function getDefaultUserRepository(): EntityRepository
+	{
+		return new EntityRepository(
+			$this->entityManager,
+			$this->entityManager->getClassMetadata($this->defaultEntity)
+		);
+	}
+
+
 	public function createLoginIdentity(IIdentity $user, string $expiration = '2 hours'): AdminIdentity
 	{
 		if (!$user instanceof CmsUser) {
-			throw new \LogicException(sprintf('User identity must be instance of "%s", but "%s" given.', CmsUser::class, $user::class));
+			throw new \LogicException(
+				sprintf('User identity must be instance of "%s", but "%s" given.', CmsUser::class, $user::class)
+			);
 		}
 		if ($user->getOtpCode() !== null) { // need OTP authentication
 			Session::set(Session::WORKFLOW_NEED_OTP_AUTH, true);
@@ -202,7 +247,7 @@ final class UserManager implements Authenticator
 	public function getUserByUsername(string $username): CmsUser
 	{
 		/** @phpstan-ignore-next-line */
-		return $this->entityManager->getRepository($this->defaultEntity)
+		return $this->getDefaultUserRepository()
 			->createQueryBuilder('user')
 			->where('user.username = :username')
 			->setParameter('username', $username)
@@ -220,9 +265,10 @@ final class UserManager implements Authenticator
 		/** @var array<int, CmsUser> $cache */
 		static $cache = [];
 
-		$find = function (int $id): CmsUser {
+		$find = function (int $id): CmsUser
+		{
 			/** @var CmsUser $entity */
-			$entity = $this->entityManager->getRepository($this->defaultEntity)
+			$entity = $this->getDefaultUserRepository()
 				->createQueryBuilder('user')
 				->where('user.id = :id')
 				->setParameter('id', $id)
@@ -317,22 +363,50 @@ final class UserManager implements Authenticator
 			$configuration->save($blockIntervalKey, $blockInterval);
 		}
 
-		/** @var array<int, array<string, int>> $attempts */
-		$attempts = $this->entityManager->getRepository(UserLoginAttempt::class)
-			->createQueryBuilder('login')
-			->select('PARTIAL login.{id}')
-			->leftJoin('login.user', 'user')
-			->where('login.user IS NULL OR user.username = :username OR user.email = :username OR login.username = :username OR login.ip = :ip')
-			->andWhere('login.insertedDateTime >= :intervalDate')
-			->andWhere('login.password = FALSE')
-			->setParameter('username', $username)
-			->setParameter('ip', $ip ?? Ip::get())
-			->setParameter('intervalDate', new \DateTime('now - ' . $blockInterval))
-			->setMaxResults(((int) $blockCount) * 2)
-			->getQuery()
-			->getArrayResult();
+		/** @var UserLoginAttemptRepository $attemptRepository */
+		$attemptRepository = $this->entityManager->getRepository(UserLoginAttemptRepository::class);
+		$attempts = $attemptRepository->getUsedAttempts($username, $blockInterval, $ip, (int) $blockCount);
 
 		return count($attempts) >= (int) $blockCount;
+	}
+
+
+	public function userExist(string $email): bool
+	{
+		try {
+			$this->getDefaultUserRepository()
+				->createQueryBuilder('user')
+				->select('PARTIAL user.{id}')
+				->where('user.username = :username')
+				->setParameter('username', $email)
+				->setMaxResults(1)
+				->getQuery()
+				->getSingleResult();
+
+			return true;
+		} catch (NoResultException | NonUniqueResultException) {
+		}
+
+		return false;
+	}
+
+
+	public function getCountUsers(): int
+	{
+		try {
+			$return = $this->getDefaultUserRepository()
+				->createQueryBuilder('user')
+				->select('COUNT(user.id)')
+				->getQuery()
+				->getSingleScalarResult();
+			if (is_numeric($return)) {
+				return (int) $return;
+			}
+		} catch (\Throwable) {
+			// Silence is golden.
+		}
+
+		throw new \LogicException('Can not count users.');
 	}
 
 
@@ -384,7 +458,10 @@ final class UserManager implements Authenticator
 
 		if ($hash === '---empty-password---') {
 			throw new AuthenticationException(
-				sprintf('User password is empty or account is locked, please contact your administrator. Username "%s" given.', $username),
+				sprintf(
+					'User password is empty or account is locked, please contact your administrator. Username "%s" given.',
+					$username
+				),
 				Authenticator::FAILURE,
 			);
 		}

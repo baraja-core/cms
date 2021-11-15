@@ -190,7 +190,7 @@ final class TemplateRenderer
 	{
 		try {
 			/** @var CmsUser $user */
-			$user = $this->context->getEntityManager()->getRepository($this->context->getUserManager()->get()->getDefaultEntity())
+			$user = $this->context->getUserManager()->get()->getDefaultUserRepository()
 				->createQueryBuilder('user')
 				->where('user.id = :userId')
 				->setParameter('userId', $userId)

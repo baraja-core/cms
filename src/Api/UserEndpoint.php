@@ -12,7 +12,7 @@ use Baraja\Cms\Helpers;
 use Baraja\Cms\Settings;
 use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\UserLogin;
-use Baraja\Cms\User\Entity\UserMeta;
+use Baraja\Cms\User\Entity\UserMetaRepository;
 use Baraja\Cms\User\UserManager;
 use Baraja\Cms\User\UserMetaManager;
 use Baraja\Doctrine\EntityManager;
@@ -58,9 +58,9 @@ final class UserEndpoint extends BaseEndpoint
 	): void {
 		$currentUserId = $this->getUser()->getId();
 		/** @var CmsUser $currentUser */
-		$currentUser = $this->entityManager->getRepository($this->userManager->getDefaultEntity())->find($currentUserId);
-		$count = $this->getCountUsers();
-		$selection = $this->entityManager->getRepository($this->userManager->getDefaultEntity())->createQueryBuilder('user');
+		$currentUser = $this->userManager->getDefaultUserRepository()->find($currentUserId);
+		$count = $this->userManager->getCountUsers();
+		$selection = $this->userManager->getDefaultUserRepository()->createQueryBuilder('user');
 
 		if ($active !== null) {
 			$selection->andWhere('user.active = ' . ($active === 'active' ? 'TRUE' : 'FALSE'));
@@ -130,7 +130,10 @@ final class UserEndpoint extends BaseEndpoint
 			->getQuery()
 			->getArrayResult();
 
-		$metaToUser = $this->getMetaByUsers(
+		/** @var UserMetaRepository $metaRepository */
+		$metaRepository = $this->entityManager->getRepository(UserMetaRepository::class);
+
+		$metaToUser = $metaRepository->loadByUsersAndKeys(
 			array_map(static fn(array $user): int => $user['id'], $users),
 			['blocked', 'block-reason', 'last-activity'],
 		);
@@ -198,30 +201,21 @@ final class UserEndpoint extends BaseEndpoint
 		?string $phone = null,
 		?string $password = null
 	): void {
-		if ($this->userExist($email) === true) {
+		if ($this->userManager->userExist($email) === true) {
 			$this->sendError(sprintf('User "%s" already exist.', $email));
 		}
 		try {
-			try {
-				$ref = new \ReflectionClass($this->userManager->getDefaultEntity());
-				/** @var CmsUser $user */
-				$user = $ref->newInstanceWithoutConstructor();
-				$user->injectDefault(
-					username: $email,
-					password: $password ?? '',
-					email: $email,
-					role: CmsUser::ROLE_USER,
-				);
-			} catch (\Throwable $e) {
-				$this->context->getContainer()->getLogger()->critical($e->getMessage(), ['exception' => $e]);
-				$this->sendError('Can not create user because user storage is broken.');
-			}
-			$user->setPhone($phone);
-			$user->addRole($role);
-			$this->entityManager->persist($user);
-			$this->entityManager->flush();
+			$user = $this->userManager->createUser(
+				email: $email,
+				password: $password,
+				phone: $phone,
+				role: $role,
+			);
 		} catch (\InvalidArgumentException $e) {
 			$this->sendError($e->getMessage());
+		} catch (\Throwable $e) {
+			$this->context->getContainer()->getLogger()->critical($e->getMessage(), ['exception' => $e]);
+			$this->sendError('Can not create user because user storage is broken.');
 		}
 
 		$this->setRealUserName($user, $fullName);
@@ -281,7 +275,7 @@ final class UserEndpoint extends BaseEndpoint
 	public function actionValidateUser(string $email): void
 	{
 		$this->sendJson([
-			'exist' => $this->userExist($email),
+			'exist' => $this->userManager->userExist($email),
 		]);
 	}
 
@@ -881,26 +875,6 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	private function userExist(string $email): bool
-	{
-		try {
-			$this->entityManager->getRepository($this->userManager->getDefaultEntity())
-				->createQueryBuilder('user')
-				->select('PARTIAL user.{id}')
-				->where('user.username = :username')
-				->setParameter('username', $email)
-				->setMaxResults(1)
-				->getQuery()
-				->getSingleResult();
-
-			return true;
-		} catch (NoResultException | NonUniqueResultException) {
-		}
-
-		return false;
-	}
-
-
 	/**
 	 * @return array<string, string>
 	 */
@@ -949,63 +923,10 @@ final class UserEndpoint extends BaseEndpoint
 	{
 		static $cache;
 
-		return $cache ?? $cache = $this->entityManager->getRepository($this->userManager->getDefaultEntity())
+		return $cache ?? $cache = $this->userManager->getDefaultUserRepository()
 				->createQueryBuilder('user')
 				->select('PARTIAL user.{id, roles, active}')
 				->getQuery()
 				->getArrayResult();
-	}
-
-
-	private function getCountUsers(): int
-	{
-		try {
-			$return = $this->entityManager->getRepository($this->userManager->getDefaultEntity())
-				->createQueryBuilder('user')
-				->select('COUNT(user.id)')
-				->getQuery()
-				->getSingleScalarResult();
-			if (is_numeric($return)) {
-				return (int) $return;
-			}
-		} catch (\Throwable) {
-			// Silence is golden.
-		}
-
-		return -1;
-	}
-
-
-	/**
-	 * @param array<int, int> $ids
-	 * @param array<int, string> $keys
-	 * @return array<int, array<string, string>>
-	 */
-	private function getMetaByUsers(array $ids, array $keys = []): array
-	{
-		$selection = $this->entityManager->getRepository(UserMeta::class)
-			->createQueryBuilder('meta')
-			->select('PARTIAL meta.{id, user, key, value}')
-			->addSelect('PARTIAL user.{id}')
-			->leftJoin('meta.user', 'user')
-			->where('user.id IN (:ids)')
-			->setParameter('ids', $ids);
-
-		if ($keys !== []) {
-			$selection->andWhere('meta.key IN (:keys)')
-				->setParameter('keys', $keys);
-		}
-
-		/** @var array<int, array{user: array{id: int}, key: string, value: string|null}> $metas */
-		$metas = $selection->getQuery()->getArrayResult();
-
-		$return = [];
-		foreach ($metas as $meta) {
-			$key = $meta['key'];
-			$value = $meta['value'] ?? '';
-			$return[$meta['user']['id']][$key] = $value;
-		}
-
-		return $return;
 	}
 }
