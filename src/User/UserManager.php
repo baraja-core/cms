@@ -265,8 +265,7 @@ final class UserManager implements Authenticator
 		/** @var array<int, CmsUser> $cache */
 		static $cache = [];
 
-		$find = function (int $id): CmsUser
-		{
+		$find = function (int $id): CmsUser {
 			/** @var CmsUser $entity */
 			$entity = $this->getDefaultUserRepository()
 				->createQueryBuilder('user')
