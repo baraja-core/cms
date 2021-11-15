@@ -6,16 +6,16 @@ namespace Baraja\Cms\Search;
 
 
 use Baraja\Cms\LinkGenerator;
-use Baraja\Doctrine\EntityManager;
 use Baraja\Plugin\PluginManager;
 use Baraja\Search\SearchAccessor;
 use Baraja\StructuredApi\BaseEndpoint;
+use Doctrine\ORM\EntityManagerInterface;
 
 final class CmsGlobalSearchEndpoint extends BaseEndpoint
 {
 	public function __construct(
 		private PluginManager $pluginManager,
-		private EntityManager $entityManager,
+		private EntityManagerInterface $entityManager,
 		private ?SearchAccessor $searchAccessor = null,
 	) {
 	}

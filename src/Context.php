@@ -14,7 +14,6 @@ use Baraja\Cms\Translator\TranslatorFilter;
 use Baraja\Cms\User\UserManagerAccessor;
 use Baraja\Cms\User\UserMetaManager;
 use Baraja\Doctrine\Cache\FilesystemCache;
-use Baraja\Doctrine\EntityManager;
 use Baraja\DynamicConfiguration\Configuration;
 use Baraja\DynamicConfiguration\ConfigurationSection;
 use Baraja\Localization\Localization;
@@ -23,6 +22,7 @@ use Baraja\Plugin\Plugin;
 use Baraja\Plugin\PluginManager;
 use DeviceDetector\Cache\DoctrineBridge;
 use DeviceDetector\DeviceDetector;
+use Doctrine\ORM\EntityManagerInterface;
 use Nette\Http\Request;
 use Nette\Http\Response;
 use Nette\Security\User;
@@ -41,7 +41,7 @@ final class Context implements ContainerInterface
 	public function __construct(
 		private Request $request,
 		private Response $response,
-		private EntityManager $entityManager,
+		private EntityManagerInterface $entityManager,
 		private Settings $settings,
 		private User $user,
 		private TranslatorFilter $translatorFilter,
@@ -141,7 +141,7 @@ final class Context implements ContainerInterface
 	}
 
 
-	public function getEntityManager(): EntityManager
+	public function getEntityManager(): EntityManagerInterface
 	{
 		return $this->entityManager;
 	}

@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Baraja\DoctrineConfiguration;
 
 
-use Baraja\Doctrine\EntityManager;
 use Baraja\DynamicConfiguration\Storage;
-use Doctrine\ORM\Mapping\MappingException;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 
@@ -16,9 +15,15 @@ use Doctrine\ORM\NoResultException;
  */
 final class DoctrineStorage implements Storage
 {
+	private OptionRepository $optionRepository;
+
+
 	public function __construct(
-		private EntityManager $entityManager,
+		private EntityManagerInterface $entityManager,
 	) {
+		/** @var OptionRepository $optionRepository */
+		$optionRepository = $entityManager->getRepository(OptionRepository::class);
+		$this->optionRepository = $optionRepository;
 	}
 
 
@@ -27,15 +32,8 @@ final class DoctrineStorage implements Storage
 	 */
 	public function loadAll(): array
 	{
-		/** @var array<int, array{id: int, key: string, value: string}> $data */
-		$data = $this->entityManager->getRepository(Option::class)
-			->createQueryBuilder('option')
-			->select('PARTIAL option.{id, key, value}')
-			->getQuery()
-			->getArrayResult();
-
 		$return = [];
-		foreach ($data as $item) {
+		foreach ($this->optionRepository->loadAll() as $item) {
 			$return[$item['key']] = $item['value'];
 		}
 
@@ -45,19 +43,7 @@ final class DoctrineStorage implements Storage
 
 	public function get(string $key): ?string
 	{
-		/** @var array<int, array{id: int, value: string|null}> $option */
-		$option = $this->entityManager->getRepository(Option::class)
-			->createQueryBuilder('option')
-			->select('PARTIAL option.{id, value}')
-			->where('option.key = :key')
-			->setParameter('key', $key)
-			->setMaxResults(1)
-			->getQuery()
-			->getArrayResult();
-
-		return isset($option[0]['value']) === true
-			? $option[0]['value']
-			: null;
+		return $this->optionRepository->getAsArray($key);
 	}
 
 
@@ -71,17 +57,8 @@ final class DoctrineStorage implements Storage
 			return [];
 		}
 
-		/** @var array<int, array{key: string, value: string}> $options */
-		$options = $this->entityManager->getRepository(Option::class)
-			->createQueryBuilder('option')
-			->select('PARTIAL option.{id, key, value}')
-			->where('option.key IN (:keys)')
-			->setParameter('keys', $keys)
-			->getQuery()
-			->getArrayResult();
-
 		$return = [];
-		foreach ($options as $option) {
+		foreach ($this->optionRepository->getMultiple($keys) as $option) {
 			$return[$option['key']] = $option['value'];
 		}
 
@@ -92,7 +69,7 @@ final class DoctrineStorage implements Storage
 	public function save(string $key, string $value): void
 	{
 		try {
-			$option = $this->getOptionEntity($key);
+			$option = $this->optionRepository->getAsEntity($key);
 		} catch (NoResultException | NonUniqueResultException) {
 			$option = new Option($key, $value);
 			$this->entityManager->persist($option);
@@ -105,35 +82,13 @@ final class DoctrineStorage implements Storage
 	public function remove(string $key): void
 	{
 		try {
-			$option = $this->getOptionEntity($key);
+			$option = $this->optionRepository->getAsEntity($key);
 		} catch (NoResultException | NonUniqueResultException) {
 			return;
 		}
 
-		try {
-			$this->entityManager->remove($option);
-			$this->entityManager->flush();
-			$this->entityManager->clear($option);
-		} catch (MappingException $e) {
-			throw new \RuntimeException($e->getMessage(), 500, $e);
-		}
-	}
-
-
-	/**
-	 * @throws NoResultException|NonUniqueResultException
-	 */
-	private function getOptionEntity(string $key): Option
-	{
-		$option = $this->entityManager->getRepository(Option::class)
-			->createQueryBuilder('option')
-			->where('option.key = :key')
-			->setParameter('key', $key)
-			->setMaxResults(1)
-			->getQuery()
-			->getSingleResult();
-		assert($option instanceof Option);
-
-		return $option;
+		$this->entityManager->remove($option);
+		$this->entityManager->flush();
+		$this->entityManager->clear($option::class);
 	}
 }

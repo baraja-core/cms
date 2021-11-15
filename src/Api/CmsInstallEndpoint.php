@@ -8,12 +8,12 @@ namespace Baraja\Cms\Api;
 use Baraja\BarajaCloud\CloudManager;
 use Baraja\Cms\Settings;
 use Baraja\Cms\User\Entity\User;
-use Baraja\Doctrine\EntityManager;
 use Baraja\DynamicConfiguration\Configuration;
 use Baraja\DynamicConfiguration\ConfigurationSection;
 use Baraja\StructuredApi\Attributes\PublicEndpoint;
 use Baraja\StructuredApi\BaseEndpoint;
 use Baraja\Url\Url;
+use Doctrine\ORM\EntityManagerInterface;
 use Nette\Utils\Strings;
 use Nette\Utils\Validators;
 
@@ -24,7 +24,7 @@ final class CmsInstallEndpoint extends BaseEndpoint
 
 
 	public function __construct(
-		private EntityManager $entityManager,
+		private EntityManagerInterface $entityManager,
 		private CloudManager $cloudManager,
 		private Settings $settings,
 		Configuration $configuration,

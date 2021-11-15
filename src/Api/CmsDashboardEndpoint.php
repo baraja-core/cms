@@ -6,16 +6,17 @@ namespace Baraja\Cms\Api;
 
 
 use Baraja\Cms\Announcement\Entity\Announcement;
+use Baraja\Cms\Announcement\Entity\AnnouncementRepository;
 use Baraja\Cms\User\Entity\User;
 use Baraja\Cms\User\UserManager;
-use Baraja\Doctrine\EntityManager;
 use Baraja\Localization\Localization;
 use Baraja\StructuredApi\BaseEndpoint;
+use Doctrine\ORM\EntityManagerInterface;
 
 final class CmsDashboardEndpoint extends BaseEndpoint
 {
 	public function __construct(
-		private EntityManager $entityManager,
+		private EntityManagerInterface $entityManager,
 		private UserManager $userManager,
 		private Localization $localization,
 	) {
@@ -24,22 +25,12 @@ final class CmsDashboardEndpoint extends BaseEndpoint
 
 	public function actionFeed(): void
 	{
+		/** @var AnnouncementRepository $repository */
+		$repository = $this->entityManager->getRepository(AnnouncementRepository::class);
+
 		$this->sendJson(
 			[
-				'feed' => $this->entityManager->getRepository(Announcement::class)
-					->createQueryBuilder('topic')
-					->select('PARTIAL topic.{id, pinned, message, showSince}')
-					->addSelect('PARTIAL user.{id, username}')
-					->leftJoin('topic.user', 'user')
-					->where('topic.parent IS NULL')
-					->andWhere('topic.active = TRUE')
-					->andWhere('topic.showSince >= :now')
-					->andWhere('topic.showUntil < :now OR topic.showUntil IS NULL')
-					->setParameter('now', date('Y-m-d') . ' 00:00:00')
-					->orderBy('topic.pinned', 'DESC')
-					->addOrderBy('topic.showSince', 'DESC')
-					->getQuery()
-					->getArrayResult(),
+				'feed' => $repository->getFeed(),
 			],
 		);
 	}

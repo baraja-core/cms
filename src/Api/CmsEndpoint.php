@@ -14,12 +14,13 @@ use Baraja\Cms\Settings;
 use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\User;
 use Baraja\Cms\User\Entity\UserResetPasswordRequest;
+use Baraja\Cms\User\Entity\UserResetPasswordRequestRepository;
 use Baraja\Cms\User\UserManager;
-use Baraja\Doctrine\EntityManager;
 use Baraja\Markdown\CommonMarkRenderer;
 use Baraja\StructuredApi\Attributes\PublicEndpoint;
 use Baraja\StructuredApi\BaseEndpoint;
 use Baraja\Url\Url;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Nette\Security\AuthenticationException;
@@ -32,7 +33,7 @@ final class CmsEndpoint extends BaseEndpoint
 		private UserManager $userManager,
 		private CloudManager $cloudManager,
 		private Settings $settings,
-		private EntityManager $entityManager,
+		private EntityManagerInterface $entityManager,
 		private ContextAccessor $contextAccessor,
 		private CommonMarkRenderer $commonMarkRenderer,
 	) {
@@ -202,18 +203,11 @@ final class CmsEndpoint extends BaseEndpoint
 
 	public function postForgotPasswordSetNew(string $token, string $locale, string $password): void
 	{
-		try {
-			/** @var UserResetPasswordRequest $request */
-			$request = $this->entityManager->getRepository(UserResetPasswordRequest::class)
-				->createQueryBuilder('resetRequest')
-				->select('resetRequest, user')
-				->leftJoin('resetRequest.user', 'user')
-				->where('resetRequest.token = :token')
-				->setParameter('token', $token)
-				->setMaxResults(1)
-				->getQuery()
-				->getSingleResult();
+		/** @var UserResetPasswordRequestRepository $repository */
+		$repository = $this->entityManager->getRepository(UserResetPasswordRequestRepository::class);
 
+		try {
+			$request = $repository->getByToken($token);
 			if ($request->isExpired() === true) {
 				$this->sendError('Token has been expired.');
 			}

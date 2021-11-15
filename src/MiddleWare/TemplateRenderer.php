@@ -15,6 +15,7 @@ use Baraja\Cms\Proxy\GlobalAsset\CmsSimpleStaticAsset;
 use Baraja\Cms\Settings;
 use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\UserResetPasswordRequest;
+use Baraja\Cms\User\Entity\UserResetPasswordRequestRepository;
 use Baraja\Plugin\BasePlugin;
 use Baraja\Plugin\CmsPluginPanel;
 use Baraja\Plugin\Component\PluginComponent;
@@ -151,18 +152,11 @@ final class TemplateRenderer
 
 	public function renderResetPasswordTemplate(string $token, string $locale): string
 	{
-		try {
-			/** @var UserResetPasswordRequest $request */
-			$request = $this->context->getEntityManager()->getRepository(UserResetPasswordRequest::class)
-				->createQueryBuilder('resetRequest')
-				->select('resetRequest, PARTIAL user.{id, username}')
-				->leftJoin('resetRequest.user', 'user')
-				->where('resetRequest.token = :token')
-				->setParameter('token', $token)
-				->setMaxResults(1)
-				->getQuery()
-				->getSingleResult();
+		/** @var UserResetPasswordRequestRepository $repository */
+		$repository = $this->context->getEntityManager()->getRepository(UserResetPasswordRequestRepository::class);
 
+		try {
+			$request = $repository->getByToken($token);
 			if ($request->isExpired() === true) {
 				throw new \InvalidArgumentException('Token has been expired.');
 			}

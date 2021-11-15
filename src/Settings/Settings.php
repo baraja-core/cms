@@ -8,14 +8,13 @@ namespace Baraja\Cms;
 use Baraja\BarajaCloud\CloudManager;
 use Baraja\Cms\Settings\SystemInfo;
 use Baraja\Cms\User\UserManagerAccessor;
-use Baraja\Doctrine\EntityManager;
-use Baraja\DoctrineConfiguration\Option;
+use Baraja\DoctrineConfiguration\OptionRepository;
 use Baraja\DynamicConfiguration\Configuration;
 use Baraja\DynamicConfiguration\ConfigurationSection;
 use Baraja\Localization\Localization;
+use Doctrine\ORM\EntityManagerInterface;
 use Nette\Caching\Cache;
 use Nette\Caching\Storage;
-use Nette\Utils\Validators;
 
 final class Settings
 {
@@ -25,7 +24,7 @@ final class Settings
 
 
 	public function __construct(
-		private EntityManager $entityManager,
+		private EntityManagerInterface $entityManager,
 		private Localization $localization,
 		private CloudManager $cloudManager,
 		private UserManagerAccessor $userManager,
@@ -92,14 +91,10 @@ final class Settings
 			return true;
 		}
 
-		$status = Validators::isNumericInt(
-			$this->entityManager->getRepository(Option::class)
-				->createQueryBuilder('option')
-				->select('COUNT(option.id)')
-				->getQuery()
-				->getSingleScalarResult(),
-		);
+		/** @var OptionRepository $optionRepository */
+		$optionRepository = $this->entityManager->getRepository(OptionRepository::class);
 
+		$status = $optionRepository->isOptionExist();
 		if ($status === true) {
 			$this->cache->save('database-connection', true);
 		}
@@ -142,6 +137,9 @@ final class Settings
 	}
 
 
+	/**
+	 * @deprecated since 2021-11-15, in future it will be implemented without cache.
+	 */
 	public function cleanCache(): void
 	{
 		$this->cache->clean([Cache::ALL => true]);
