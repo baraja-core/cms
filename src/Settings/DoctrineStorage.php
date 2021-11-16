@@ -22,7 +22,7 @@ final class DoctrineStorage implements Storage
 		private EntityManagerInterface $entityManager,
 	) {
 		/** @var OptionRepository $optionRepository */
-		$optionRepository = $entityManager->getRepository(OptionRepository::class);
+		$optionRepository = $entityManager->getRepository(Option::class);
 		$this->optionRepository = $optionRepository;
 	}
 

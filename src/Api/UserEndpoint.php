@@ -12,6 +12,7 @@ use Baraja\Cms\Helpers;
 use Baraja\Cms\Settings;
 use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\UserLogin;
+use Baraja\Cms\User\Entity\UserMeta;
 use Baraja\Cms\User\Entity\UserMetaRepository;
 use Baraja\Cms\User\UserManager;
 use Baraja\Cms\User\UserMetaManager;
@@ -131,7 +132,7 @@ final class UserEndpoint extends BaseEndpoint
 			->getArrayResult();
 
 		/** @var UserMetaRepository $metaRepository */
-		$metaRepository = $this->entityManager->getRepository(UserMetaRepository::class);
+		$metaRepository = $this->entityManager->getRepository(UserMeta::class);
 
 		$metaToUser = $metaRepository->loadByUsersAndKeys(
 			array_map(static fn(array $user): int => $user['id'], $users),

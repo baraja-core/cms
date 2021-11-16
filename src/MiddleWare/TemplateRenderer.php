@@ -14,6 +14,7 @@ use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Proxy\GlobalAsset\CmsSimpleStaticAsset;
 use Baraja\Cms\Settings;
 use Baraja\Cms\User\Entity\CmsUser;
+use Baraja\Cms\User\Entity\UserResetPasswordRequest;
 use Baraja\Cms\User\Entity\UserResetPasswordRequestRepository;
 use Baraja\Plugin\BasePlugin;
 use Baraja\Plugin\CmsPluginPanel;
@@ -152,7 +153,7 @@ final class TemplateRenderer
 	public function renderResetPasswordTemplate(string $token, string $locale): string
 	{
 		/** @var UserResetPasswordRequestRepository $repository */
-		$repository = $this->context->getEntityManager()->getRepository(UserResetPasswordRequestRepository::class);
+		$repository = $this->context->getEntityManager()->getRepository(UserResetPasswordRequest::class);
 
 		try {
 			$request = $repository->getByToken($token);

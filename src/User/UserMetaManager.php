@@ -28,7 +28,7 @@ final class UserMetaManager
 	public function loadAll(int $userId): self
 	{
 		/** @var UserMetaRepository $userMetaRepository */
-		$userMetaRepository = $this->entityManager->getRepository(UserMetaRepository::class);
+		$userMetaRepository = $this->entityManager->getRepository(UserMeta::class);
 
 		foreach ($userMetaRepository->loadAll($userId) as $meta) {
 			$cacheKey = $this->getCacheKey($userId, $meta->getKey());
@@ -47,7 +47,7 @@ final class UserMetaManager
 		}
 		try {
 			/** @var UserMetaRepository $userMetaRepository */
-			$userMetaRepository = $this->entityManager->getRepository(UserMetaRepository::class);
+			$userMetaRepository = $this->entityManager->getRepository(UserMeta::class);
 			$meta = $userMetaRepository->load($userId, $key);
 			self::$cache[$cacheKey] = $meta;
 
@@ -71,7 +71,7 @@ final class UserMetaManager
 		$cacheKey = $this->getCacheKey($user->getId(), $key);
 		try {
 			/** @var UserMetaRepository $userMetaRepository */
-			$userMetaRepository = $this->entityManager->getRepository(UserMetaRepository::class);
+			$userMetaRepository = $this->entityManager->getRepository(UserMeta::class);
 			/** @var UserMeta $meta */
 			$meta = self::$cache[$cacheKey] ?? $userMetaRepository->load($user->getId(), $key);
 		} catch (NoResultException | NonUniqueResultException) {

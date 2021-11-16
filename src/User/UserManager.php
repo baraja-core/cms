@@ -363,7 +363,7 @@ final class UserManager implements Authenticator
 		}
 
 		/** @var UserLoginAttemptRepository $attemptRepository */
-		$attemptRepository = $this->entityManager->getRepository(UserLoginAttemptRepository::class);
+		$attemptRepository = $this->entityManager->getRepository(UserLoginAttempt::class);
 		$attempts = $attemptRepository->getUsedAttempts($username, $blockInterval, $ip, (int) $blockCount);
 
 		return count($attempts) >= (int) $blockCount;

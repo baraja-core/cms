@@ -204,7 +204,7 @@ final class CmsEndpoint extends BaseEndpoint
 	public function postForgotPasswordSetNew(string $token, string $locale, string $password): void
 	{
 		/** @var UserResetPasswordRequestRepository $repository */
-		$repository = $this->entityManager->getRepository(UserResetPasswordRequestRepository::class);
+		$repository = $this->entityManager->getRepository(UserResetPasswordRequest::class);
 
 		try {
 			$request = $repository->getByToken($token);

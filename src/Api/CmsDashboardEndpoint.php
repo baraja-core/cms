@@ -26,7 +26,7 @@ final class CmsDashboardEndpoint extends BaseEndpoint
 	public function actionFeed(): void
 	{
 		/** @var AnnouncementRepository $repository */
-		$repository = $this->entityManager->getRepository(AnnouncementRepository::class);
+		$repository = $this->entityManager->getRepository(Announcement::class);
 
 		$this->sendJson(
 			[

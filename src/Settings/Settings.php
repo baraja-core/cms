@@ -8,6 +8,7 @@ namespace Baraja\Cms;
 use Baraja\BarajaCloud\CloudManager;
 use Baraja\Cms\Settings\SystemInfo;
 use Baraja\Cms\User\UserManagerAccessor;
+use Baraja\DoctrineConfiguration\Option;
 use Baraja\DoctrineConfiguration\OptionRepository;
 use Baraja\DynamicConfiguration\Configuration;
 use Baraja\DynamicConfiguration\ConfigurationSection;
@@ -92,7 +93,7 @@ final class Settings
 		}
 
 		/** @var OptionRepository $optionRepository */
-		$optionRepository = $this->entityManager->getRepository(OptionRepository::class);
+		$optionRepository = $this->entityManager->getRepository(Option::class);
 
 		$status = $optionRepository->isOptionExist();
 		if ($status === true) {
