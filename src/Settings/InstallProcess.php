@@ -25,15 +25,9 @@ final class InstallProcess
 	{
 		AdminBar::enable(AdminBar::MODE_DISABLED);
 		$url = Url::get()->getCurrentUrl();
-		$databaseException = null;
 		try {
-			$dbOk = $this->settings->isDatabaseConnectionOk();
-		} catch (\Throwable $e) {
-			$dbOk = false;
-			$databaseException = $e;
-		}
-
-		if ($dbOk === false) {
+			$this->settings->isDatabaseConnectionOk();
+		} catch (\Throwable $databaseException) {
 			/** @var string $host */
 			$host = $this->entityManager->getConnection()->getParams()['host'] ?? '';
 
