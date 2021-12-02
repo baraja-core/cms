@@ -93,15 +93,17 @@ final class CmsEndpoint extends BaseEndpoint
 		if ($userEntity === null) {
 			$this->sendError('User is not logged in.');
 		}
-		assert($userEntity instanceof CmsUser);
+		assert(method_exists($userEntity, 'getId'));
+		$id = $userEntity->getId();
+		assert(is_numeric($id));
 		try {
-			$user = $this->userManager->getUserById($userEntity->getId());
+			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
-			$this->sendError('User "' . $userEntity->getId() . '" does not exist.');
+			$this->sendError(sprintf('User "%d" does not exist.', $id));
 		}
 		$otpCode = $user->getOtpCode();
 		if ($otpCode === null) {
-			$this->sendError('OTP code for user "' . $userEntity->getId() . '" does not exist.');
+			$this->sendError(sprintf('OTP code for user "%d" does not exist.', $user->getId()));
 		}
 		if (Helpers::checkAuthenticatorOtpCodeManually($otpCode, (int) $code) === true) {
 			Session::remove(Session::WORKFLOW_NEED_OTP_AUTH);
