@@ -70,6 +70,8 @@
 						{$exception->getMessage()}
 					</b-alert>
 					<p>File:<br><code>{$exception->getFile()}:{$exception->getLine()}</code></p>
+					<h2 class="h5">Call stack</h2>
+					<code><pre>{$exception|breaklines}</pre></code>
 				</div>
 			</b-card>
 			<table class="w-100">
