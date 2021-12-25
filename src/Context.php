@@ -55,12 +55,12 @@ final class Context implements ContainerInterface
 		Configuration $configuration,
 	) {
 		$this->config = new ConfigurationSection($configuration, 'core');
+		$this->container = new Container($pluginManager);
 		try {
 			$localization->setContextLocale($localization->getDefaultLocale());
 		} catch (LocalizationException $e) {
 			Helpers::brokenAdmin($e);
 		}
-		$this->container = new Container($pluginManager);
 	}
 
 
