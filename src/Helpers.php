@@ -243,7 +243,7 @@ final class Helpers
 			}
 		}
 		for ($ttl = 10; $ttl > 0; $ttl--) {
-			if (ob_end_clean() === true) {
+			if (ob_get_length() === false || ob_end_clean() === true) {
 				break;
 			}
 		}
