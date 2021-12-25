@@ -17,6 +17,7 @@ use Baraja\Doctrine\Cache\FilesystemCache;
 use Baraja\DynamicConfiguration\Configuration;
 use Baraja\DynamicConfiguration\ConfigurationSection;
 use Baraja\Localization\Localization;
+use Baraja\Localization\LocalizationException;
 use Baraja\Plugin\Component\PluginComponent;
 use Baraja\Plugin\Plugin;
 use Baraja\Plugin\PluginManager;
@@ -54,7 +55,11 @@ final class Context implements ContainerInterface
 		Configuration $configuration,
 	) {
 		$this->config = new ConfigurationSection($configuration, 'core');
-		$localization->setContextLocale($localization->getDefaultLocale());
+		try {
+			$localization->setContextLocale($localization->getDefaultLocale());
+		} catch (LocalizationException $e) {
+			Helpers::brokenAdmin($e);
+		}
 		$this->container = new Container($pluginManager);
 	}
 
