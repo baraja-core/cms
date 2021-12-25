@@ -77,7 +77,8 @@
 			<table class="w-100">
 				<tr>
 					<td class="text-secondary">
-						Server time:&nbsp;{date('Y-m-d H:i:s')}
+						Server time:&nbsp;{date('Y-m-d H:i:s')}<br>
+						{date_default_timezone_get()}
 					</td>
 					<td class="text-right">
 						{if $isLogged}
