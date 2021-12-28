@@ -10,10 +10,7 @@ use Baraja\Cms\LinkGenerator;
 use Baraja\Cms\MiddleWare\RequestHandler;
 use Baraja\Plugin\CmsPluginPanel;
 use Baraja\Plugin\PluginManager;
-use Baraja\Url\Url;
-use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
-use GuzzleHttp\Psr7\Uri;
 use Nette\Caching\Storage;
 use Nette\Caching\Storages\FileStorage;
 use PhpMiddleware\RequestId\Generator\PhpUniqidGenerator;
@@ -152,7 +149,7 @@ final class Container implements ContainerInterface
 	public function getServerRequest(): ServerRequestInterface
 	{
 		if ($this->serverRequest === null) {
-			$this->serverRequest = new ServerRequest('GET', new Uri(Url::get()->getCurrentUrl()));
+			$this->serverRequest = ServerRequest::fromGlobals();
 		}
 
 		return $this->serverRequest;
