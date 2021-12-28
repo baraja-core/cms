@@ -236,7 +236,10 @@ final class Helpers
 		$container = Container::getSingleton();
 		if ($container !== null) {
 			try {
-				$container->getLogger()->debug($e->getMessage(), ['exception' => $e]);
+				$container->getLogger()->debug($e->getMessage(), [
+					'exception' => $e,
+					'request_id' => self::getRequestId(),
+				]);
 				$logged = true;
 			} catch (\Throwable) {
 				// Silence is golden.
@@ -255,5 +258,20 @@ final class Helpers
 				'isDebug' => Configuration::get()->isDebugMode(),
 			]));
 		die;
+	}
+
+
+	public static function getRequestId(): ?string
+	{
+		$container = Container::getSingleton();
+		if ($container !== null) {
+			try {
+				return $container->getRequestId();
+			} catch (\Throwable) {
+				// Silence is golden.
+			}
+		}
+
+		return null;
 	}
 }
