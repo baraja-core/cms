@@ -46,8 +46,8 @@ final class InstallProcess
 				->renderToString(__DIR__ . '/../../template/install-basic.latte', [
 					'basePath' => Url::get()->getBaseUrl(),
 					'locale' => $this->localization->getLocale(),
-					'isLocalhost' => strpos($url, 'localhost') !== false,
-					'isBarajaCz' => strpos($url, 'baraja.cz') !== false,
+					'isLocalhost' => str_contains($url, 'localhost'),
+					'isBrj' => str_contains($url, 'brj.cz') || str_contains($url, 'baraja.cz'),
 				]);
 		}
 
