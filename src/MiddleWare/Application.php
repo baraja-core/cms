@@ -28,7 +28,7 @@ final class Application
 	public function __construct(
 		private Context $context,
 		private CmsPluginPanel $panel,
-		private TemplateRenderer $templateRenderer
+		private TemplateRenderer $templateRenderer,
 	) {
 	}
 
@@ -99,7 +99,7 @@ final class Application
 			$this->redirect(
 				Url::get()->getBaseUrl()
 				. '/' . Configuration::get()->getBaseUriEscaped()
-				. ($redirectPath === '' ? '' : '/' . $redirectPath)
+				. ($redirectPath === '' ? '' : '/' . $redirectPath),
 			);
 		} catch (PluginTerminateException) {
 			$this->terminate();

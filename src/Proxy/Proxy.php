@@ -33,7 +33,7 @@ final class Proxy
 
 
 	public function __construct(
-		private Context $context
+		private Context $context,
 	) {
 	}
 

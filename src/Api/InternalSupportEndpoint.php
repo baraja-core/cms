@@ -13,7 +13,7 @@ use Nette\Utils\Validators;
 final class InternalSupportEndpoint extends BaseEndpoint
 {
 	public function __construct(
-		private Support $support
+		private Support $support,
 	) {
 	}
 
@@ -41,7 +41,7 @@ final class InternalSupportEndpoint extends BaseEndpoint
 		string $message,
 		string $priority,
 		?string $dueDate = null,
-		?string $url = null
+		?string $url = null,
 	): void {
 		if (isset(Support::PRIORITY_LIST[$priority]) === false) {
 			$this->sendError('Priority "' . $priority . '" does not exist. Did you mean "' . implode('", "', array_keys(Support::PRIORITY_LIST)) . '"?');

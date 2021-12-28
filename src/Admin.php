@@ -150,7 +150,7 @@ final class Admin
 				$this->context->getContainer()->getLogger()->log(
 					level: LogLevel::CRITICAL,
 					message: $e->getMessage(),
-					context: ['exception' => $e]
+					context: ['exception' => $e],
 				);
 			} catch (\Throwable) {
 				// Silence is golden.

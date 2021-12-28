@@ -14,7 +14,7 @@ final class CmsSimpleStaticAsset implements CmsAsset
 
 	public function __construct(
 		private string $format,
-		private string $url
+		private string $url,
 	) {
 		if (in_array($format, self::SUPPORTED_FORMATS, true) === false) {
 			throw new \InvalidArgumentException(

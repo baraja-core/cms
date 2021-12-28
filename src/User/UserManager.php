@@ -41,7 +41,7 @@ final class UserManager implements Authenticator
 		$userEntity ??= User::class;
 		if (is_subclass_of($userEntity, CmsUser::class) === false) {
 			throw new \InvalidArgumentException(
-				sprintf('User entity "%s" must implements "%s" interface.', $userEntity, CmsUser::class)
+				sprintf('User entity "%s" must implements "%s" interface.', $userEntity, CmsUser::class),
 			);
 		}
 		$this->defaultEntity = $userEntity;
@@ -146,7 +146,7 @@ final class UserManager implements Authenticator
 	{
 		return new EntityRepository(
 			$this->entityManager,
-			$this->entityManager->getClassMetadata($this->defaultEntity)
+			$this->entityManager->getClassMetadata($this->defaultEntity),
 		);
 	}
 
@@ -155,7 +155,7 @@ final class UserManager implements Authenticator
 	{
 		if (!$user instanceof CmsUser) {
 			throw new \LogicException(
-				sprintf('User identity must be instance of "%s", but "%s" given.', CmsUser::class, $user::class)
+				sprintf('User identity must be instance of "%s", but "%s" given.', CmsUser::class, $user::class),
 			);
 		}
 		if ($user->getOtpCode() !== null) { // need OTP authentication
@@ -431,7 +431,7 @@ final class UserManager implements Authenticator
 		UserLoginAttempt $attempt,
 		string $username,
 		string $password,
-		string $expiration
+		string $expiration,
 	): IIdentity {
 		try {
 			$user = $this->getUserByUsername($username);
@@ -459,7 +459,7 @@ final class UserManager implements Authenticator
 			throw new AuthenticationException(
 				sprintf(
 					'User password is empty or account is locked, please contact your administrator. Username "%s" given.',
-					$username
+					$username,
 				),
 				Authenticator::FAILURE,
 			);

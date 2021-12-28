@@ -41,10 +41,10 @@ final class SentryBridge
 							'ip_address' => Ip::get(),
 							'username' => $identity->getName(),
 							'roles' => $identity->getRoles(),
-						]
+						],
 					);
 				}
-			}
+			},
 		);
 	}
 }

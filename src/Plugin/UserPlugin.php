@@ -76,8 +76,8 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 				'(%s) %s %s',
 				(string) $user->getId(),
 				$this->userManager->isOnline($id) ? '[ONLINE]' : '',
-				$user->getName()
-			)
+				$user->getName(),
+			),
 		);
 		$this->setSubtitle($user->getEmail());
 		$this->setLinkBack($this->link('Article:default'));

@@ -81,7 +81,7 @@ final class LinkGenerator implements PluginLinkGenerator
 			Url::get()->getBaseUrl()
 			. '/' . Configuration::get()->getBaseUriEscaped()
 			. ($path !== '' ? '/' . $path : '')
-			. ($params !== [] ? '?' . http_build_query($params) : '')
+			. ($params !== [] ? '?' . http_build_query($params) : ''),
 		);
 	}
 

@@ -41,7 +41,7 @@ final class CmsInstallEndpoint extends BaseEndpoint
 		string $mail,
 		string $password,
 		string $passwordVerify,
-		bool $vop = false
+		bool $vop = false,
 	): void {
 		if ($this->settings->isBasicConfigurationOk() === true) {
 			$this->sendError('Unauthorized request.');
@@ -97,7 +97,7 @@ final class CmsInstallEndpoint extends BaseEndpoint
 				[
 					'state' => 'error',
 					'errors' => $errors,
-				]
+				],
 			);
 		}
 
@@ -119,7 +119,7 @@ final class CmsInstallEndpoint extends BaseEndpoint
 		string $password,
 		string $firstName,
 		string $lastName,
-		?string $phone = null
+		?string $phone = null,
 	): void {
 		if ($this->settings->isCloudConnectionOk() === true) {
 			$this->sendError('Unauthorized request.');
@@ -143,9 +143,9 @@ final class CmsInstallEndpoint extends BaseEndpoint
 				. '&password=' . urlencode($password)
 				. '&firstName=' . urlencode($firstName)
 				. '&lastName=' . urlencode($lastName)
-				. ($phone !== null ? '&phone=' . urlencode($phone) : '')
+				. ($phone !== null ? '&phone=' . urlencode($phone) : ''),
 			),
-			true
+			true,
 		);
 		if (isset($response['token']) === false) {
 			$this->sendError($response['message'] ?? 'Account with given e-mail or password does not exist.');
@@ -175,9 +175,9 @@ final class CmsInstallEndpoint extends BaseEndpoint
 				CloudManager::ENDPOINT_URL . '/cloud-status/token-by-user?domain='
 				. urlencode(Url::get()->getNetteUrl()->getDomain(3))
 				. '&email=' . urlencode($email)
-				. '&password=' . urlencode($password)
+				. '&password=' . urlencode($password),
 			),
-			true
+			true,
 		);
 		if (isset($response['token']) === false) {
 			$this->sendError($response['message'] ?? 'Account with given e-mail or password does not exist.');

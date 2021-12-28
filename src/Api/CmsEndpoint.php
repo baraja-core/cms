@@ -264,7 +264,7 @@ final class CmsEndpoint extends BaseEndpoint
 		$this->sendJson(
 			[
 				'html' => $this->commonMarkRenderer->render($haystack),
-			]
+			],
 		);
 	}
 }

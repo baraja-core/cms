@@ -227,8 +227,8 @@ final class Context implements ContainerInterface
 		$dd = new DeviceDetector($_SERVER['HTTP_USER_AGENT'] ?? '');
 		$dd->setCache(
 			new DoctrineBridge(
-				new FilesystemCache($this->container->getConfiguration()->getTempDir() . '/device-detector')
-			)
+				new FilesystemCache($this->container->getConfiguration()->getTempDir() . '/device-detector'),
+			),
 		);
 		$dd->skipBotDetection();
 		$dd->parse();
@@ -252,7 +252,7 @@ final class Context implements ContainerInterface
 						'last-activity',
 						date('Y-m-d H:i:s'),
 					);
-				}
+				},
 			);
 			$service->addRunEvent(
 				function (): void {
@@ -267,7 +267,7 @@ final class Context implements ContainerInterface
 							Session::removeAll();
 						}
 					}
-				}
+				},
 			);
 		}
 

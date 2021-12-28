@@ -353,7 +353,7 @@ final class CmsExtension extends CompilerExtension
 	private function createUrlFromAssetPath(
 		ServiceDefinition $globalAssetManager,
 		string $path,
-		string $format
+		string $format,
 	): string {
 		$hash = md5($path . '.' . $format);
 		$globalAssetManager->addSetup('?->addDiskPath(?, ?)', [

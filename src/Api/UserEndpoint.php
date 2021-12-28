@@ -55,7 +55,7 @@ final class UserEndpoint extends BaseEndpoint
 		int $limit = 32,
 		?string $role = null,
 		?string $query = null,
-		?string $active = null
+		?string $active = null,
 	): void {
 		$currentUserId = $this->getUser()->getId();
 		/** @var CmsUser $currentUser */
@@ -200,7 +200,7 @@ final class UserEndpoint extends BaseEndpoint
 		string $email,
 		string $role,
 		?string $phone = null,
-		?string $password = null
+		?string $password = null,
 	): void {
 		if ($this->userManager->userExist($email) === true) {
 			$this->sendError(sprintf('User "%s" already exist.', $email));
@@ -808,7 +808,7 @@ final class UserEndpoint extends BaseEndpoint
 				],
 				onError: static function (string $message): void {
 					throw new \RuntimeException($message);
-				}
+				},
 			);
 		} catch (\RuntimeException $e) {
 			$this->context->getContainer()->getLogger()->critical($e->getMessage(), ['exception' => $e]);
