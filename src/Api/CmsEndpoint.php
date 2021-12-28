@@ -93,9 +93,9 @@ final class CmsEndpoint extends BaseEndpoint
 		if ($userEntity === null) {
 			$this->sendError('User is not logged in.');
 		}
-		assert(method_exists($userEntity, 'getId'));
 		$id = $userEntity->getId();
 		assert(is_numeric($id));
+		$id = (int) $id;
 		try {
 			$user = $this->userManager->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
