@@ -7,13 +7,23 @@ namespace Baraja\Cms\Container;
 
 use Baraja\Cms\Configuration;
 use Baraja\Cms\LinkGenerator;
+use Baraja\Cms\MiddleWare\RequestHandler;
 use Baraja\Plugin\CmsPluginPanel;
 use Baraja\Plugin\PluginManager;
+use Baraja\Url\Url;
+use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\ServerRequest;
+use GuzzleHttp\Psr7\Uri;
 use Nette\Caching\Storage;
 use Nette\Caching\Storages\FileStorage;
+use PhpMiddleware\RequestId\Generator\PhpUniqidGenerator;
+use PhpMiddleware\RequestId\RequestIdMiddleware;
+use PhpMiddleware\RequestId\RequestIdProviderFactory;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Tracy\Bridges\Psr\TracyToPsrLoggerAdapter;
 use Tracy\Debugger;
@@ -30,6 +40,12 @@ final class Container implements ContainerInterface
 
 	private ?CmsPluginPanel $pluginPanel = null;
 
+	private ?ServerRequestInterface $serverRequest;
+
+	private ?RequestHandlerInterface $requestHandler;
+
+	private ?RequestIdMiddleware $requestIdMiddleware = null;
+
 	private PluginManager $pluginManager;
 
 	/** @var array<string, string> */
@@ -38,11 +54,17 @@ final class Container implements ContainerInterface
 	];
 
 
-	public function __construct(PluginManager $pluginManager)
-	{
+	public function __construct(
+		PluginManager $pluginManager,
+		?ServerRequestInterface $serverRequest = null,
+		?RequestHandlerInterface $requestHandler = null,
+	) {
 		self::$singleton = $this;
-		$this->configuration = Configuration::get();
+		$this->serverRequest = $serverRequest;
+		$this->requestHandler = $requestHandler;
 		$this->pluginManager = $pluginManager;
+		$this->getRequestIdMiddleware()->process($this->getServerRequest(), $this->getRequestHandler());
+		$this->configuration = Configuration::get();
 	}
 
 
@@ -124,5 +146,45 @@ final class Container implements ContainerInterface
 		}
 
 		return $this->linkGenerator;
+	}
+
+
+	public function getServerRequest(): ServerRequestInterface
+	{
+		if ($this->serverRequest === null) {
+			$this->serverRequest = new ServerRequest('GET', new Uri(Url::get()->getCurrentUrl()));
+		}
+
+		return $this->serverRequest;
+	}
+
+
+	public function getRequestHandler(): RequestHandlerInterface
+	{
+		if ($this->requestHandler === null) {
+			$this->requestHandler = new RequestHandler;
+		}
+
+		return $this->requestHandler;
+	}
+
+
+	public function getRequestIdMiddleware(): RequestIdMiddleware
+	{
+		if ($this->requestIdMiddleware === null) {
+			$this->requestIdMiddleware = new RequestIdMiddleware(
+				new RequestIdProviderFactory(
+					new PhpUniqidGenerator,
+				),
+			);
+		}
+
+		return $this->requestIdMiddleware;
+	}
+
+
+	public function getRequestId(): string
+	{
+		return $this->getRequestIdMiddleware()->getRequestId();
 	}
 }

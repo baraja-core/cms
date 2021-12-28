@@ -28,6 +28,8 @@ use Nette\Http\Request;
 use Nette\Http\Response;
 use Nette\Security\User;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 final class Context implements ContainerInterface
 {
@@ -53,9 +55,11 @@ final class Context implements ContainerInterface
 		private CustomGlobalAssetManagerAccessor $customGlobalAssetManager,
 		private Localization $localization,
 		Configuration $configuration,
+		?ServerRequestInterface $serverRequest = null,
+		?RequestHandlerInterface $requestHandler = null,
 	) {
 		$this->config = new ConfigurationSection($configuration, 'core');
-		$this->container = new Container($pluginManager);
+		$this->container = new Container($pluginManager, $serverRequest, $requestHandler);
 		try {
 			$localization->setContextLocale($localization->getDefaultLocale());
 		} catch (LocalizationException $e) {
