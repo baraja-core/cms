@@ -42,7 +42,7 @@ final class Admin
 			Debugger::getBar()->addPanel($context->getContainer()->getPluginPanel());
 		}
 		if (function_exists('Sentry\configureScope')) {
-			(new SentryBridge($context->getUserManager()->get()))->register();
+			(new SentryBridge($context->getUserManager()->get(), $this->context))->register();
 		}
 	}
 

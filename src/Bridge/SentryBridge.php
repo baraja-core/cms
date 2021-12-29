@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Baraja\Cms\MiddleWare\Bridge;
 
 
+use Baraja\Cms\Context;
 use Baraja\Cms\User\UserManager;
 use Baraja\Network\Ip;
 use Baraja\TracySentryBridge\SentryLogger;
@@ -16,6 +17,7 @@ final class SentryBridge
 {
 	public function __construct(
 		private UserManager $userManager,
+		private Context $context,
 	) {
 	}
 
@@ -30,6 +32,7 @@ final class SentryBridge
 		}
 		configureScope(
 			function (Scope $scope): void {
+				$scope->setTag('request_id', $this->context->getContainer()->getRequestId());
 				if ($this->userManager->isLoggedIn() === false) {
 					return;
 				}
