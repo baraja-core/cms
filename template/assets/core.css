@@ -67,6 +67,10 @@
 	background: #eee;
 }
 
+.cms-support-sidebar .b-sidebar-header {
+	margin-top: 2em;
+}
+
 .modal-dialog {
 	margin-top: 4em !important;
 }

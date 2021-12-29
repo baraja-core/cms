@@ -14,6 +14,7 @@ use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Proxy\Proxy;
 use Baraja\Cms\Search\SearchAdminBarPlugin;
 use Baraja\Cms\Session;
+use Baraja\Cms\Support\SupportAdminBarPlugin;
 use Baraja\Plugin\CmsPluginPanel;
 use Baraja\Plugin\Exception\PluginRedirectException;
 use Baraja\Plugin\Exception\PluginTerminateException;
@@ -58,6 +59,7 @@ final class Application
 		$this->processLoginPage($path, $locale);
 		AdminBar::enable(AdminBar::MODE_ENABLED);
 		AdminBar::getBar()->setEnableVue();
+		AdminBar::getBar()->addPlugin(new SupportAdminBarPlugin);
 		if (class_exists(Search::class)) {
 			AdminBar::getBar()->addPlugin(new SearchAdminBarPlugin);
 		}
