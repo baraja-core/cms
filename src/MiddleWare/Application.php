@@ -86,7 +86,7 @@ final class Application
 					->invoke(
 						service: $pluginService,
 						methodName: $actionMethod,
-						params: $this->context->getRequest()->getUrl()->getQueryParameters(),
+						params: $this->context->getRequest()->getQueryParams(),
 					);
 			}
 
@@ -124,7 +124,7 @@ final class Application
 			isset($_GET[LinkGenerator::NONCE_QUERY_PARAM]) === true
 			&& (
 				LinkGenerator::verifyNonce() === false
-				|| $this->context->getRequest()->isSameSite() === false
+				|| isset($this->context->getRequest()->getCookieParams()['_nss']) === false // is same site?
 			)
 		) {
 			$this->terminate(

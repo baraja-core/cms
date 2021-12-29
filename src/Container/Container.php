@@ -17,7 +17,6 @@ use PhpMiddleware\RequestId\Generator\PhpUniqidGenerator;
 use PhpMiddleware\RequestId\RequestIdMiddleware;
 use PhpMiddleware\RequestId\RequestIdProviderFactory;
 use Psr\Container\ContainerInterface;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -60,7 +59,7 @@ final class Container implements ContainerInterface
 		$this->serverRequest = $serverRequest;
 		$this->requestHandler = $requestHandler;
 		$this->pluginManager = $pluginManager;
-		$this->getRequestIdMiddleware()->process($this->getServerRequest(), $this->getRequestHandler());
+		$this->getRequestIdMiddleware()->process($this->getRequest(), $this->getRequestHandler());
 		$this->configuration = Configuration::get();
 	}
 
@@ -114,9 +113,13 @@ final class Container implements ContainerInterface
 	}
 
 
-	public function getRequest(): RequestInterface
+	public function getRequest(): ServerRequestInterface
 	{
-		throw new \LogicException('Method has not been implemented.');
+		if ($this->serverRequest === null) {
+			$this->serverRequest = ServerRequest::fromGlobals();
+		}
+
+		return $this->serverRequest;
 	}
 
 
@@ -143,16 +146,6 @@ final class Container implements ContainerInterface
 		}
 
 		return $this->linkGenerator;
-	}
-
-
-	public function getServerRequest(): ServerRequestInterface
-	{
-		if ($this->serverRequest === null) {
-			$this->serverRequest = ServerRequest::fromGlobals();
-		}
-
-		return $this->serverRequest;
 	}
 
 

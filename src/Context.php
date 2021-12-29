@@ -24,7 +24,6 @@ use Baraja\Plugin\PluginManager;
 use DeviceDetector\Cache\DoctrineBridge;
 use DeviceDetector\DeviceDetector;
 use Doctrine\ORM\EntityManagerInterface;
-use Nette\Http\Request;
 use Nette\Http\Response;
 use Nette\Security\User;
 use Psr\Container\ContainerInterface;
@@ -42,7 +41,6 @@ final class Context implements ContainerInterface
 
 
 	public function __construct(
-		private Request $request,
 		private Response $response,
 		private EntityManagerInterface $entityManager,
 		private Settings $settings,
@@ -138,9 +136,9 @@ final class Context implements ContainerInterface
 	}
 
 
-	public function getRequest(): Request
+	public function getRequest(): ServerRequestInterface
 	{
-		return $this->request;
+		return $this->container->getRequest();
 	}
 
 

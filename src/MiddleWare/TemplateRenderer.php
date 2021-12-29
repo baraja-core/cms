@@ -25,6 +25,7 @@ use Baraja\Url\Url;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Latte\Engine;
+use Nette\Http\RequestFactory;
 
 final class TemplateRenderer
 {
@@ -279,7 +280,7 @@ final class TemplateRenderer
 	{
 		try {
 			return '<!-- component ' . Helpers::escapeHtmlComment($component->getKey()) . ' -->' . "\n"
-				. $component->render($this->context->getRequest(), $plugin);
+				. $component->render((new RequestFactory)->fromGlobals(), $plugin);
 		} catch (\Throwable $e) {
 			$this->context->getContainer()->getLogger()->critical($e->getMessage(), ['exception' => $e]);
 
