@@ -29,6 +29,7 @@ final class Settings
 		private Localization $localization,
 		private CloudManager $cloudManager,
 		private UserManagerAccessor $userManager,
+		private string $currentVersion,
 		Storage $storage,
 		Configuration $configuration,
 	) {
@@ -144,5 +145,11 @@ final class Settings
 	public function cleanCache(): void
 	{
 		$this->cache->clean([Cache::ALL => true]);
+	}
+
+
+	public function getCurrentVersion(): string
+	{
+		return $this->currentVersion;
 	}
 }

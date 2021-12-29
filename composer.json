@@ -25,6 +25,7 @@
 		"baraja-core/network": "^1.0",
 		"baraja-core/markdown-latte-filter": "^3.0",
 		"php-middleware/request-id": "^4.1",
+		"jean85/pretty-package-versions": "^2.0.1",
 		"guzzlehttp/psr7": "^2.0",
 		"nette/di": "^3.0",
 		"latte/latte": "^2.5",

@@ -28,6 +28,7 @@ use Baraja\Plugin\PluginComponentExtension;
 use Baraja\Plugin\PluginLinkGenerator;
 use Baraja\Plugin\PluginManager;
 use Baraja\Url\Url;
+use Jean85\PrettyVersions;
 use Nette\Application\Application;
 use Nette\Bridges\ApplicationLatte\LatteFactory;
 use Nette\DI\CompilerExtension;
@@ -69,7 +70,8 @@ final class CmsExtension extends CompilerExtension
 
 	public function beforeCompile(): void
 	{
-		PluginComponentExtension::defineBasicServices($builder = $this->getContainerBuilder());
+		$builder = $this->getContainerBuilder();
+		PluginComponentExtension::defineBasicServices($builder);
 		OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\Cms\User\Entity', __DIR__ . '/User/Entity');
 		OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\Cms\Announcement\Entity', __DIR__ . '/Announcement');
 		OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\DoctrineConfiguration', __DIR__ . '/Settings/Entity');
@@ -122,7 +124,8 @@ final class CmsExtension extends CompilerExtension
 
 		// settings
 		$builder->addDefinition($this->prefix('settings'))
-			->setFactory(Settings::class);
+			->setFactory(Settings::class)
+			->setArgument('currentVersion', PrettyVersions::getVersion('baraja-core/cms')->getPrettyVersion());
 
 		$builder->addDefinition($this->prefix('tokenStorage'))
 			->setFactory(CmsConstantTokenStorage::class);
