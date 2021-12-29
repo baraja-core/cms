@@ -69,6 +69,7 @@ final class TemplateRenderer
 				'startWeekday' => 0,
 			],
 			'settings' => $this->settings->getSystemInfo()->toArray(),
+			'currentVersion' => $this->settings->getCurrentVersion(),
 		];
 
 		/** @phpstan-ignore-next-line */

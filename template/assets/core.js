@@ -34,7 +34,7 @@ Vue.component('cms-menu-item', {
 });
 
 Vue.component('cms-footer', {
-	props: ['year'],
+	props: ['year', 'version'],
 	template: `<footer role="contentinfo">
 	<div class="cms-footer">
 		<div class="container" role="contentinfo">
@@ -47,6 +47,9 @@ Vue.component('cms-footer', {
 						©&nbsp;2009-{{ year }}
 						|&nbsp;<a href="https://brj.cz/help" target="_blank">Help</a>
 						|&nbsp;<a href="https://brj.cz/support" target="_blank">Support</a>
+					</p>
+					<p class="pb-0 mb-0">
+						<span class="text-secondary">{{ version }}</span>
 					</p>
 				</div>
 				<div class="col text-right">
