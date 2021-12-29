@@ -96,7 +96,7 @@ Vue.component('user-permissions', {
 			axiosApi.post('user/mark-user-as-admin', {
 				id: this.id,
 				password: this.userPassword,
-			}).then(req => {
+			}).then(() => {
 				this.sync();
 				this.$bvModal.hide('modal-set-admin');
 			});
@@ -106,7 +106,7 @@ Vue.component('user-permissions', {
 				id: this.id,
 				roles: this.roles,
 				permissions: this.items,
-			}).then(req => {
+			}).then(() => {
 				this.sync();
 			});
 		}

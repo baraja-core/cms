@@ -108,7 +108,7 @@ Vue.component('user-security', {
 			this.isDisabling = true;
 			axiosApi.post('user/cancel-oauth', {
 				id: this.id
-			}).then(req => {
+			}).then(() => {
 				this.$bvModal.hide('disable-auth');
 				this.sync();
 			}).finally(() => this.isDisabling = false)
@@ -125,7 +125,7 @@ Vue.component('user-security', {
 			axiosApi.post('user/block-user', {
 				id: this.id,
 				reason: this.block.reason
-			}).then(req => {
+			}).then(() => {
 				this.$bvModal.hide('block-user');
 				this.sync();
 			});
@@ -136,7 +136,7 @@ Vue.component('user-security', {
 			}
 			axiosApi.post('user/block-user-cancel', {
 				id: this.id,
-			}).then(req => {
+			}).then(() => {
 				this.sync();
 			});
 		}
@@ -207,7 +207,7 @@ Vue.component('modal-change-password', {
 				axiosApi.post('user/set-user-password', {
 					id: this.id,
 					password: this.form.password,
-				}).then(req => {
+				}).then(() => {
 					this.$bvModal.hide('modal-change-password');
 				});
 			}
@@ -393,10 +393,10 @@ Vue.component('modal-two-step-verification', {
 					id: this.id,
 					hash: this.twoFactor.otpCode.hash,
 					code: this.codeValue.replace(' ', ''),
-				}).then(req => {
+				}).then(() => {
 					this.$bvModal.hide('modal-two-step-verification');
 					this.$emit('success')
-				}).catch(req => {
+				}).catch(() => {
 					this.codeValue = null;
 					this.isValid = false;
 				})

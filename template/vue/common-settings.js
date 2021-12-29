@@ -165,7 +165,7 @@ Vue.component('common-settings', {
 				projectName: this.projectName,
 				adminEmail: this.adminEmail,
 				cloudToken: this.cloudToken
-			}).then(req => {
+			}).then(() => {
 				this.sync();
 			}).finally(() => this.loading.saving = false)
 		}

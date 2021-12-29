@@ -485,7 +485,7 @@ Vue.component('cms-quick-edit', {
 					id: this.id,
 					value: value,
 					type: this.type ? this.type : 'text'
-				})).then(req => {
+				})).then(() => {
 					this.editable = false;
 					this.loading = false;
 					this.originalValue = value;

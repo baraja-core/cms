@@ -208,7 +208,7 @@ Vue.component('user-overview', {
 					username: this.form.username,
 					email: this.form.email,
 					name: this.form.fullName
-				}).then(req => {
+				}).then(() => {
 					this.sync();
 				}).finally(() => this.loading.saving = false)
 			}
@@ -226,7 +226,7 @@ Vue.component('user-overview', {
 		},
 		saveMetaValue() {
 			this.loading.meta = true;
-			axiosApi.get(`user/save-meta?id=${this.id}&key=${this.editMeta.key}&value=${this.editMeta.value}`).then(req => {
+			axiosApi.get(`user/save-meta?id=${this.id}&key=${this.editMeta.key}&value=${this.editMeta.value}`).then(() => {
 				this.$bvModal.hide('modal-change-meta');
 				this.sync();
 			});
@@ -234,7 +234,7 @@ Vue.component('user-overview', {
 		deleteMetaValue(key) {
 			if (confirm('Really delete "' + key + '"?')) {
 				this.loading.meta = true;
-				axiosApi.get(`user/save-meta?id=${this.id}&key=${key}`).then(req => {
+				axiosApi.get(`user/save-meta?id=${this.id}&key=${key}`).then(() => {
 					this.sync();
 				});
 			}
@@ -249,7 +249,7 @@ Vue.component('user-overview', {
 				headers: {
 					'Content-Type': 'multipart/form-data'
 				}
-			}).then(req => {
+			}).then(() => {
 				this.editPhoto.loading = false;
 				this.$bvModal.hide('modal-change-photo');
 				this.sync();
@@ -260,7 +260,7 @@ Vue.component('user-overview', {
 			this.editPhone.phone = this.form.phone.phone;
 		},
 		savePhone() {
-			axiosApi.get(`user/save-phone?id=${this.id}&phone=${this.editPhone.phone}&region=${this.editPhone.region}`).then(req => {
+			axiosApi.get(`user/save-phone?id=${this.id}&phone=${this.editPhone.phone}&region=${this.editPhone.region}`).then(() => {
 				this.$bvModal.hide('modal-change-phone');
 				this.sync();
 			});

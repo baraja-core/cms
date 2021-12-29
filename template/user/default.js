@@ -303,7 +303,7 @@ Vue.component('user-default', {
 		},
 		deleteUser(id) {
 			if (confirm('Really delete this user?')) {
-				return axiosApi.delete(`/user?id=${id}`).then(req => {
+				return axiosApi.delete(`/user?id=${id}`).then(() => {
 					this.sync();
 				});
 			}
