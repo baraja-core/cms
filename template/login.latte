@@ -287,7 +287,7 @@
 							<p>{{ translator[locale].needHelp.forgotPasswordDescription }}</p>
 							<b-form @submit="onReportProblem">
 								<b-form-group>
-									<b-form-input id="username" v-model="reportProblem.username" type="text" required></b-form-input>
+									<b-form-input id="username" v-model="form.username" type="text" required></b-form-input>
 								</b-form-group>
 								<b-button type="submit" variant="primary">
 									{{ translator[locale].needHelp.sendButton }}
@@ -312,7 +312,7 @@
 									<b-form-textarea id="problemDescription" v-model="reportProblem.problemDescription" rows="6" required></b-form-textarea>
 								</b-form-group>
 								<b-form-group label="E-mail:" label-for="username">
-									<b-form-input id="username" v-model="reportProblem.username" type="email" required></b-form-input>
+									<b-form-input id="username" v-model="form.username" type="email" required></b-form-input>
 								</b-form-group>
 								<b-button type="submit" variant="primary">
 									{{ translator[locale].needHelp.sendButton }}
@@ -338,7 +338,6 @@
 				},
 				reportProblem: {
 					realName: '',
-					username: '',
 					problemDescription: '',
 					isBusy: false,
 					state: null,
@@ -355,7 +354,7 @@
 							help: 'Need help?'
 						},
 						needHelp: {
-							title: 'Helper center',
+							title: 'Help center',
 							description: 'What can we help you with?',
 							forgotPassword: 'Forgotten password',
 							forgotPasswordDescription: 'Enter your username or email:',
@@ -443,7 +442,7 @@
 					queryUrl = 'forgot-password';
 					queryParameters = {
 						locale: this.locale,
-						username: this.reportProblem.username
+						username: this.form.username
 					};
 				} else if (this.needHelpPage === 'forgotUsername') {
 					queryUrl = 'forgot-username';
@@ -456,7 +455,7 @@
 					queryParameters = {
 						locale: this.locale,
 						description: this.reportProblem.problemDescription,
-						username: this.reportProblem.username
+						username: this.form.username
 					};
 				}
 
