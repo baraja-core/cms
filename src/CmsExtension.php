@@ -123,9 +123,17 @@ final class CmsExtension extends CompilerExtension
 			->setFactory(TranslatorFilter::class);
 
 		// settings
+		$currentVersion = null;
+		if (PHP_SAPI !== 'cli') {
+			try {
+				$currentVersion = PrettyVersions::getVersion('baraja-core/cms')->getPrettyVersion();
+			} catch (\Throwable $e) {
+				trigger_error(sprintf('Can not get CMS version: %s', $e->getMessage()));
+			}
+		}
 		$builder->addDefinition($this->prefix('settings'))
 			->setFactory(Settings::class)
-			->setArgument('currentVersion', PrettyVersions::getVersion('baraja-core/cms')->getPrettyVersion());
+			->setArgument('currentVersion', $currentVersion ?? '?');
 
 		$builder->addDefinition($this->prefix('tokenStorage'))
 			->setFactory(CmsConstantTokenStorage::class);
