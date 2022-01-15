@@ -114,7 +114,7 @@ foreach ($staticAssets as $staticAsset) {
         }
         return Promise.resolve(ok);
     }, (error) => {
-        if (typeof error === 'object' || error.response === undefined) {
+        if (typeof error === 'object' && error.response === undefined) {
             app.$bvToast.toast(error.toString(), {
                 variant: 'danger',
                 title: 'Error',
