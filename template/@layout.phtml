@@ -114,7 +114,14 @@ foreach ($staticAssets as $staticAsset) {
         }
         return Promise.resolve(ok);
     }, (error) => {
-        let data = error.response.data;
+        if (typeof error === 'object' || error.response === undefined) {
+	    app.$bvToast.toast(error.toString(), {
+		    variant: 'danger',
+		    title: 'Error',
+		    toaster: 'b-toaster-bottom-left'
+	    });
+	return;
+	}
         if ('flashMessages' in data) {
             data.flashMessages.forEach(flashItem => {
                 app.$bvToast.toast(flashItem.message, {
