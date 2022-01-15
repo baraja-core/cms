@@ -116,9 +116,9 @@ foreach ($staticAssets as $staticAsset) {
     }, (error) => {
         if (typeof error === 'object' || error.response === undefined) {
             app.$bvToast.toast(error.toString(), {
-                    variant: 'danger',
-                    title: 'Error',
-                    toaster: 'b-toaster-bottom-left'
+                variant: 'danger',
+                title: 'Error',
+                toaster: 'b-toaster-bottom-left'
 	    });
             return;
         }
