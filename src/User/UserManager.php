@@ -201,6 +201,7 @@ final class UserManager implements Authenticator
 		$attempt = new UserLoginAttempt(null, $username);
 		$this->entityManager->persist($attempt);
 		$this->entityManager->flush();
+		$this->processSecuritySleep();
 
 		try {
 			$username = Helpers::formatUsername($username);
@@ -485,5 +486,18 @@ final class UserManager implements Authenticator
 		$this->logLoginAttempt($attempt, $user);
 
 		return $this->createLoginIdentity($user, $expiration);
+	}
+
+
+	/**
+	 * Sets the application to sleep for a randomly long period of time and prevents a possible attack.
+	 * If all login requests were handled immediately, an attacker could guess from the response time which way
+	 * the code was processed and what login credentials he needs to guess. If the authentication time is random,
+	 * the success of the attempt cannot be inferred from it.
+	 */
+	private function processSecuritySleep(): void
+	{
+		// 1 ms = 1 000 microseconds
+		usleep(random_int(1, 300) * 1000);
 	}
 }
