@@ -227,6 +227,20 @@ final class Helpers
 	}
 
 
+	public static function formatUsername(string $username): string
+	{
+		$username = mb_strtolower(trim($username), 'UTF-8');
+		if (mb_strlen($username, 'UTF-8') > 64) {
+			throw new \InvalidArgumentException(sprintf('Username "%s" is too long.', $username));
+		}
+		if (preg_match('/^[a-z0-9@\-_.]+$/', $username) !== 1) {
+			throw new \InvalidArgumentException(sprintf('Username "%s" is not valid, because it contains forbidden characters.', $username));
+		}
+
+		return $username;
+	}
+
+
 	/**
 	 * @return never-return
 	 */

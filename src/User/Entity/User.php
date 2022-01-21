@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Baraja\Cms\User\Entity;
 
 
+use Baraja\Cms\Helpers;
 use Baraja\Network\Ip;
 use Baraja\PhoneNumber\PhoneNumberFormatter;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -125,7 +126,7 @@ class User implements CmsUser
 		string $email,
 		string $role = self::ROLE_USER,
 	): void {
-		$this->username = Strings::lower(trim($username));
+		$this->username = Helpers::formatUsername($username);
 		$this->password = $password !== ''
 			? (new Passwords)->hash($password)
 			: '---empty-password---';
@@ -252,13 +253,13 @@ class User implements CmsUser
 
 	public function getUsername(): string
 	{
-		return $this->username;
+		return Helpers::formatUsername($this->username);
 	}
 
 
 	public function setUsername(string $username): void
 	{
-		$this->username = Strings::webalize($username, '.,-@', false);
+		$this->username = Helpers::formatUsername($username);
 	}
 
 

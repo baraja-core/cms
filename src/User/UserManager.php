@@ -6,6 +6,7 @@ namespace Baraja\Cms\User;
 
 
 use Baraja\AdminBar\User\AdminIdentity;
+use Baraja\Cms\Helpers;
 use Baraja\Cms\Session;
 use Baraja\Cms\User\Entity\CmsUser;
 use Baraja\Cms\User\Entity\User;
@@ -200,6 +201,12 @@ final class UserManager implements Authenticator
 		$attempt = new UserLoginAttempt(null, $username);
 		$this->entityManager->persist($attempt);
 		$this->entityManager->flush();
+
+		try {
+			$username = Helpers::formatUsername($username);
+		} catch (\InvalidArgumentException $e) {
+			throw new AuthenticationException($e->getMessage(), Authenticator::INVALID_CREDENTIAL);
+		}
 
 		if ($this->authenticationService !== null) {
 			try {
