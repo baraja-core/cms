@@ -246,11 +246,15 @@
 					</form>
 				</div>
 			</div>
+			<div class="text-right mt-3">
+				<a :href="signOutUrl" class="small">{{ translator[locale].otp.logout }}</a>
+			</div>
 		</div>`,
 		data: function () {
 			return {
 				locale: 'en',
 				projectName: {$projectName},
+				signOutUrl: {$signOutUrl},
 				redirect: '',
 				isLoading: false,
 				errorMessage: '',
@@ -263,7 +267,8 @@
 							authCode: 'Authentication code',
 							invalidCode: 'The entered code does not correspond to the real one.',
 							info: 'Enter the code from your 2-step verification application.',
-							submit: 'Submit'
+							submit: 'Verify code',
+							logout: 'Logout'
 						}
 					},
 					cs: {
@@ -271,7 +276,8 @@
 							authCode: 'Ověřovací kód',
 							invalidCode: 'Zadaný kód neodpovídá reálnému.',
 							info: 'Zadejte kód z vaší aplikace pro dvoufázové ověřování.',
-							submit: 'Odeslat'
+							submit: 'Ověřit kód',
+							logout: 'Odhlásit se'
 						}
 					}
 				}

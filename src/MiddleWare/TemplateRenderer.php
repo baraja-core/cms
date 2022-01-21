@@ -147,6 +147,7 @@ final class TemplateRenderer
 					'availableLocales' => Configuration::get()->getSupportedLocales(),
 					'projectName' => $this->context->getConfiguration()->get('name'),
 					'locale' => $locale,
+					'signOutUrl' => $this->context->getContainer()->getLinkGenerator()->link('Cms:signOut'),
 				],
 			);
 	}
