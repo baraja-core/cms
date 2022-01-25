@@ -77,16 +77,12 @@ final class Admin
 		}
 
 		$route = $this->route($path);
-		try {
-			$this->runApplication(
-				plugin: $route['plugin'],
-				view: $route['view'],
-				locale: $route['locale'] ?? $this->context->getLocale(),
-				path: $route['path'],
-			);
-		} catch (\Throwable $e) {
-			Helpers::brokenAdmin($e);
-		}
+		$this->runApplication(
+			plugin: $route['plugin'],
+			view: $route['view'],
+			locale: $route['locale'] ?? $this->context->getLocale(),
+			path: $route['path'],
+		);
 		die;
 	}
 
