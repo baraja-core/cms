@@ -158,6 +158,7 @@ final class Admin
 			} catch (\Throwable) {
 				// Silence is golden.
 			}
+			Helpers::brokenAdmin($e);
 		}
 	}
 
