@@ -248,8 +248,10 @@ final class Helpers
 	{
 		$logged = false;
 		$container = Container::getSingleton();
+		$correlationId = null;
 		if ($container !== null) {
 			try {
+				$correlationId = $container->getRequestId();
 				$container->getLogger()->debug($e->getMessage(), [
 					'exception' => $e,
 					'request_id' => self::getRequestId(),
@@ -268,6 +270,7 @@ final class Helpers
 			->renderToString(__DIR__ . '/../template/broken-admin.latte', [
 				'basePath' => Url::get()->getBaseUrl(),
 				'exception' => $e,
+				'correlationId' => $correlationId,
 				'isLogged' => $logged,
 				'isDebug' => Configuration::get()->isDebugMode(),
 			]));

@@ -86,6 +86,10 @@
 						{else}
 							<span class="text-danger">Error can not be logged, because your Logger is broken.</span>
 						{/if}
+						{if $correlationId !== null}
+							<br>
+							<span class="text-secondary">Correlation&nbsp;ID:&nbsp;{$correlationId}</span>
+						{/if}
 					</td>
 				</tr>
 			</table>
