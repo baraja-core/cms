@@ -132,7 +132,7 @@ final class Context implements ContainerInterface
 			}
 		}
 
-		throw new \RuntimeException('Plugin info for "' . $type . '" does not exist.');
+		throw new \RuntimeException(sprintf('Plugin info for "%s" does not exist.', $type));
 	}
 
 
@@ -277,10 +277,13 @@ final class Context implements ContainerInterface
 	}
 
 
+	/**
+	 * Verifies that the submitted plugin and view can be seen/called by the currently logged in user.
+	 */
 	public function checkPermission(string $plugin, ?string $view = null): bool
 	{
 		$pluginName = Helpers::formatPresenterNameToUri($plugin);
-		if ($pluginName === 'cms') {
+		if ($pluginName === 'cms') { // Internal "cms" plugin is always available
 			return true;
 		}
 		try {
@@ -306,7 +309,7 @@ final class Context implements ContainerInterface
 
 
 	/**
-	 * @return CmsAsset[]
+	 * @return array<int, CmsAsset>
 	 */
 	public function getCustomGlobalAssetPaths(): array
 	{
@@ -329,7 +332,7 @@ final class Context implements ContainerInterface
 	public function setCustomAssetPath(string $type, string $path): void
 	{
 		if (isset($this->customAssets[$type]) === true) {
-			throw new \RuntimeException('Custom asset "' . $type . '" already exist.');
+			throw new \RuntimeException(sprintf('Custom asset "%s" already exist.', $type));
 		}
 		$this->customAssets[$type] = $path;
 	}

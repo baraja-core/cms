@@ -48,6 +48,7 @@ final class Application
 	 * 8. Processing of internal logic of the plugin
 	 * 9. Render the template and end the request
 	 *
+	 * @throws \Throwable|AdminBusinessLogicControlException
 	 * @return never-return
 	 */
 	public function run(string $plugin, string $view, string $locale, string $path): void

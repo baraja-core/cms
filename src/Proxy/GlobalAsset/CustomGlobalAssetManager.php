@@ -7,7 +7,7 @@ namespace Baraja\Cms\Proxy\GlobalAsset;
 
 final class CustomGlobalAssetManager
 {
-	/** @var CmsAsset[] */
+	/** @var array<int, CmsAsset> */
 	private array $assets = [];
 
 	/** @var array<string, string> (hash => path) */
@@ -23,17 +23,19 @@ final class CustomGlobalAssetManager
 	public function addDiskPath(string $hash, string $diskPath): void
 	{
 		if (isset($this->diskPathsMap[$hash]) && $this->diskPathsMap[$hash] !== $diskPath) {
-			throw new \InvalidArgumentException(
-				'File "' . $diskPath . '" and "' . $this->diskPathsMap[$hash] . '" '
-				. 'already has been defined with same hash "' . $hash . '".',
-			);
+			throw new \InvalidArgumentException(sprintf(
+				'File "%s" and "%s" already has been defined with same hash "%s".',
+				$diskPath,
+				$this->diskPathsMap[$hash],
+				$hash,
+			));
 		}
 		$this->diskPathsMap[$hash] = $diskPath;
 	}
 
 
 	/**
-	 * @return CmsAsset[]
+	 * @return array<int, CmsAsset>
 	 */
 	public function getAssets(): array
 	{
