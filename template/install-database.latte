@@ -7,8 +7,8 @@
 	<meta name="author" content="Baraja.cz">
 	<meta name="robots" content="noindex, nofollow">
 	<meta content="width=device-width,initial-scale=.5" name="viewport">
-	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap@4.6.0/dist/css/bootstrap.min.css">
-	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.min.css">
+	<link type="text/css" rel="stylesheet" href="{\Baraja\Cms\Proxy\Proxy::getUrl('css/bootstrap-4-6-0.min.css')}">
+	<link type="text/css" rel="stylesheet" href="{\Baraja\Cms\Proxy\Proxy::getUrl('css/bootstrap-vue-2-21-2.min.css')}">
 	<script>
 	  let basePath = {$basePath};
 	  let baseApiPath = {$basePath . '/api/v1'};
@@ -31,10 +31,10 @@
 <div id="app">
 	{include content}
 </div>
-<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
-<script src="https://unpkg.com/bootstrap-vue@2.7.0/dist/bootstrap-vue.min.js"></script>
-<script src="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue-icons.min.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="{\Baraja\Cms\Proxy\Proxy::getUrl('js/vue-2-6-11.min.js')}"></script>
+<script src="{\Baraja\Cms\Proxy\Proxy::getUrl('js/bootstrap-vue-2-16-0.min.js')}"></script>
+<script src="{\Baraja\Cms\Proxy\Proxy::getUrl('js/bootstrap-vue-icons-2-21-2.min.js')}"></script>
+<script src="{\Baraja\Cms\Proxy\Proxy::getUrl('js/axios-0-21-1.min.js')}"></script>
 {include scripts}
 </body>
 </html>

@@ -31,8 +31,8 @@ use Baraja\Cms\Proxy\Proxy;
 	<meta name="author" content="Baraja.cz">
 	<meta name="robots" content="noindex, nofollow, noarchive">
 	<title><?= $title ? htmlspecialchars((string) $title) . ' | ' : '' ?>Admin</title>
-	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap@4.6.0/dist/css/bootstrap.min.css">
-	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.min.css">
+	<link type="text/css" rel="stylesheet" href="<?= Helpers::escapeHtmlAttr(Proxy::getUrl('css/bootstrap-4-6-0.min.css')) ?>">
+	<link type="text/css" rel="stylesheet" href="<?= Helpers::escapeHtmlAttr(Proxy::getUrl('css/bootstrap-vue-2-21-2.min.css')) ?>">
 	<link type="text/css" rel="stylesheet" href="<?= Helpers::escapeHtmlAttr(Proxy::getUrl('core.css')) ?>">
 	<?php
 		if (($settings['user']['theme'] ?? '') !== '' && ($settings['user']['theme'] ?? '') !== 'light') {
@@ -86,10 +86,10 @@ use Baraja\Cms\Proxy\Proxy;
 	<cms-support-sidebar></cms-support-sidebar>
 	<cms-footer :year="<?=date('Y')?>" version="<?=htmlspecialchars($currentVersion)?>"></cms-footer>
 </div>
-<script src="<?= $isDebug ? 'https://unpkg.com/vue@2.6.11/dist/vue.js' : 'https://unpkg.com/vue@2.6.11/dist/vue.min.js' ?>"></script>
-<script src="https://unpkg.com/bootstrap-vue@2.17.0/dist/bootstrap-vue.min.js"></script>
-<script src="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue-icons.min.js"></script>
-<script src="https://unpkg.com/axios@0.21.1/dist/axios.min.js"></script>
+<script src="<?= Helpers::escapeHtmlAttr(Proxy::getUrl($isDebug ? 'js/vue-2-6-11.js' : 'js/vue-2-6-11.min.js')) ?>"></script>
+<script src="<?= Helpers::escapeHtmlAttr(Proxy::getUrl('js/bootstrap-vue-2-16-0.min.js')) ?>"></script>
+<script src="<?= Helpers::escapeHtmlAttr(Proxy::getUrl('js/bootstrap-vue-icons-2-21-2.min.js')) ?>"></script>
+<script src="<?= Helpers::escapeHtmlAttr(Proxy::getUrl('js/axios-0-21-1.min.js')) ?>"></script>
 <?php
 foreach ($staticAssets as $staticAsset) {
 	if ($staticAsset->getFormat() === 'js') {
