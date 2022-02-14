@@ -5,6 +5,6 @@ declare(strict_types=1);
 namespace Baraja\Cms\MiddleWare;
 
 
-interface AdminBusinessLogicControlException
+interface AdminBusinessLogicControlException extends \Throwable
 {
 }
