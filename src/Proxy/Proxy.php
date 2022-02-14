@@ -21,6 +21,8 @@ final class Proxy
 		'js' => 'application/javascript',
 		'css' => 'text/css',
 		'ico' => 'image/x-icon',
+		'txt' => 'text/plain',
+		'map' => 'text/plain',
 	];
 
 	public const TEXTUAL_FILE_EXTENSIONS = [
@@ -41,17 +43,14 @@ final class Proxy
 	public static function getUrl(string $file): string
 	{
 		if (str_contains($file, '..')) {
-			throw new \LogicException('File path "' . $file . '" is not safe.');
+			throw new \LogicException(sprintf('File path "%s" is not safe.', $file));
 		}
-		$diskPath = __DIR__ . '/../../template/assets/' . $file;
+		$diskPath = sprintf('%s/../../template/assets/%s', __DIR__, $file);
 		if (is_file($diskPath) === false) {
-			throw new \InvalidArgumentException(
-				'Static file "' . $file . '" does not exist. '
-				. 'Path "' . $diskPath . '" given.',
-			);
+			throw new \InvalidArgumentException(sprintf('Static file "%s" does not exist. Path "%s" given.', $file, $diskPath));
 		}
 
-		return Url::get()->getBaseUrl() . '/' . Configuration::get()->getBaseUriEscaped() . '/assets/' . $file;
+		return sprintf('%s/%s/assets/%s', Url::get()->getBaseUrl(), Configuration::get()->getBaseUriEscaped(), $file);
 	}
 
 
@@ -79,7 +78,7 @@ final class Proxy
 			$return .= '/* Component ' . $component->getKey() . ' */' . "\n";
 			if (\is_file($component->getSource()) === true) {
 				$content = trim((string) file_get_contents($component->getSource()));
-				if (substr($content, -2) === '})') {
+				if (str_ends_with($content, '})')) {
 					$content .= ';';
 				}
 				$return .= $content . "\n\n\n";
@@ -150,7 +149,7 @@ final class Proxy
 			}
 		} elseif (
 			preg_match(
-				'/^assets\/(?<filename>([a-z0-9\/\-]+)\.(?<extension>[^.]+))$/',
+				'~^assets/(?<filename>([a-z0-9/.-]+)\.(?<extension>[^.]+?))$~',
 				$path,
 				$pathParser,
 			) === 1
@@ -159,6 +158,10 @@ final class Proxy
 			$fileName = $pathParser['filename'] ?? throw new \LogicException('Filename does not exist.');
 			$assetPath = __DIR__ . '/../../template/assets/' . $fileName;
 			if (!is_file($assetPath)) {
+				header(sprintf('Content-Type: %s', self::CONTENT_TYPES['txt']));
+				echo 'Error 404' . "\n\n";
+				echo sprintf('File "%s" does not exist. Make sure you are loading the correct URL.', htmlspecialchars($path));
+				echo "\n\n" . 'Rendered by </BRJ> CMS.';
 				die;
 			}
 		} else {
@@ -166,13 +169,29 @@ final class Proxy
 		}
 
 		if (isset(self::CONTENT_TYPES[$extension])) {
-			header('Content-Type: ' . self::CONTENT_TYPES[$extension]);
+			header(sprintf('Content-Type: %s', self::CONTENT_TYPES[$extension]));
 		} else {
-			throw new \OutOfRangeException(
-				'Invalid content type, because unknown format "' . $extension . '" given. '
-				. 'Did you mean "' . implode('", "', array_keys(self::CONTENT_TYPES)) . '"?',
-			);
+			throw new \OutOfRangeException(sprintf(
+				'Invalid content type, because unknown format "%s" given. Did you mean "%s"?',
+				$extension,
+				implode('", "', array_keys(self::CONTENT_TYPES)),
+			));
 		}
+
+		$modificationTime = (int) filemtime($assetPath);
+		$tsString = gmdate('D, d M Y H:i:s ', $modificationTime) . 'GMT';
+		$etag = 'EN' . $modificationTime;
+		if (
+			($_SERVER['HTTP_IF_NONE_MATCH'] ?? '') === $etag
+			&& ($_SERVER['HTTP_IF_MODIFIED_SINCE'] ?? '') === $tsString
+		) {
+			header('HTTP/1.1 304 Not Modified');
+			die;
+		}
+		header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 86_400)); // 1 day
+		header('Last-Modified: ' . $tsString);
+		header('ETag: "' . md5($etag) . '"');
+
 		$return = (string) file_get_contents($assetPath);
 		if ($fileName === 'core.css' || $fileName === 'core.js') {
 			$customAssetPath = $this->context->getCustomAssetPath($extension);
@@ -181,10 +200,12 @@ final class Proxy
 			}
 		}
 		if (isset(self::TEXTUAL_FILE_EXTENSIONS[$extension])) {
-			if ($extension === 'css') {
-				$return = Helpers::minifyHtml($return);
-			} elseif ($extension === 'js' && \class_exists(DefaultJsMinifier::class)) {
-				$return = (new DefaultJsMinifier)->minify($return);
+			if (str_contains($path, '.min') === false) {
+				if ($extension === 'css') {
+					$return = Helpers::minifyHtml($return);
+				} elseif ($extension === 'js' && \class_exists(DefaultJsMinifier::class)) {
+					$return = (new DefaultJsMinifier)->minify($return);
+				}
 			}
 			echo '/*' . "\n"
 				. ' * This file is part of Baraja CMS.' . "\n"
