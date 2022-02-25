@@ -70,6 +70,7 @@ final class TemplateRenderer
 			],
 			'settings' => $this->settings->getSystemInfo()->toArray(),
 			'currentVersion' => $this->settings->getCurrentVersion(),
+			'installationHash' => substr(md5(sprintf('%s|%s', __FILE__, $this->settings->getCurrentVersion())), 0, 8),
 		];
 
 		/** @phpstan-ignore-next-line */
