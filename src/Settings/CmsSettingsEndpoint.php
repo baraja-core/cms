@@ -40,7 +40,7 @@ final class CmsSettingsEndpoint extends BaseEndpoint
 				->createQueryBuilder('domain')
 				->select('PARTIAL domain.{id, https, domain, www, environment, default, protected}')
 				->addSelect('PARTIAL locale.{id, locale}')
-				->leftJoin('domain.locale', 'locale')
+				->join('domain.locale', 'locale')
 				->orderBy('domain.environment')
 				->getQuery()
 				->getArrayResult(),

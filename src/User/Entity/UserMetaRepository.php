@@ -16,7 +16,6 @@ final class UserMetaRepository extends EntityRepository
 	 */
 	public function load(int $userId, string $key): UserMeta
 	{
-		/** @var UserMeta $meta */
 		$meta = $this->createQueryBuilder('meta')
 			->where('meta.user = :userId')
 			->andWhere('meta.key = :key')
@@ -25,6 +24,7 @@ final class UserMetaRepository extends EntityRepository
 			->setMaxResults(1)
 			->getQuery()
 			->getSingleResult();
+		assert($meta instanceof UserMeta);
 
 		return $meta;
 	}
@@ -38,7 +38,7 @@ final class UserMetaRepository extends EntityRepository
 		/** @var array<int, UserMeta> $metas */
 		$metas = $this->createQueryBuilder('meta')
 			->select('meta, PARTIAL user.{id}')
-			->leftJoin('meta.user', 'user')
+			->join('meta.user', 'user')
 			->where('meta.user = :userId')
 			->setParameter('userId', $userId)
 			->getQuery()
@@ -58,7 +58,7 @@ final class UserMetaRepository extends EntityRepository
 		$selection = $this->createQueryBuilder('meta')
 			->select('PARTIAL meta.{id, user, key, value}')
 			->addSelect('PARTIAL user.{id}')
-			->leftJoin('meta.user', 'user')
+			->join('meta.user', 'user')
 			->where('user.id IN (:ids)')
 			->setParameter('ids', $userIds);
 

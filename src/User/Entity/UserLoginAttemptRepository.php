@@ -22,7 +22,7 @@ final class UserLoginAttemptRepository extends EntityRepository
 		/** @var array<int, array<string, int>> $attempts */
 		$attempts = $this->createQueryBuilder('login')
 			->select('PARTIAL login.{id}')
-			->leftJoin('login.user', 'user')
+			->join('login.user', 'user')
 			->where(
 				'login.user IS NULL OR user.username = :username OR user.email = :username OR login.username = :username OR login.ip = :ip'
 			)

@@ -27,7 +27,7 @@ final class AnnouncementRepository extends EntityRepository
 		return $this->createQueryBuilder('topic')
 			->select('PARTIAL topic.{id, pinned, message, showSince}')
 			->addSelect('PARTIAL user.{id, username}')
-			->leftJoin('topic.user', 'user')
+			->join('topic.user', 'user')
 			->where('topic.parent IS NULL')
 			->andWhere('topic.active = TRUE')
 			->andWhere('topic.showSince >= :now')

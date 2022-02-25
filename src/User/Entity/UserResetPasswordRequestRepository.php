@@ -16,15 +16,15 @@ final class UserResetPasswordRequestRepository extends EntityRepository
 	 */
 	public function getByToken(string $token): UserResetPasswordRequest
 	{
-		/** @var UserResetPasswordRequest $request */
 		$request = $this->createQueryBuilder('resetRequest')
 			->select('resetRequest, user')
-			->leftJoin('resetRequest.user', 'user')
+			->join('resetRequest.user', 'user')
 			->where('resetRequest.token = :token')
 			->setParameter('token', $token)
 			->setMaxResults(1)
 			->getQuery()
 			->getSingleResult();
+		assert($request instanceof UserResetPasswordRequest);
 
 		return $request;
 	}
