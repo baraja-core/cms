@@ -665,6 +665,11 @@ Vue.component('cms-quick-edit-datetime', {
 			this.newValue = this.value;
 		});
 	},
+	watch: {
+		value: function (newVal) {
+			this.newValue = newVal;
+		}
+	},
 	methods: {
 		save() {
 			this.$nextTick(() => {
