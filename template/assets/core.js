@@ -481,58 +481,16 @@ Vue.component('cms-quick-edit', {
 	mounted() {
 		this.originalValue = this.value;
 		this.newValue = this.value;
-		this.key = 'quickEdit-' + this.entity + '-' + this.id + '-' + this.property;
+		this.key = `quickEdit-${this.entity}-${this.id}-${this.property}-${Date.now()}_${Math.random() * 50000}`;
 		eventBus.$on('cms-quick-edit-open', (key) => {
 			if (key !== this.key) {
 				this.editable = false;
 			}
 		});
 		eventBus.$on('cms-quick-edit-save', (key, value) => {
-			if (key === this.key) {
-				if (value === this.originalValue) {
-					this.editable = false;
-					this.loading = false;
-					return;
-				}
-				if (this.confirm !== false) {
-					if (
-						(this.confirm === true && !confirm('Do you really want change ' + this.property + '?'))
-						|| (this.confirm !== true && !confirm(this.confirm))
-					) {
-						this.loading = true;
-						this.syncValue(this.originalValue);
-						this.$nextTick(() => {
-							this.loading = false;
-						});
-						return;
-					}
-				}
-				if (this.type === 'bool') {
-					value = value === true || value === 'true';
-				}
-				this.newValue = value;
-				this.loading = true;
-				this.$emit('click');
-				axiosApi.interceptors.response.use((ok) => {
-					return Promise.resolve(ok);
-				}, (error) => {
-					this.loading = false;
-					return Promise.reject(error);
-				});
-				axiosApi.get((this.endpointUri ? this.endpointUri : 'quick-edit') + '?' + httpBuildQuery({
-					entity: this.entity,
-					property: this.property,
-					id: this.id,
-					value: value,
-					type: this.type ? this.type : 'text'
-				})).then(() => {
-					this.editable = false;
-					this.loading = false;
-					this.originalValue = value;
-					this.$emit('input', value);
-					this.$emit('changed');
-				});
-			}
+			if (key !== this.key) return;
+			if (this.timeout) clearTimeout(this.timeout);
+			this.timeout = setTimeout(this.processSaveValue, 300, value);
 		});
 	},
 	data() {
@@ -541,7 +499,8 @@ Vue.component('cms-quick-edit', {
 			loading: false,
 			key: '',
 			originalValue: '',
-			newValue: ''
+			newValue: '',
+			timeout: null
 		}
 	},
 	watch: {
@@ -558,6 +517,51 @@ Vue.component('cms-quick-edit', {
 			this.originalValue = newVal;
 			this.newValue = newVal;
 			this.editable = false;
+		},
+		processSaveValue(value) {
+			if (value === this.originalValue) {
+				this.editable = false;
+				this.loading = false;
+				return;
+			}
+			if (this.confirm !== false) {
+				if (
+					(this.confirm === true && !confirm('Do you really want change ' + this.property + '?'))
+					|| (this.confirm !== true && !confirm(this.confirm))
+				) {
+					this.loading = true;
+					this.syncValue(this.originalValue);
+					this.$nextTick(() => {
+						this.loading = false;
+					});
+					return;
+				}
+			}
+			if (this.type === 'bool') {
+				value = value === true || value === 'true';
+			}
+			this.newValue = value;
+			this.loading = true;
+			this.$emit('click');
+			axiosApi.interceptors.response.use((ok) => {
+				return Promise.resolve(ok);
+			}, (error) => {
+				this.loading = false;
+				return Promise.reject(error);
+			});
+			axiosApi.get((this.endpointUri ? this.endpointUri : 'quick-edit') + '?' + httpBuildQuery({
+				entity: this.entity,
+				property: this.property,
+				id: this.id,
+				value: value,
+				type: this.type ? this.type : 'text'
+			})).then(() => {
+				this.editable = false;
+				this.loading = false;
+				this.originalValue = value;
+				this.$emit('input', value);
+				this.$emit('changed');
+			});
 		}
 	},
 	computed: {
