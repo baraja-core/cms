@@ -77,6 +77,16 @@ class User implements CmsUser
 	#[ORM\Column(type: 'json')]
 	private ?array $privileges = [];
 
+	#[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
+	private ?self $parent = null;
+
+	#[ORM\Column(type: 'string', length: 50, nullable: true)]
+	private ?string $pathEnumeration = null;
+
+	/** @var Collection|array<int, self> */
+	#[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
+	private Collection $children;
+
 	#[ORM\Column(type: 'string', length: 16, nullable: true)]
 	private ?string $phone;
 
@@ -135,6 +145,7 @@ class User implements CmsUser
 		$this->registerIp = Ip::get();
 		$this->registerDate = new \DateTimeImmutable('now');
 		$this->createDate = new \DateTimeImmutable('now');
+		$this->children = new ArrayCollection;
 		$this->metas = new ArrayCollection;
 		$this->logins = new ArrayCollection;
 		$this->loginAttempts = new ArrayCollection;
@@ -555,6 +566,45 @@ class User implements CmsUser
 		$this->phone = $phone !== null && $phone !== ''
 			? PhoneNumberFormatter::fix($phone, $region)
 			: null;
+	}
+
+
+	public function getParent(): ?self
+	{
+		return $this->parent;
+	}
+
+
+	public function setParent(?self $parent): void
+	{
+		$this->parent = $parent;
+	}
+
+
+	/**
+	 * @return Collection|User[]
+	 */
+	public function getChildren(): Collection
+	{
+		return $this->children;
+	}
+
+
+	public function addChildren(self $user): void
+	{
+		$this->children[] = $user;
+	}
+
+
+	public function getPathEnumeration(): ?string
+	{
+		return $this->pathEnumeration;
+	}
+
+
+	public function setPathEnumeration(?string $pathEnumeration): void
+	{
+		$this->pathEnumeration = $pathEnumeration;
 	}
 
 
