@@ -83,7 +83,7 @@ class User implements CmsUser
 	#[ORM\Column(type: 'string', length: 50, nullable: true)]
 	private ?string $pathEnumeration = null;
 
-	/** @var Collection|array<int, self> */
+	/** @var Collection<self> */
 	#[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
 	private Collection $children;
 
@@ -102,21 +102,21 @@ class User implements CmsUser
 	#[ORM\Column(type: 'boolean')]
 	private bool $active = true;
 
-	/** @var UserMeta[]|Collection */
+	/** @var Collection<UserMeta> */
 	#[ORM\OneToMany(mappedBy: 'user', targetEntity: UserMeta::class)]
-	private $metas;
+	private Collection $metas;
 
-	/** @var UserLogin[]|Collection */
+	/** @var Collection<UserLogin> */
 	#[ORM\OneToMany(mappedBy: 'user', targetEntity: UserLogin::class)]
-	private $logins;
+	private Collection $logins;
 
-	/** @var UserLoginAttempt[]|Collection */
+	/** @var Collection<UserLoginAttempt> */
 	#[ORM\OneToMany(mappedBy: 'user', targetEntity: UserLoginAttempt::class)]
-	private $loginAttempts;
+	private Collection $loginAttempts;
 
-	/** @var UserResetPasswordRequest[]|Collection */
+	/** @var Collection<UserResetPasswordRequest> */
 	#[ORM\OneToMany(mappedBy: 'user', targetEntity: UserResetPasswordRequest::class)]
-	private $passwordResets;
+	private Collection $passwordResets;
 
 	/** @var string|resource|null */
 	#[ORM\Column(type: 'binary', nullable: true)]
@@ -479,18 +479,18 @@ class User implements CmsUser
 
 
 	/**
-	 * @return UserLoginAttempt[]|Collection
+	 * @return Collection<UserLoginAttempt>
 	 */
-	public function getLoginAttempts()
+	public function getLoginAttempts(): Collection
 	{
 		return $this->loginAttempts;
 	}
 
 
 	/**
-	 * @return UserResetPasswordRequest[]|Collection
+	 * @return Collection<UserResetPasswordRequest>
 	 */
-	public function getPasswordResets()
+	public function getPasswordResets(): Collection
 	{
 		return $this->passwordResets;
 	}
@@ -582,7 +582,7 @@ class User implements CmsUser
 
 
 	/**
-	 * @return Collection|User[]
+	 * @return Collection<User>
 	 */
 	public function getChildren(): Collection
 	{
@@ -609,9 +609,9 @@ class User implements CmsUser
 
 
 	/**
-	 * @return UserLogin[]|Collection
+	 * @return Collection<UserLogin>
 	 */
-	public function getLogins()
+	public function getLogins(): Collection
 	{
 		return $this->logins;
 	}
