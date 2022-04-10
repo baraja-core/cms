@@ -131,6 +131,7 @@ final class Container implements ContainerInterface
 
 	public function getPluginPanel(): CmsPluginPanel
 	{
+		assert(class_exists(Debugger::class)); // TODO: Debugger can be undefined.
 		if ($this->pluginPanel === null) {
 			$this->pluginPanel = new CmsPluginPanel($this->pluginManager);
 		}
