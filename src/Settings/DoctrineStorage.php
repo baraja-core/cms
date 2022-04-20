@@ -89,6 +89,6 @@ final class DoctrineStorage implements Storage
 
 		$this->entityManager->remove($option);
 		$this->entityManager->flush();
-		$this->entityManager->clear($option::class);
+		$this->entityManager->clear();
 	}
 }
