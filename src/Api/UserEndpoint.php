@@ -320,16 +320,7 @@ final class UserEndpoint extends BaseEndpoint
 			],
 			'avatarUrl' => $user->getAvatarUrl(),
 			'created' => $user->getCreateDate(),
-			'meta' => (static function (array $data): array {
-				$return = [];
-				foreach ($data as $key => $value) {
-					if (\is_scalar($value) === true) {
-						$return[$key] = $value;
-					}
-				}
-
-				return $return;
-			})($user->getMetaData()),
+			'meta' => $user->getMetaData(),
 		]);
 	}
 
