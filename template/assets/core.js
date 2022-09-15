@@ -584,7 +584,7 @@ Vue.component('cms-quick-edit', {
 Vue.component('cms-quick-edit-text', {
 	props: ['value', 'elementKey'],
 	template: `<b-input-group>
-		<b-form-input v-model="newValue" :id="elementKey" size="sm" @keyup.enter.native="save()" @blur="save()"></b-form-input>
+		<b-form-input v-model="newValue" :id="elementKey" size="sm" @keyup.enter.native="$event.target.blur()" @blur="save()"></b-form-input>
 		<b-input-group-append>
 			<b-button size="sm" type="submit" variant="success" @click="save()">Save</b-button>
 		</b-input-group-append>
