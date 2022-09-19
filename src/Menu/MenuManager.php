@@ -30,7 +30,7 @@ final class MenuManager
 
 
 	/**
-	 * @return mixed[]
+	 * @return array<int, MenuItem>
 	 */
 	public function getItems(): array
 	{
@@ -50,18 +50,19 @@ final class MenuManager
 			}
 			$route = Helpers::formatPresenterNameToUri($plugin['name']);
 			if ($this->authorizator->get()->isAllowedPlugin($route)) {
-				$return[] = [
-					'key' => $plugin['service'],
-					'title' => $plugin['label'],
-					'priority' => $plugin['priority'],
-					'link' => Configuration::get()->getBaseUri() . '/' . $route,
-					'icon' => $plugin['icon'] ?? null,
-					'child' => [],
-				];
+				$return[] = new MenuItem(
+					key: $plugin['service'],
+					title: $plugin['label'],
+					pluginName: $plugin['name'],
+					priority: $plugin['priority'],
+					link: Configuration::get()->getBaseUri() . '/' . $route,
+					icon: $plugin['icon'] ?? null,
+					child: [],
+				);
 			}
 		}
 
-		usort($return, static fn(array $a, array $b): int => $a['priority'] < $b['priority'] ? 1 : -1);
+		usort($return, static fn(MenuItem $a, MenuItem $b): int => $a->priority < $b->priority ? 1 : -1);
 
 		return $return;
 	}

@@ -114,7 +114,7 @@ final class Context implements ContainerInterface
 	/**
 	 * @return array<int, PluginComponent>
 	 */
-	public function getComponents(Plugin $plugin, string $view): array
+	public function getComponents(Plugin $plugin, ?string $view = null): array
 	{
 		return $this->pluginManager->getComponents($plugin, $view);
 	}

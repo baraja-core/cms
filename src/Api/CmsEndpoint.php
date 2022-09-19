@@ -5,10 +5,17 @@ declare(strict_types=1);
 namespace Baraja\Cms\Api;
 
 
+use Baraja\AdminBar\AdminBar;
 use Baraja\BarajaCloud\CloudManager;
+use Baraja\Cms\Api\DTO\CmsGlobalSettingsResponse;
+use Baraja\Cms\Api\DTO\CmsPluginResponse;
+use Baraja\Cms\Api\DTO\CmsSettingsResponse;
 use Baraja\Cms\Configuration;
 use Baraja\Cms\ContextAccessor;
 use Baraja\Cms\Helpers;
+use Baraja\Cms\MenuManager;
+use Baraja\Cms\Plugin\ErrorPlugin;
+use Baraja\Cms\Proxy\GlobalAsset\CmsSimpleStaticAsset;
 use Baraja\Cms\Session;
 use Baraja\Cms\Settings;
 use Baraja\Cms\User\Entity\CmsUser;
@@ -17,6 +24,7 @@ use Baraja\Cms\User\Entity\UserResetPasswordRequest;
 use Baraja\Cms\User\Entity\UserResetPasswordRequestRepository;
 use Baraja\Cms\User\UserManager;
 use Baraja\Markdown\CommonMarkRenderer;
+use Baraja\Plugin\BasePlugin;
 use Baraja\StructuredApi\Attributes\PublicEndpoint;
 use Baraja\StructuredApi\BaseEndpoint;
 use Baraja\Url\Url;
@@ -33,6 +41,7 @@ final class CmsEndpoint extends BaseEndpoint
 		private UserManager $userManager,
 		private CloudManager $cloudManager,
 		private Settings $settings,
+		private MenuManager $menuManager,
 		private EntityManagerInterface $entityManager,
 		private ContextAccessor $contextAccessor,
 		private CommonMarkRenderer $commonMarkRenderer,
@@ -53,6 +62,58 @@ final class CmsEndpoint extends BaseEndpoint
 				->getIntegrityWorkflow()
 				->run(true),
 		]);
+	}
+
+
+	public function actionSettings(): CmsSettingsResponse
+	{
+		$context = $this->contextAccessor->get();
+
+		return new CmsSettingsResponse(
+			isDebug: AdminBar::getBar()->isDebugMode(),
+			basePath: Url::get()->getBaseUrl(),
+			staticAssets: $context->getCustomGlobalAssetPaths(),
+			projectName: 'Project name',
+			locale: $context->getLocale(),
+			menu: $this->menuManager->getItems(),
+			globalSettings: new CmsGlobalSettingsResponse(startWeekday: 0),
+			settings: $this->settings->getSystemInfo()->toArray(),
+			currentVersion: $this->settings->getCurrentVersion(),
+			installationHash: substr(md5(sprintf('%s|%s', __FILE__, $this->settings->getCurrentVersion())), 0, 8),
+		);
+	}
+
+
+	public function actionPlugin(string $name, ?string $locale = null): CmsPluginResponse
+	{
+		$context = $this->contextAccessor->get();
+		if ($locale !== null) {
+			$context->setLocale($locale);
+		}
+		try {
+			$plugin = $context->getPluginByName($name);
+			if ($context->checkPermission($name) === false) {
+				$this->sendError('Permission denied.');
+			}
+		} catch (\RuntimeException | \InvalidArgumentException $e) {
+			if ($e->getCode() !== 404) {
+				$context->getContainer()->getLogger()->warning($e->getMessage(), ['exception' => $e]);
+			}
+			$plugin = $context->getPluginByType(ErrorPlugin::class);
+		}
+		$baseUrl = Url::get()->getBaseUrl();
+		$baseUrlPrefix = $baseUrl . '/' . Configuration::get()->getBaseUriEscaped();
+		$components = $context->getComponents($plugin, $plugin instanceof ErrorPlugin ? 'default' : null);
+
+		return new CmsPluginResponse(
+			staticAssets: [
+				new CmsSimpleStaticAsset('js', $baseUrlPrefix . '/cms-web-loader/' . $context->getPluginNameByType($plugin) . '.js'),
+				new CmsSimpleStaticAsset('js', $baseUrlPrefix . '/assets/core.js'),
+			],
+			title: $plugin instanceof BasePlugin ? $plugin->getTitle() : null,
+			activeKey: $context->getPluginKey($plugin),
+			components: $components,
+		);
 	}
 
 
