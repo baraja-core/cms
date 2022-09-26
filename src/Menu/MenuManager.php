@@ -43,22 +43,10 @@ final class MenuManager
 			if (isset($this->ignorePlugins[$plugin['type']]) === true) {
 				continue;
 			}
-			$menuItem = $plugin['menuItem'] ?? null;
-			if ($menuItem !== null) {
-				$return[] = $menuItem;
-				continue;
-			}
-			$route = Helpers::formatPresenterNameToUri($plugin['name']);
-			if ($this->authorizator->get()->isAllowedPlugin($route)) {
-				$return[] = new MenuItem(
-					key: $plugin['service'],
-					title: $plugin['label'],
-					pluginName: $plugin['name'],
-					priority: $plugin['priority'],
-					link: Configuration::get()->getBaseUri() . '/' . $route,
-					icon: $plugin['icon'] ?? null,
-					child: [],
-				);
+			if (isset($plugin['menuItem'])) {
+				$return[] = MenuItem::fromPluginDefinition($plugin['menuItem']);
+			} elseif ($this->authorizator->get()->isAllowedPlugin(Helpers::formatPresenterNameToUri($plugin['name']))) {
+				$return[] = MenuItem::fromPluginDefinition($plugin);
 			}
 		}
 
