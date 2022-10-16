@@ -6,16 +6,16 @@ namespace Baraja\Cms\User\AdminBar;
 
 
 use Baraja\AdminBar\Panel\Panel;
+use Baraja\CAS\User;
 use Baraja\Cms\LinkGenerator;
 use Baraja\Cms\Session;
-use Baraja\Cms\User\UserManagerAccessor;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 
 final class BackToLastIdentityPanel implements Panel
 {
 	public function __construct(
-		private UserManagerAccessor $userManager,
+		private User $user,
 	) {
 	}
 
@@ -27,8 +27,8 @@ final class BackToLastIdentityPanel implements Panel
 			return '';
 		}
 		try {
-			$user = $this->userManager->get()->getUserById($userId);
-		} catch (NoResultException | NonUniqueResultException) {
+			$user = $this->user->getUserStorage()->getUserById($userId);
+		} catch (NoResultException|NonUniqueResultException) {
 			return '';
 		}
 

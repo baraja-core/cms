@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Baraja\Cms;
 
 
-use Baraja\Cms\User\UserManagerAccessor;
-use Nette\Security\User as NetteUser;
+use Baraja\CAS\User;
 
 final class MenuAuthorizator
 {
@@ -21,10 +20,8 @@ final class MenuAuthorizator
 	private array $privileges;
 
 
-	public function __construct(
-		NetteUser $userService,
-		UserManagerAccessor $userManager,
-	) {
+	public function __construct(User $userService)
+	{
 		if ($userService->isLoggedIn() === false) {
 			$this->id = null;
 			$this->roles = [];
@@ -34,9 +31,9 @@ final class MenuAuthorizator
 		}
 
 		/** @var array<int, array{id: int, roles: array<int, string>|null, privileges: array<int, string>|null}> $user */
-		$user = $userManager->get()->getDefaultUserRepository()
+		$user = $userService->getUserStorage()->getUserRepository()
 			->createQueryBuilder('user')
-			->select('PARTIAL user.{id, roles, privileges}')
+			->select('PARTIAL user.{id}')
 			->where('user.id = :id')
 			->setParameter('id', $userService->getId())
 			->setMaxResults(1)
@@ -45,12 +42,15 @@ final class MenuAuthorizator
 
 		if (isset($user[0])) {
 			$this->id = $user[0]['id'];
-			$this->roles = array_flip($user[0]['roles'] ?? []);
-			$this->privileges = array_flip($user[0]['privileges'] ?? []);
+			$this->roles = array_flip($user[0]['roles'] ?? []); // TODO
+			$this->privileges = array_flip($user[0]['privileges'] ?? []); // TODO
 		} else {
 			throw new \RuntimeException(
-				'User (type of "' . $userManager->get()->getDefaultEntity() . '", id "' . $userService->getId() . '") '
-				. 'does not exist or is not logged in.',
+				sprintf(
+					'User (type of "%s", id "%s") does not exist or is not logged in.',
+					\Baraja\CAS\Entity\User::class,
+					$userService->getId(),
+				),
 				404,
 			);
 		}

@@ -178,8 +178,11 @@ final class Application
 			str_starts_with($path, 'cms/') === false
 			&& $this->context->getUser()->isLoggedIn() === false
 		) { // route login form
-			if ($this->context->getUser()->getId() !== null) {
+			try {
+				$this->context->getUser()->getId();
 				$this->terminate($this->templateRenderer->renderNeedOtpAuth());
+			} catch (\LogicException) {
+				// Silence is golden.
 			}
 			$this->terminate($this->templateRenderer->renderLoginTemplate($locale));
 		}

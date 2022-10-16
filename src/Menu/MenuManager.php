@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace Baraja\Cms;
 
 
+use Baraja\CAS\User;
 use Baraja\Cms\Plugin\CmsPlugin;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Plugin\HomepagePlugin;
+use Baraja\Plugin\Plugin;
 use Baraja\Plugin\PluginManager;
-use Nette\Security\User;
 
 final class MenuManager
 {
-	/** @var true[] */
+	/** @var array<class-string<Plugin>, true> */
 	private array $ignorePlugins = [
 		CmsPlugin::class => true,
 		ErrorPlugin::class => true,
@@ -26,6 +27,15 @@ final class MenuManager
 		private MenuAuthorizatorAccessor $authorizator,
 		private User $user,
 	) {
+	}
+
+
+	/**
+	 * @param Plugin|class-string<Plugin> $plugin
+	 */
+	public function addIgnorePlugin(Plugin|string $plugin): void
+	{
+		$this->ignorePlugins[is_string($plugin) ? $plugin : $plugin::class] = true;
 	}
 
 

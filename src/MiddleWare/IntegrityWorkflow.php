@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Baraja\Cms\MiddleWare;
 
 
+use Baraja\CAS\User;
 use Baraja\Cms\Session;
-use Nette\Security\User;
 use Nette\Utils\Arrays;
 use Tracy\Debugger;
 

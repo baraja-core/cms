@@ -6,8 +6,8 @@ namespace Baraja\Cms\Api;
 
 
 use Baraja\BarajaCloud\CloudManager;
+use Baraja\CAS\Entity\User;
 use Baraja\Cms\Settings;
-use Baraja\Cms\User\Entity\User;
 use Baraja\DynamicConfiguration\Configuration;
 use Baraja\DynamicConfiguration\ConfigurationSection;
 use Baraja\StructuredApi\Attributes\PublicEndpoint;
@@ -104,7 +104,7 @@ final class CmsInstallEndpoint extends BaseEndpoint
 		$this->config->save('name', $name);
 		$this->config->save('admin-email', $mail);
 
-		$user = new User($username, $password, $mail, 'admin');
+		$user = new User($username, $password, $mail);
 		$user->setFirstName($firstName);
 		$user->setLastName($lastName);
 

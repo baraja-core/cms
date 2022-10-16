@@ -6,6 +6,7 @@ namespace Baraja\Cms;
 
 
 use Baraja\AdminBar\AdminBar;
+use Baraja\CAS\User;
 use Baraja\Cms\Component\ErrorComponent;
 use Baraja\Cms\MiddleWare\Bridge\AdminBarBridge;
 use Baraja\Cms\Plugin\CommonSettingsPlugin;
@@ -19,9 +20,6 @@ use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManagerAccessor;
 use Baraja\Cms\Support\Support;
 use Baraja\Cms\Translator\TranslatorFilter;
 use Baraja\Cms\User\AdminBarUser;
-use Baraja\Cms\User\UserManager;
-use Baraja\Cms\User\UserManagerAccessor;
-use Baraja\Cms\User\UserMetaManager;
 use Baraja\Doctrine\ORM\DI\OrmAnnotationsExtension;
 use Baraja\Plugin\Component\VueComponent;
 use Baraja\Plugin\PluginComponentExtension;
@@ -38,7 +36,6 @@ use Nette\DI\MissingServiceException;
 use Nette\PhpGenerator\ClassType;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
-use Nette\Security\User;
 use Nette\Utils\FileSystem;
 use Nette\Utils\Validators;
 
@@ -72,7 +69,6 @@ final class CmsExtension extends CompilerExtension
 	{
 		$builder = $this->getContainerBuilder();
 		PluginComponentExtension::defineBasicServices($builder);
-		OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\Cms\User\Entity', __DIR__ . '/User/Entity');
 		OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\Cms\Announcement\Entity', __DIR__ . '/Announcement');
 		OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\DoctrineConfiguration', __DIR__ . '/Settings/Entity');
 
@@ -81,8 +77,8 @@ final class CmsExtension extends CompilerExtension
 			->setFactory(LinkGenerator::class);
 
 		try {
-			/** @var ServiceDefinition $pluginContext */
 			$pluginContext = $builder->getDefinitionByType(\Baraja\Plugin\Context::class);
+			assert($pluginContext instanceof ServiceDefinition);
 			$pluginContext->addSetup('?->setLinkGenerator(?)', ['@self', '@' . PluginLinkGenerator::class]);
 		} catch (MissingServiceException $e) {
 			throw new \RuntimeException('Can not compile CMS extension, because service "' . \Baraja\Plugin\Context::class . '" (from package baraja-core/plugin-system) does not exist. Did you register Plugin system extension before CMS?', 500, $e);
@@ -158,16 +154,6 @@ final class CmsExtension extends CompilerExtension
 
 		$builder->addAccessorDefinition($this->prefix('customGlobalAssetManagerAccessor'))
 			->setImplement(CustomGlobalAssetManagerAccessor::class);
-
-		// user
-		$builder->addDefinition($this->prefix('userManager'))
-			->setFactory(UserManager::class);
-
-		$builder->addDefinition($this->prefix('userMetaManager'))
-			->setFactory(UserMetaManager::class);
-
-		$builder->addAccessorDefinition($this->prefix('userManagerAccessor'))
-			->setImplement(UserManagerAccessor::class);
 
 		/** @var ServiceDefinition $pluginManager */
 		$pluginManager = $this->getContainerBuilder()->getDefinitionByType(PluginManager::class);
@@ -268,20 +254,20 @@ final class CmsExtension extends CompilerExtension
 	{
 		$builder = $this->getContainerBuilder();
 
-		/** @var ServiceDefinition $application */
 		$application = $builder->getDefinitionByType(Application::class);
+		assert($application instanceof ServiceDefinition);
 
-		/** @var ServiceDefinition $admin */
 		$admin = $builder->getDefinitionByType(Admin::class);
+		assert($admin instanceof ServiceDefinition);
 
-		/** @var ServiceDefinition $netteUser */
-		$netteUser = $builder->getDefinitionByType(User::class);
+		$userService = $builder->getDefinitionByType(User::class);
+		assert($userService instanceof ServiceDefinition);
 
-		/** @var ServiceDefinition $adminBarBridge */
 		$adminBarBridge = $builder->getDefinitionByType(AdminBarBridge::class);
+		assert($adminBarBridge instanceof ServiceDefinition);
 
-		/** @var FactoryDefinition $latte */
 		$latte = $builder->getDefinitionByType(LatteFactory::class);
+		assert($latte instanceof FactoryDefinition);
 		$latte->getResultDefinition()->addSetup('addFilter(?, ?)', [
 			'translate', '@' . TranslatorFilter::class,
 		]);
@@ -303,7 +289,7 @@ final class CmsExtension extends CompilerExtension
 			[
 				$application->getName(),
 				$admin->getName(),
-				$netteUser->getName(),
+				$userService->getName(),
 				$adminBarBridge->getName(),
 			],
 		);
