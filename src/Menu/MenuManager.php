@@ -53,10 +53,15 @@ final class MenuManager
 			if (isset($this->ignorePlugins[$plugin['type']]) === true) {
 				continue;
 			}
+			$menuItemDefinition = null;
 			if (isset($plugin['menuItem'])) {
-				$return[] = MenuItem::fromPluginDefinition($plugin['menuItem']);
+				$menuItemDefinition = $plugin['menuItem'];
 			} elseif ($this->authorizator->get()->isAllowedPlugin(Helpers::formatPresenterNameToUri($plugin['name']))) {
-				$return[] = MenuItem::fromPluginDefinition($plugin);
+				$menuItemDefinition = $plugin;
+			}
+			if ($menuItemDefinition !== null) {
+				/** @phpstan-ignore-next-line */
+				$return[] = MenuItem::fromPluginDefinition($menuItemDefinition);
 			}
 		}
 

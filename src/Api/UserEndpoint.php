@@ -842,7 +842,9 @@ final class UserEndpoint extends BaseEndpoint
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $id));
 		}
-		if ($currentUser->getId() !== $member->getId() && \in_array('admin', $currentUser->getRoles(), true) === false) {
+		if ($currentUser->getId() !== $member->getId()
+			&& in_array('admin', $currentUser->getRoleCodes(), true) === false
+		) {
 			$this->sendError('Current user must be admin for change password.');
 		}
 		try {
