@@ -6,7 +6,10 @@ namespace Baraja\Cms\Api;
 
 
 use Baraja\BarajaCloud\CloudManager;
+use Baraja\CAS\Entity\Organisation;
+use Baraja\CAS\Entity\OrganisationMember;
 use Baraja\CAS\Entity\User;
+use Baraja\CAS\Entity\UserEmail;
 use Baraja\Cms\Settings;
 use Baraja\DynamicConfiguration\Configuration;
 use Baraja\DynamicConfiguration\ConfigurationSection;
@@ -93,22 +96,35 @@ final class CmsInstallEndpoint extends BaseEndpoint
 			$errors[] = 'Musíte souhlasit s podmínkami služby.';
 		}
 		if ($errors !== []) {
-			$this->sendJson(
-				[
-					'state' => 'error',
-					'errors' => $errors,
-				],
-			);
+			$this->sendJson([
+				'state' => 'error',
+				'errors' => $errors,
+			]);
 		}
 
 		$this->config->save('name', $name);
 		$this->config->save('admin-email', $mail);
 
-		$user = new User($username, $password, $mail);
+		$user = new User($username, $password);
+		$this->entityManager->persist($user);
 		$user->setFirstName($firstName);
 		$user->setLastName($lastName);
 
-		$this->entityManager->persist($user);
+		$userEmail = new UserEmail($user, $mail);
+		$this->entityManager->persist($userEmail);
+		$user->setEmail($userEmail);
+
+		$this->entityManager->flush();
+
+		$organisation = new Organisation($name, Strings::webalize($name));
+		$this->entityManager->persist($organisation);
+		$organisation->setDefault(true);
+		$this->entityManager->flush();
+
+		$member = new OrganisationMember($organisation, $user);
+		$this->entityManager->persist($member);
+		$organisation->setSupportPerson($member);
+
 		$this->entityManager->flush();
 		$this->sendOk();
 	}

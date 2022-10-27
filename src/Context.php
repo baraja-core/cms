@@ -257,7 +257,7 @@ final class Context implements ContainerInterface
 			$service->addRunEvent(
 				function (): void {
 					$hash = Session::get(Session::WORKFLOW_PASSWORD_HASH);
-					$identity = $this->user->getIdentity();
+					$identity = $this->user->getIdentityEntity();
 					if ($identity !== null) {
 						$newHash = md5($identity->getPassword());
 						if ($hash === null) {
