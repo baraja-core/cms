@@ -248,7 +248,7 @@ final class Context implements ContainerInterface
 					$identity = $this->user->getIdentity();
 					assert($identity !== null);
 					$this->userMetaManager->set(
-						$identity->getId(),
+						$identity->getUserId(),
 						'last-activity',
 						date('Y-m-d H:i:s'),
 					);
