@@ -19,7 +19,7 @@ final class CmsDashboardEndpoint extends BaseEndpoint
 
 	public function __construct(
 		private EntityManagerInterface $entityManager,
-		private User $user,
+		private User $userService,
 		private Localization $localization,
 	) {
 		$repository = $this->entityManager->getRepository(Announcement::class);
@@ -38,7 +38,7 @@ final class CmsDashboardEndpoint extends BaseEndpoint
 
 	public function postPostTopic(string $message, ?int $parentId = null): void
 	{
-		$identity = $this->user->getIdentityEntity();
+		$identity = $this->userService->getIdentityEntity();
 		assert($identity !== null);
 
 		$parent = null;

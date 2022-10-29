@@ -26,6 +26,7 @@ use Baraja\Url\Url;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Nette\Caching\Cache;
+use Nette\Caching\Storage;
 use Nette\Http\FileUpload;
 use Nette\Http\Request;
 use Nette\NotSupportedException;
@@ -36,8 +37,10 @@ use Nette\Utils\Strings;
 
 final class UserEndpoint extends BaseEndpoint
 {
+	private Cache $cache;
+
+
 	public function __construct(
-		private \Baraja\CAS\User $user,
 		private UserMetaManager $userMetaManager,
 		private EntityManager $entityManager,
 		private CloudManager $cloudManager,
@@ -45,7 +48,10 @@ final class UserEndpoint extends BaseEndpoint
 		private MemberRoleManager $memberRoleManager,
 		private Settings $settings,
 		private Context $context,
+		private Request $httpRequest,
+		Storage $cacheStorage,
 	) {
+		$this->cache = new Cache($cacheStorage, 'user-endpoint');
 	}
 
 
@@ -481,7 +487,7 @@ final class UserEndpoint extends BaseEndpoint
 		$opCodeHuman = CasHelper::otpBase32Encode($otpCode);
 		$otpCodeHash = md5($opCodeHuman);
 
-		$this->getCache('user-endpoint-otp')->save($otpCodeHash, $otpCode, [
+		$this->cache->save($otpCodeHash, $otpCode, [
 			Cache::EXPIRE => '10 minutes',
 		]);
 
@@ -503,7 +509,7 @@ final class UserEndpoint extends BaseEndpoint
 	public function postSetAuth(int $id, string $hash, string $code): void
 	{
 		/** @var string|null $otpCode */
-		$otpCode = $this->getCache('user-endpoint-otp')->load($hash);
+		$otpCode = $this->cache->load($hash);
 
 		if ($otpCode === null) {
 			$this->sendError('Hash is invalid or already expired.');
@@ -740,9 +746,7 @@ final class UserEndpoint extends BaseEndpoint
 
 	public function postUploadAvatar(): void
 	{
-		/** @var Request $request */
-		$request = $this->container->getByType(Request::class);
-		$userIdParam = $request->getPost('userId');
+		$userIdParam = $this->httpRequest->getPost('userId');
 		$userId = is_numeric($userIdParam) ? (int) $userIdParam : 0;
 
 		try {
@@ -750,14 +754,11 @@ final class UserEndpoint extends BaseEndpoint
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $userId));
 		}
-		if (
-			!$this->getUser()->isInRole('admin')
-			&& $this->user->getId() !== $userId
-		) {
+		if ($this->user->getId() !== $userId && !$this->getUser()->isInRole('admin')) {
 			$this->sendError('Upload avatar is not permitted.');
 		}
 
-		$file = $request->getFile('avatar');
+		$file = $this->httpRequest->getFile('avatar');
 		if ($file === null) {
 			$this->sendError('Please select avatar image to upload.');
 		}

@@ -36,7 +36,6 @@ use Doctrine\ORM\NoResultException;
 final class CmsEndpoint extends BaseEndpoint
 {
 	public function __construct(
-		private \Baraja\CAS\User $user,
 		private CloudManager $cloudManager,
 		private Settings $settings,
 		private MenuManager $menuManager,
@@ -153,8 +152,6 @@ final class CmsEndpoint extends BaseEndpoint
 			$this->sendError('User is not logged in.');
 		}
 		$id = $userEntity->getId();
-		assert(is_numeric($id));
-		$id = (int) $id;
 		try {
 			$user = $this->user->getUserStorage()->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
