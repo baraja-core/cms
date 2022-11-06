@@ -120,7 +120,7 @@ final class CmsEndpoint extends BaseEndpoint
 			$this->sendError('Empty username or password.');
 		}
 		try {
-			$this->user->getAuthenticator()->authentication($username, $password, $remember);
+			$this->getUser()->getAuthenticator()->authentication($username, $password, $remember);
 		} catch (AuthenticationException $e) {
 			$code = $e->getCode();
 			if (in_array($code, [Authenticator::IdentityNotFound, Authenticator::InvalidCredential, Authenticator::Failure], true)) {
@@ -153,7 +153,7 @@ final class CmsEndpoint extends BaseEndpoint
 		}
 		$id = $userEntity->getId();
 		try {
-			$user = $this->user->getUserStorage()->getUserById($id);
+			$user = $this->getUser()->getUserStorage()->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%d" does not exist.', $id));
 		}
@@ -172,7 +172,7 @@ final class CmsEndpoint extends BaseEndpoint
 	public function postForgotPassword(string $locale, string $username): void
 	{
 		try {
-			$user = $this->user->getUserStorage()->getUserRepository()
+			$user = $this->getUser()->getUserStorage()->getUserRepository()
 				->createQueryBuilder('user')
 				->leftJoin('user.email', 'email')
 				->where('user.username = :username')
@@ -208,7 +208,7 @@ final class CmsEndpoint extends BaseEndpoint
 	{
 		if (preg_match('/^(\S+)\s+(\S+)$/', trim($realName), $parser) === 1) {
 			try {
-				$user = $this->user->getUserStorage()->getUserRepository()
+				$user = $this->getUser()->getUserStorage()->getUserRepository()
 					->createQueryBuilder('user')
 					->where('user.firstName = :firstName')
 					->andWhere('user.lastName = :lastName')
@@ -291,7 +291,7 @@ final class CmsEndpoint extends BaseEndpoint
 	public function postSetUserPassword(string $locale, int $userId, string $password): void
 	{
 		try {
-			$user = $this->user->getUserStorage()->getUserById($userId);
+			$user = $this->getUser()->getUserStorage()->getUserById($userId);
 		} catch (NoResultException | NonUniqueResultException | \InvalidArgumentException) {
 			$this->sendError('User "' . $userId . '" does not exist.');
 		}
