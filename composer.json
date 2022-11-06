@@ -13,7 +13,7 @@
 		"composer-runtime-api": "^2.0.0",
 		"baraja-core/dynamic-configuration": "^2.1",
 		"baraja-core/doctrine": "^3.0",
-		"baraja-core/structured-api": "^4.0",
+		"baraja-core/structured-api": "^4.0 <4.1",
 		"baraja-core/admin-bar": "^2.3",
 		"baraja-core/plugin-system": "^2.3",
 		"baraja-core/localization": "^2.0",
