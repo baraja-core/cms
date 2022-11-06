@@ -9,9 +9,8 @@ use Baraja\CAS\User;
 use Baraja\Cms\Context;
 use Baraja\Network\Ip;
 use Baraja\TracySentryBridge\SentryLogger;
-use function Sentry\configureScope;
-
 use Sentry\State\Scope;
+use function Sentry\configureScope;
 
 final class SentryBridge
 {
@@ -38,13 +37,11 @@ final class SentryBridge
 				}
 				$identity = $this->user->getIdentity();
 				if ($identity !== null) {
-					$scope->setUser(
-						[
-							'id' => $identity->getId(),
-							'ip_address' => Ip::get(),
-							'username' => $identity->getName(),
-						],
-					);
+					$scope->setUser([
+						'id' => $identity->getId(),
+						'ip_address' => Ip::get(),
+						'username' => $identity->getName(),
+					]);
 				}
 			},
 		);

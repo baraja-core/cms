@@ -64,7 +64,7 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 	{
 		try {
 			$user = $this->user->getUserStorage()->getUserById($id);
-		} catch (NoResultException|NonUniqueResultException) {
+		} catch (NoResultException | NonUniqueResultException) {
 			$this->error();
 		}
 
@@ -94,11 +94,9 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 	{
 		$identity = $this->user->getIdentity();
 		if ($identity !== null) {
-			$this->redirect(
-				$this->link('User:detail', [
-					'id' => $identity->getId(),
-				])
-			);
+			$this->redirect($this->link('User:detail', [
+				'id' => $identity->getId(),
+			]));
 		}
 		$this->redirect(Url::get()->getBaseUrl() . '/admin');
 	}
@@ -113,7 +111,7 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 
 		try {
 			$member = $this->user->getUserStorage()->getMemberByUser($id);
-		} catch (NoResultException|NonUniqueResultException) {
+		} catch (NoResultException | NonUniqueResultException) {
 			throw new \InvalidArgumentException('User "' . $id . '" does not exist.');
 		}
 		if (isset($_SESSION) && session_status() === PHP_SESSION_ACTIVE) {

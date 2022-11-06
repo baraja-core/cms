@@ -195,15 +195,6 @@ final class Context implements ContainerInterface
 	}
 
 
-	/**
-	 * @deprecated since 2021-10-22 use configuration service.
-	 */
-	public function getTempDir(): string
-	{
-		return $this->container->getConfiguration()->getTempDir();
-	}
-
-
 	public function isBot(): bool
 	{
 		if (PHP_SAPI === 'cli') {

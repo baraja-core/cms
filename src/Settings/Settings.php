@@ -141,15 +141,6 @@ final class Settings
 	}
 
 
-	/**
-	 * @deprecated since 2021-11-15, in future it will be implemented without cache.
-	 */
-	public function cleanCache(): void
-	{
-		$this->cache->clean([Cache::ALL => true]);
-	}
-
-
 	public function getCurrentVersion(): string
 	{
 		return $this->currentVersion;
