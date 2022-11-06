@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Baraja\Cms\Plugin;
 
 
-use Baraja\Cms\User\UserManager;
+use Baraja\CAS\User;
 use Baraja\Plugin\BasePlugin;
 
 final class CmsPlugin extends BasePlugin
 {
 	public function __construct(
-		private UserManager $userManager,
+		private User $user,
 	) {
 	}
 
@@ -36,7 +36,7 @@ final class CmsPlugin extends BasePlugin
 
 	public function actionSignOut(): void
 	{
-		$this->userManager->logout();
+		$this->user->logout();
 		$this->redirect('');
 	}
 }

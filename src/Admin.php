@@ -16,9 +16,6 @@ use Tracy\Debugger;
 
 final class Admin
 {
-	/** @deprecated since 2021-10-20, use Configuration::get()->getSupportedLocales() instead. */
-	public const SUPPORTED_LOCALES = ['cs', 'en'];
-
 	private Application $application;
 
 
@@ -42,7 +39,7 @@ final class Admin
 			Debugger::getBar()->addPanel($context->getContainer()->getPluginPanel());
 		}
 		if (function_exists('Sentry\configureScope')) {
-			(new SentryBridge($context->getUserManager()->get(), $this->context))->register();
+			(new SentryBridge($context->getUser(), $this->context))->register();
 		}
 	}
 
@@ -59,19 +56,12 @@ final class Admin
 	/**
 	 * @return never-return
 	 */
-	public function run(?string $locale = null, ?string $path = null): void
+	public function run(): void
 	{
 		if (PHP_SAPI === 'cli') {
 			throw new \RuntimeException('CMS is not available in CLI.');
 		}
-		if ($locale !== null) {
-			trigger_error('Argument $locale is deprecated. Please remove it from your implementation.');
-		}
-		if ($path !== null) {
-			trigger_error('Argument $path is deprecated. Please remove it from your implementation.');
-		} else {
-			$path = Url::get()->getRelativeUrl();
-		}
+		$path = Url::get()->getRelativeUrl();
 		if (self::isAdminRequest() === false) {
 			throw new \LogicException(sprintf('Path "%s" is not a admin request.', $path));
 		}

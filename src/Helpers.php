@@ -6,8 +6,6 @@ namespace Baraja\Cms;
 
 
 use Baraja\Cms\Container\Container;
-use Baraja\Network\Ip;
-use Baraja\PhoneNumber\PhoneNumberFormatter;
 use Baraja\Url\Url;
 use Latte\Engine;
 use Nette\Utils\Strings;
@@ -31,16 +29,8 @@ final class Helpers
 	}
 
 
-	/** @deprecated since 2021-09-11 use Ip::get() instead. */
-	public static function userIp(): string
-	{
-		return Ip::get();
-	}
-
-
 	/**
 	 * @param string $data -> a string of length divisible by five
-	 * @copyright Jakub Vrána, https://php.vrana.cz/
 	 */
 	public static function otpBase32Encode(string $data): string
 	{
@@ -64,7 +54,6 @@ final class Helpers
 	 * @param string $issuer -> service (or project) name
 	 * @param string $user -> username (displayed in Authenticator app)
 	 * @param string $secret -> in binary format
-	 * @copyright Jakub Vrána, https://php.vrana.cz/
 	 */
 	public static function getOtpQrUrl(string $issuer, string $user, string $secret): string
 	{
@@ -82,7 +71,6 @@ final class Helpers
 	 *
 	 * @param string $secret -> in binary format
 	 * @param string $timeSlot -> example: floor(time() / 30)
-	 * @copyright Jakub Vrána, https://php.vrana.cz/
 	 */
 	public static function getOtp(string $secret, string $timeSlot): int
 	{
@@ -100,23 +88,6 @@ final class Helpers
 		$checker = static fn(int $timeSlot): bool => self::getOtp($otpCode, (string) $timeSlot) === $code;
 
 		return $checker($slot = (int) floor(time() / 30)) || $checker($slot - 1) || $checker($slot + 1);
-	}
-
-
-	/**
-	 * @deprecated since 2021-04-21, use PhoneNumberFormatter::fix() instead.
-	 * Normalize phone to basic format if pattern match.
-	 *
-	 * @param int $region use this prefix when number prefix does not exist
-	 */
-	public static function fixPhone(string $phone, int $region = 420): string
-	{
-		trigger_error(
-			__METHOD__ . ': Method fixPhone() is deprecated and will be removed soon, '
-			. 'please use PhoneNumberFormatter::fix() instead.',
-		);
-
-		return PhoneNumberFormatter::fix($phone, $region);
 	}
 
 

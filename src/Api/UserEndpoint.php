@@ -6,16 +6,19 @@ namespace Baraja\Cms\Api;
 
 
 use Baraja\BarajaCloud\CloudManager;
+use Baraja\CAS\CasHelper;
+use Baraja\CAS\Entity\OrganisationMember;
+use Baraja\CAS\Entity\Role;
+use Baraja\CAS\Entity\User;
+use Baraja\CAS\Entity\UserEmail;
+use Baraja\CAS\Entity\UserLogin;
+use Baraja\CAS\Entity\UserMeta;
+use Baraja\CAS\Repository\UserMetaRepository;
+use Baraja\CAS\Service\MemberRoleManager;
+use Baraja\CAS\Service\UserMetaManager;
 use Baraja\Cms\Configuration;
 use Baraja\Cms\Context;
-use Baraja\Cms\Helpers;
 use Baraja\Cms\Settings;
-use Baraja\Cms\User\Entity\CmsUser;
-use Baraja\Cms\User\Entity\UserLogin;
-use Baraja\Cms\User\Entity\UserMeta;
-use Baraja\Cms\User\Entity\UserMetaRepository;
-use Baraja\Cms\User\UserManager;
-use Baraja\Cms\User\UserMetaManager;
 use Baraja\Doctrine\EntityManager;
 use Baraja\Plugin\PluginManager;
 use Baraja\StructuredApi\BaseEndpoint;
@@ -23,6 +26,7 @@ use Baraja\Url\Url;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Nette\Caching\Cache;
+use Nette\Caching\Storage;
 use Nette\Http\FileUpload;
 use Nette\Http\Request;
 use Nette\NotSupportedException;
@@ -33,15 +37,21 @@ use Nette\Utils\Strings;
 
 final class UserEndpoint extends BaseEndpoint
 {
+	private Cache $cache;
+
+
 	public function __construct(
-		private UserManager $userManager,
 		private UserMetaManager $userMetaManager,
 		private EntityManager $entityManager,
 		private CloudManager $cloudManager,
 		private PluginManager $pluginManager,
+		private MemberRoleManager $memberRoleManager,
 		private Settings $settings,
 		private Context $context,
+		private Request $httpRequest,
+		Storage $cacheStorage,
 	) {
+		$this->cache = new Cache($cacheStorage, 'user-endpoint');
 	}
 
 
@@ -58,10 +68,13 @@ final class UserEndpoint extends BaseEndpoint
 		?string $active = null,
 	): void {
 		$currentUserId = $this->getUser()->getId();
-		/** @var CmsUser $currentUser */
-		$currentUser = $this->userManager->getDefaultUserRepository()->find($currentUserId);
-		$count = $this->userManager->getCountUsers();
-		$selection = $this->userManager->getDefaultUserRepository()->createQueryBuilder('user');
+		$currentUser = $this->getUser()->getIdentityEntity();
+		assert($currentUser !== null);
+		$count = $this->getUser()->getUserStorage()->getUserRepository()->getCountUsers();
+
+		$selection = $this->entityManager
+			->getRepository(User::class)
+			->createQueryBuilder('user');
 
 		if ($active !== null) {
 			$selection->andWhere('user.active = ' . ($active === 'active' ? 'TRUE' : 'FALSE'));
@@ -131,8 +144,8 @@ final class UserEndpoint extends BaseEndpoint
 			->getQuery()
 			->getArrayResult();
 
-		/** @var UserMetaRepository $metaRepository */
 		$metaRepository = $this->entityManager->getRepository(UserMeta::class);
+		assert($metaRepository instanceof UserMetaRepository);
 
 		$metaToUser = $metaRepository->loadByUsersAndKeys(
 			array_map(static fn(array $user): int => $user['id'], $users),
@@ -198,19 +211,17 @@ final class UserEndpoint extends BaseEndpoint
 	public function createDefault(
 		string $fullName,
 		string $email,
-		string $role,
 		?string $phone = null,
 		?string $password = null,
 	): void {
-		if ($this->userManager->userExist($email) === true) {
+		if ($this->getUser()->getUserStorage()->userExist($email)) {
 			$this->sendError(sprintf('User "%s" already exist.', $email));
 		}
 		try {
-			$user = $this->userManager->createUser(
+			$user = $this->getUser()->createUser(
 				email: $email,
 				password: $password,
 				phone: $phone,
-				role: $role,
 			);
 		} catch (\InvalidArgumentException $e) {
 			$this->sendError($e->getMessage());
@@ -243,12 +254,12 @@ final class UserEndpoint extends BaseEndpoint
 	public function deleteDefault(int $id): void
 	{
 		try {
-			$user = $this->userManager->getUserById($id);
+			$member = $this->getMemberById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $id));
 		}
 
-		$user->setActive(false);
+		$member->getUser()->setActive(false);
 		$this->entityManager->flush();
 		$this->flashMessage('User was marked as deleted.', 'success');
 		$this->sendOk();
@@ -258,12 +269,12 @@ final class UserEndpoint extends BaseEndpoint
 	public function actionRevertUser(int $id): void
 	{
 		try {
-			$user = $this->userManager->getUserById($id);
+			$member = $this->getMemberById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $id));
 		}
 
-		$user->setActive(true);
+		$member->getUser()->setActive(true);
 		$this->entityManager->flush();
 		$this->flashMessage('User was reverted to active state.', 'success');
 		$this->sendOk();
@@ -276,7 +287,7 @@ final class UserEndpoint extends BaseEndpoint
 	public function actionValidateUser(string $email): void
 	{
 		$this->sendJson([
-			'exist' => $this->userManager->userExist($email),
+			'exist' => $this->getUser()->getUserStorage()->userExist($email),
 		]);
 	}
 
@@ -284,7 +295,7 @@ final class UserEndpoint extends BaseEndpoint
 	public function actionOverview(int $id): void
 	{
 		try {
-			$user = $this->userManager->getUserById($id);
+			$user = $this->getUser()->getUserStorage()->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $id));
 		}
@@ -328,7 +339,7 @@ final class UserEndpoint extends BaseEndpoint
 	public function postOverview(int $id, string $username, string $email, string $name): void
 	{
 		try {
-			$user = $this->userManager->getUserById($id);
+			$user = $this->getMemberById($id)->getUser();
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $id));
 		}
@@ -336,10 +347,14 @@ final class UserEndpoint extends BaseEndpoint
 		$this->setRealUserName($user, $name);
 		$user->setUsername($username);
 
-		try {
-			$user->addEmail($email);
-		} catch (\InvalidArgumentException $e) {
-			$this->sendError($e->getMessage());
+		if ($user->getEmail() !== $email) {
+			try {
+				$emailEntity = new UserEmail($user, $email);
+				$this->entityManager->persist($emailEntity);
+				$user->addEmail($emailEntity);
+			} catch (\InvalidArgumentException $e) {
+				$this->sendError($e->getMessage());
+			}
 		}
 
 		$this->entityManager->flush();
@@ -362,7 +377,7 @@ final class UserEndpoint extends BaseEndpoint
 	public function postSetPassword(int $id, string $password): void
 	{
 		try {
-			$user = $this->userManager->getUserById($id);
+			$user = $this->getMemberById($id)->getUser();
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $id));
 		}
@@ -382,7 +397,7 @@ final class UserEndpoint extends BaseEndpoint
 	public function actionSecurity(int $id): void
 	{
 		try {
-			$user = $this->userManager->getUserById($id);
+			$user = $this->getMemberById($id)->getUser();
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $id));
 		}
@@ -400,7 +415,7 @@ final class UserEndpoint extends BaseEndpoint
 			'twoFactorAuth' => $user->getOtpCode() !== null,
 			'options' => [
 				'canBan' => $isBlocked === false
-					&& $this->userManager->isAdmin()
+					&& $this->getUser()->isAdmin()
 					&& $this->getUser()->getId() !== $id,
 				'isBlocked' => $isBlocked,
 				'blockedReason' => $this->userMetaManager->get($id, 'block-reason'),
@@ -412,7 +427,7 @@ final class UserEndpoint extends BaseEndpoint
 	public function postCancelOauth(int $id): void
 	{
 		try {
-			$user = $this->userManager->getUserById($id);
+			$user = $this->getMemberById($id)->getUser();
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $id));
 		}
@@ -425,31 +440,14 @@ final class UserEndpoint extends BaseEndpoint
 
 	public function postBlockUser(int $id, string $reason): void
 	{
-		if ($this->userManager->isAdmin() === false) {
-			$this->sendError('You are not admin.');
-		}
-		/** @var int $userId */
-		$userId = $this->getUser()->getId();
-		if ($userId === $id) {
-			$this->sendError('Your account can not be blocked.');
-		}
-		$reason = trim($reason);
-		if ($reason === '') {
-			$this->flashMessage('Block reason can not be empty.', 'error');
-			$this->sendError('Block reason can not be empty.');
-		}
 		try {
-			$user = $this->userManager->getUserById($id);
-			$user->setActive(false);
-			$user->resetPrivileges();
-			$user->resetRoles();
+			$member = $this->getMemberById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $id));
 		}
 
-		$this->userMetaManager->set($id, 'blocked', 'true');
-		$this->userMetaManager->set($id, 'block-reason', $reason);
-		$this->userMetaManager->set($id, 'block-admin', (string) $userId);
+		$this->getUser()->getUserStorage()->disableMember($member, $reason);
+
 		$this->flashMessage('User has been blocked.', 'success');
 		$this->sendOk();
 	}
@@ -457,11 +455,11 @@ final class UserEndpoint extends BaseEndpoint
 
 	public function postBlockUserCancel(int $id): void
 	{
-		if ($this->userManager->isAdmin() === false) {
+		if ($this->getUser()->isAdmin() === false) {
 			$this->sendError('You are not admin.');
 		}
 		try {
-			$this->userManager->getUserById($id);
+			$this->getMemberById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $id));
 		}
@@ -477,7 +475,7 @@ final class UserEndpoint extends BaseEndpoint
 	public function actionGenerateOauth(int $id): void
 	{
 		try {
-			$user = $this->userManager->getUserById($id);
+			$user = $this->getMemberById($id)->getUser();
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $id));
 		}
@@ -485,11 +483,11 @@ final class UserEndpoint extends BaseEndpoint
 			$this->sendError('OTP code already exist.');
 		}
 
-		$otpCode = $this->userManager->generateOtpCode();
-		$opCodeHuman = Helpers::otpBase32Encode($otpCode);
+		$otpCode = CasHelper::generateOtpCode();
+		$opCodeHuman = CasHelper::otpBase32Encode($otpCode);
 		$otpCodeHash = md5($opCodeHuman);
 
-		$this->getCache('user-endpoint-otp')->save($otpCodeHash, $otpCode, [
+		$this->cache->save($otpCodeHash, $otpCode, [
 			Cache::EXPIRE => '10 minutes',
 		]);
 
@@ -499,7 +497,7 @@ final class UserEndpoint extends BaseEndpoint
 				'hash' => $otpCodeHash,
 				'human' => $opCodeHuman,
 			],
-			'qrCodeUrl' => Helpers::getOtpQrUrl(
+			'qrCodeUrl' => CasHelper::getOtpQrUrl(
 				Url::get()->getNetteUrl()->getDomain(3) . ' | ' . ($this->settings->getProjectName() ?? 'Baraja CMS'),
 				$user->getUsername(),
 				$otpCode,
@@ -511,14 +509,14 @@ final class UserEndpoint extends BaseEndpoint
 	public function postSetAuth(int $id, string $hash, string $code): void
 	{
 		/** @var string|null $otpCode */
-		$otpCode = $this->getCache('user-endpoint-otp')->load($hash);
+		$otpCode = $this->cache->load($hash);
 
 		if ($otpCode === null) {
 			$this->sendError('Hash is invalid or already expired.');
 		}
-		if (Helpers::checkAuthenticatorOtpCodeManually($otpCode, (int) $code) === true) {
+		if (CasHelper::checkAuthenticatorOtpCodeManually($otpCode, (int) $code) === true) {
 			try {
-				$user = $this->userManager->getUserById($id);
+				$user = $this->getMemberById($id)->getUser();
 			} catch (NoResultException | NonUniqueResultException) {
 				$this->sendError(sprintf('User "%s" does not exist.', $id));
 			}
@@ -534,14 +532,13 @@ final class UserEndpoint extends BaseEndpoint
 
 	public function actionPermissions(int $id): void
 	{
-		/** @var int $userId */
 		$userId = $this->getUser()->getId();
-		$currentUser = $this->userManager->getUserById($userId);
-		if ($currentUser->isAdmin() === false) {
+		$currentMember = $this->getMemberById($userId);
+		if ($currentMember->isAdmin() === false) {
 			$this->sendError('Permissions settings is available only for admin user.');
 		}
 		try {
-			$user = $this->userManager->getUserById($id);
+			$member = $this->getMemberById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $id));
 		}
@@ -551,13 +548,13 @@ final class UserEndpoint extends BaseEndpoint
 			$components = [];
 			foreach ($this->pluginManager->getComponents($plugin, null) as $component) {
 				$components[] = [
-					'active' => $user->containPrivilege('component-' . $component->getName()),
+					'active' => $member->hasRole('component-' . $component->getName()),
 					'tab' => $component->getTab(),
 					'name' => $component->getName(),
 				];
 			}
 			$plugins[] = [
-				'active' => $user->containPrivilege('plugin-' . $plugin->getSanitizedName()),
+				'active' => $member->hasRole('plugin-' . $plugin->getSanitizedName()),
 				'name' => $plugin->getSanitizedName(),
 				'type' => $plugin->getType(),
 				'realName' => $plugin->getRealName(),
@@ -566,8 +563,8 @@ final class UserEndpoint extends BaseEndpoint
 		}
 
 		$this->sendJson([
-			'isAdmin' => $user->isAdmin(),
-			'roles' => $user->getRoles(),
+			'isAdmin' => $member->isAdmin(),
+			'roles' => $member->getRoles(),
 			'items' => $plugins,
 		]);
 	}
@@ -586,24 +583,27 @@ final class UserEndpoint extends BaseEndpoint
 	 *     }>
 	 * }> $permissions
 	 */
-	public function postSavePermissions(int $id, array $roles, array $permissions): void
+	public function postSavePermissions(int $id, array $roles, array $permissions = []): void
 	{
-		/** @var int $userId */
 		$userId = $this->getUser()->getId();
-		$currentUser = $this->userManager->getUserById($userId);
-		if ($currentUser->isAdmin() === false) {
+		$currentMember = $this->getMemberById($userId);
+		if ($currentMember->isAdmin() === false) {
 			$this->sendError('Permissions settings is available only for admin user.');
 		}
 		try {
-			$user = $this->userManager->getUserById($id);
+			$member = $this->getMemberById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $id));
 		}
+
 		$roles = array_map(static fn(string $role): string => strtolower($role), $roles);
-		if ($user->isAdmin() === false && \in_array('admin', $roles, true) === true) {
+		if ($member->isAdmin() === false && \in_array('admin', $roles, true) === true) {
 			$this->sendError('You cannot set the administrator role manually. To maintain security, use the "Set as admin" button.');
 		}
 
+		// TODO: Privilege and role engine is temporally disabled.
+
+		/*
 		$privileges = [];
 		foreach ($permissions as $plugin) {
 			if ($plugin['active'] === false) {
@@ -625,15 +625,16 @@ final class UserEndpoint extends BaseEndpoint
 			}
 		}
 
-		$user->resetPrivileges();
+		$member->resetPrivileges();
 		foreach ($privileges as $privilege) {
-			$user->addPrivilege($privilege);
+			$member->addPrivilege($privilege);
 		}
 
-		$user->resetRoles();
+		$member->resetRoles();
 		foreach ($roles as $role) {
-			$user->addRole($role);
+			$member->addRole($role);
 		}
+		*/
 
 		$this->entityManager->flush();
 		$this->flashMessage('User permissions has been set.', 'success');
@@ -643,23 +644,20 @@ final class UserEndpoint extends BaseEndpoint
 
 	public function postMarkUserAsAdmin(int $id, string $password): void
 	{
-		/** @var int $userId */
-		$userId = $this->getUser()->getId();
-		$currentUser = $this->userManager->getUserById($userId);
-		if ($currentUser->isAdmin() === false) {
+		$currentMember = $this->getMemberById($this->getUser()->getId());
+		if ($currentMember->isAdmin() === false) {
 			$this->sendError('Permissions settings is available only for admin user.');
 		}
 		try {
-			$user = $this->userManager->getUserById($id);
+			$member = $this->getMemberById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $id));
 		}
-		if ($currentUser->passwordVerify($password) === false) {
+		if ($currentMember->getUser()->passwordVerify($password) === false) {
 			$this->sendError('Admin password is incorrect.');
 		}
 
-		$user->addRole('admin');
-		$this->entityManager->flush();
+		$this->memberRoleManager->addRole($member, Role::RoleAdmin);
 		$this->sendOk();
 	}
 
@@ -669,7 +667,7 @@ final class UserEndpoint extends BaseEndpoint
 	 */
 	public function actionLoginHistory(int $id, int $page = 1, int $limit = 32): void
 	{
-		$permitted = $this->userManager->isAdmin() || $this->getUser()->getId() === $id;
+		$permitted = $this->getUser()->isAdmin() || $this->getUser()->getId() === $id;
 		$count = 0;
 		if ($permitted === true) {
 			/** @var array<int, array{id: int, ip: string, hostname: string, userAgent: string, loginDatetime: \DateTime}> $logins */
@@ -748,24 +746,19 @@ final class UserEndpoint extends BaseEndpoint
 
 	public function postUploadAvatar(): void
 	{
-		/** @var Request $request */
-		$request = $this->container->getByType(Request::class);
-		$userIdParam = $request->getPost('userId');
+		$userIdParam = $this->httpRequest->getPost('userId');
 		$userId = is_numeric($userIdParam) ? (int) $userIdParam : 0;
 
 		try {
-			$user = $this->userManager->getUserById($userId);
+			$member = $this->getMemberById($userId);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $userId));
 		}
-		if (
-			!$this->getUser()->isInRole('admin')
-			&& $this->getUser()->getId() !== $userId
-		) {
+		if ($this->getUser()->getId() !== $userId && !$this->getUser()->isInRole('admin')) {
 			$this->sendError('Upload avatar is not permitted.');
 		}
 
-		$file = $request->getFile('avatar');
+		$file = $this->httpRequest->getFile('avatar');
 		if ($file === null) {
 			$this->sendError('Please select avatar image to upload.');
 		}
@@ -785,7 +778,7 @@ final class UserEndpoint extends BaseEndpoint
 							'header' => 'Content-Type: application/x-www-form-urlencoded',
 							'user_agent' => 'BarajaBot in PHP',
 							'content' => http_build_query([
-								'email' => $user->getEmail(),
+								'email' => $member->getUser()->getEmail(),
 								'blob' => base64_encode((static function (FileUpload $file): string {
 									try { // try to compress
 										return $file->toImage()->toString(IMAGETYPE_PNG);
@@ -821,12 +814,12 @@ final class UserEndpoint extends BaseEndpoint
 	public function actionSavePhone(int $id, string $phone, int $region = 420): void
 	{
 		try {
-			$user = $this->userManager->getUserById($id);
+			$member = $this->getMemberById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User "' . $id . '" does not exist.');
 		}
 		try {
-			$user->setPhone($phone, $region);
+			$member->getUser()->setPhone($phone, $region);
 		} catch (\Throwable $e) {
 			$this->sendError($e->getMessage());
 		}
@@ -840,26 +833,27 @@ final class UserEndpoint extends BaseEndpoint
 	public function postSetUserPassword(int $id, string $password): void
 	{
 		try {
-			/** @var int $userId */
 			$userId = $this->getUser()->getId();
-			$currentUser = $this->userManager->getUserById($userId);
+			$currentUser = $this->getMemberById($userId);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('User is not logged in.');
 		}
 		try {
-			$user = $this->userManager->getUserById($id);
+			$member = $this->getMemberById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%s" does not exist.', $id));
 		}
-		if ($currentUser->getId() !== $user->getId() && \in_array('admin', $currentUser->getRoles(), true) === false) {
+		if ($currentUser->getId() !== $member->getId()
+			&& in_array('admin', $currentUser->getRoleCodes(), true) === false
+		) {
 			$this->sendError('Current user must be admin for change password.');
 		}
 		try {
-			$user->setPassword($password);
+			$member->getUser()->setPassword($password);
 		} catch (\InvalidArgumentException $e) {
 			$this->sendError('Password can not be changed. Reason: ' . $e->getMessage());
 		}
-		$this->userMetaManager->set($user->getId(), 'password-last-changed-date', date('Y-m-d'));
+		$this->userMetaManager->set($member->getId(), 'password-last-changed-date', date('Y-m-d'));
 		$this->entityManager->flush();
 		$this->flashMessage('User password has been changed.', 'success');
 
@@ -897,9 +891,9 @@ final class UserEndpoint extends BaseEndpoint
 	}
 
 
-	private function setRealUserName(CmsUser $user, string $name): void
+	private function setRealUserName(User $user, string $name): void
 	{
-		$nameParser = Helpers::nameParser($name);
+		$nameParser = CasHelper::nameParser($name);
 		$user->setFirstName($nameParser['firstName']);
 		$user->setLastName($nameParser['lastName']);
 		$this->userMetaManager->set($user->getId(), 'name--degree-before', $nameParser['degreeBefore']);
@@ -915,10 +909,19 @@ final class UserEndpoint extends BaseEndpoint
 	{
 		static $cache;
 
-		return $cache ?? $cache = $this->userManager->getDefaultUserRepository()
+		return $cache ?? $cache = $this->getUser()->getUserStorage()->getUserRepository()
 				->createQueryBuilder('user')
 				->select('PARTIAL user.{id, roles, active}')
 				->getQuery()
 				->getArrayResult();
+	}
+
+
+	/**
+	 * @throws NoResultException|NonUniqueResultException
+	 */
+	private function getMemberById(int $id): OrganisationMember
+	{
+		return $this->getUser()->getUserStorage()->getMemberByUser($id);
 	}
 }

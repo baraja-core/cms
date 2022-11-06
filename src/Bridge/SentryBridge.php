@@ -5,18 +5,17 @@ declare(strict_types=1);
 namespace Baraja\Cms\MiddleWare\Bridge;
 
 
+use Baraja\CAS\User;
 use Baraja\Cms\Context;
-use Baraja\Cms\User\UserManager;
 use Baraja\Network\Ip;
 use Baraja\TracySentryBridge\SentryLogger;
-use function Sentry\configureScope;
-
 use Sentry\State\Scope;
+use function Sentry\configureScope;
 
 final class SentryBridge
 {
 	public function __construct(
-		private UserManager $userManager,
+		private User $user,
 		private Context $context,
 	) {
 	}
@@ -33,19 +32,16 @@ final class SentryBridge
 		configureScope(
 			function (Scope $scope): void {
 				$scope->setTag('request_id', $this->context->getContainer()->getRequestId());
-				if ($this->userManager->isLoggedIn() === false) {
+				if ($this->user->isLoggedIn() === false) {
 					return;
 				}
-				$identity = $this->userManager->getIdentity();
+				$identity = $this->user->getIdentity();
 				if ($identity !== null) {
-					$scope->setUser(
-						[
-							'id' => $identity->getId(),
-							'ip_address' => Ip::get(),
-							'username' => $identity->getName(),
-							'roles' => $identity->getRoles(),
-						],
-					);
+					$scope->setUser([
+						'id' => $identity->getId(),
+						'ip_address' => Ip::get(),
+						'username' => $identity->getName(),
+					]);
 				}
 			},
 		);

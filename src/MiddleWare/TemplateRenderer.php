@@ -6,6 +6,8 @@ namespace Baraja\Cms\MiddleWare;
 
 
 use Baraja\AdminBar\AdminBar;
+use Baraja\CAS\Entity\UserResetPasswordRequest;
+use Baraja\CAS\Repository\UserResetPasswordRequestRepository;
 use Baraja\Cms\Configuration;
 use Baraja\Cms\Context;
 use Baraja\Cms\Helpers;
@@ -13,9 +15,6 @@ use Baraja\Cms\MenuManager;
 use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Proxy\GlobalAsset\CmsSimpleStaticAsset;
 use Baraja\Cms\Settings;
-use Baraja\Cms\User\Entity\CmsUser;
-use Baraja\Cms\User\Entity\UserResetPasswordRequest;
-use Baraja\Cms\User\Entity\UserResetPasswordRequestRepository;
 use Baraja\Plugin\BasePlugin;
 use Baraja\Plugin\CmsPluginPanel;
 use Baraja\Plugin\Component\PluginComponent;
@@ -156,8 +155,8 @@ final class TemplateRenderer
 
 	public function renderResetPasswordTemplate(string $token, string $locale): string
 	{
-		/** @var UserResetPasswordRequestRepository $repository */
 		$repository = $this->context->getEntityManager()->getRepository(UserResetPasswordRequest::class);
+		assert($repository instanceof UserResetPasswordRequestRepository);
 
 		try {
 			$request = $repository->getByToken($token);
@@ -187,14 +186,7 @@ final class TemplateRenderer
 	public function renderSetUserPasswordTemplate(string $userId, string $locale): string
 	{
 		try {
-			/** @var CmsUser $user */
-			$user = $this->context->getUserManager()->get()->getDefaultUserRepository()
-				->createQueryBuilder('user')
-				->where('user.id = :userId')
-				->setParameter('userId', $userId)
-				->setMaxResults(1)
-				->getQuery()
-				->getSingleResult();
+			$user = $this->context->getUser()->getUserStorage()->getUserById((int) $userId);
 		} catch (NoResultException | NonUniqueResultException | \InvalidArgumentException) {
 			return 'This link does not work. For more information, please contact your project administrator.';
 		}

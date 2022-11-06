@@ -6,21 +6,23 @@ namespace Baraja\Cms\Plugin;
 
 
 use Baraja\AdminBar\AdminBar;
+use Baraja\CAS\Entity\User;
+use Baraja\CAS\Entity\UserLoginIdentity;
 use Baraja\Cms\Search\SearchablePlugin;
 use Baraja\Cms\Session;
 use Baraja\Cms\User\AdminBar\LoginAsUserPanel;
-use Baraja\Cms\User\Entity\CmsUser;
-use Baraja\Cms\User\UserManager;
 use Baraja\Plugin\BasePlugin;
 use Baraja\Plugin\SimpleComponent\Breadcrumb;
 use Baraja\Url\Url;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 
 final class UserPlugin extends BasePlugin implements SearchablePlugin
 {
 	public function __construct(
-		private UserManager $userManager,
+		private \Baraja\CAS\User $user,
+		private EntityManagerInterface $entityManager,
 	) {
 	}
 
@@ -38,11 +40,11 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 
 
 	/**
-	 * @return class-string<CmsUser>
+	 * @return class-string<User>
 	 */
 	public function getBaseEntity(): string
 	{
-		return $this->userManager->getDefaultEntity();
+		return User::class;
 	}
 
 
@@ -61,12 +63,12 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 	public function actionDetail(int $id): void
 	{
 		try {
-			$user = $this->userManager->getUserById($id);
+			$user = $this->user->getUserStorage()->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->error();
 		}
 
-		$currentIdentity = $this->userManager->getIdentity();
+		$currentIdentity = $this->user->getIdentity();
 		if ($currentIdentity !== null && $currentIdentity->getId() !== $id) {
 			AdminBar::getBar()->addPanel(new LoginAsUserPanel($user->getId()));
 		}
@@ -75,7 +77,7 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 			sprintf(
 				'(%s) %s %s',
 				(string) $user->getId(),
-				$this->userManager->isOnline($id) ? '[ONLINE]' : '',
+				$this->user->isOnline($id) ? '[ONLINE]' : '',
 				$user->getName(),
 			),
 		);
@@ -90,7 +92,7 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 
 	public function actionMe(): void
 	{
-		$identity = $this->userManager->getIdentity();
+		$identity = $this->user->getIdentity();
 		if ($identity !== null) {
 			$this->redirect($this->link('User:detail', [
 				'id' => $identity->getId(),
@@ -102,8 +104,27 @@ final class UserPlugin extends BasePlugin implements SearchablePlugin
 
 	public function actionLoginAs(int $id): void
 	{
+		$currentUser = $this->user->getIdentityEntity();
+		if ($currentUser === null || $currentUser->getId() === $id) {
+			return;
+		}
+
 		try {
-			$this->userManager->loginAs($id);
+			$member = $this->user->getUserStorage()->getMemberByUser($id);
+		} catch (NoResultException | NonUniqueResultException) {
+			throw new \InvalidArgumentException('User "' . $id . '" does not exist.');
+		}
+		if (isset($_SESSION) && session_status() === PHP_SESSION_ACTIVE) {
+			Session::set(Session::LAST_IDENTITY_ID, $currentUser->getId());
+		}
+		Session::remove(Session::WORKFLOW_NEED_OTP_AUTH);
+
+		$loginIdentity = new UserLoginIdentity($member, new \DateTimeImmutable('now + 2 hours'));
+		$this->entityManager->persist($loginIdentity);
+		$this->entityManager->flush();
+
+		try {
+			$this->user->getUserStorage()->saveAuthentication($loginIdentity);
 		} catch (\Throwable $e) {
 			$this->error($e->getMessage());
 		}

@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Baraja\Cms\Settings;
 
 
+use Baraja\CAS\Service\UserMetaManager;
+use Baraja\CAS\User;
 use Baraja\Cms\Session;
-use Baraja\Cms\User\UserManagerAccessor;
 
 final class SystemInfo
 {
@@ -17,7 +18,8 @@ final class SystemInfo
 
 
 	public function __construct(
-		private UserManagerAccessor $userManager,
+		private User $user,
+		private UserMetaManager $userMetaManager,
 	) {
 	}
 
@@ -60,17 +62,16 @@ final class SystemInfo
 	 */
 	private function getUserSettings(): array
 	{
-		$identity = $this->userManager->get()->getIdentity();
+		$identity = $this->user->getIdentity();
 		if ($identity === null) {
 			throw new \LogicException('User is not logged in.');
 		}
 		$id = $identity->getId();
-		$metaManager = $this->userManager->get()->getUserMetaManager();
-		$metaManager->loadAll($id);
+		$this->userMetaManager->loadAll($id);
 
 		$return = [];
 		foreach ($this->userKeys as $key) {
-			$return[$key] = $metaManager->get($id, $key);
+			$return[$key] = $this->userMetaManager->get($id, $key);
 		}
 
 		return $return;

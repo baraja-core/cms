@@ -6,13 +6,13 @@ namespace Baraja\Cms;
 
 
 use Baraja\AdminBar\Panel\BasicPanel;
+use Baraja\CAS\Service\UserMetaManager;
+use Baraja\CAS\User;
 use Baraja\Cms\Container\Container;
 use Baraja\Cms\MiddleWare\IntegrityWorkflow;
 use Baraja\Cms\Proxy\GlobalAsset\CmsAsset;
 use Baraja\Cms\Proxy\GlobalAsset\CustomGlobalAssetManagerAccessor;
 use Baraja\Cms\Translator\TranslatorFilter;
-use Baraja\Cms\User\UserManagerAccessor;
-use Baraja\Cms\User\UserMetaManager;
 use Baraja\Doctrine\Cache\FilesystemCache;
 use Baraja\DynamicConfiguration\Configuration;
 use Baraja\DynamicConfiguration\ConfigurationSection;
@@ -25,7 +25,6 @@ use DeviceDetector\Cache\DoctrineBridge;
 use DeviceDetector\DeviceDetector;
 use Doctrine\ORM\EntityManagerInterface;
 use Nette\Http\Response;
-use Nette\Security\User;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -49,9 +48,9 @@ final class Context implements ContainerInterface
 		private BasicPanel $basicInformation,
 		private PluginManager $pluginManager,
 		private MenuAuthorizatorAccessor $authorizator,
-		private UserManagerAccessor $userManager,
 		private CustomGlobalAssetManagerAccessor $customGlobalAssetManager,
 		private Localization $localization,
+		private UserMetaManager $userMetaManager,
 		Configuration $configuration,
 		?ServerRequestInterface $serverRequest = null,
 		?RequestHandlerInterface $requestHandler = null,
@@ -196,15 +195,6 @@ final class Context implements ContainerInterface
 	}
 
 
-	/**
-	 * @deprecated since 2021-10-22 use configuration service.
-	 */
-	public function getTempDir(): string
-	{
-		return $this->container->getConfiguration()->getTempDir();
-	}
-
-
 	public function isBot(): bool
 	{
 		if (PHP_SAPI === 'cli') {
@@ -246,11 +236,10 @@ final class Context implements ContainerInterface
 			$service = new IntegrityWorkflow($this->user);
 			$service->addRunEvent(
 				function (): void {
-					$identity = $this->userManager->get()->getIdentity();
+					$identity = $this->user->getIdentity();
 					assert($identity !== null);
-					$metaManager = new UserMetaManager($this->entityManager, $this->userManager->get());
-					$metaManager->set(
-						$identity->getId(),
+					$this->userMetaManager->set(
+						$identity->getUserId(),
 						'last-activity',
 						date('Y-m-d H:i:s'),
 					);
@@ -259,13 +248,13 @@ final class Context implements ContainerInterface
 			$service->addRunEvent(
 				function (): void {
 					$hash = Session::get(Session::WORKFLOW_PASSWORD_HASH);
-					$identity = $this->userManager->get()->getIdentity();
+					$identity = $this->user->getIdentityEntity();
 					if ($identity !== null) {
 						$newHash = md5($identity->getPassword());
 						if ($hash === null) {
 							Session::set(Session::WORKFLOW_PASSWORD_HASH, $newHash);
 						} elseif ($hash !== $newHash) {
-							$this->user->logout(true);
+							$this->user->logout();
 							Session::removeAll();
 						}
 					}
@@ -292,7 +281,7 @@ final class Context implements ContainerInterface
 				: $this->authorizator->get()->isAllowedComponent($pluginName, $view);
 		} catch (\Throwable $e) {
 			if ($e->getCode() === 404) { // Identity is broken or user does not exist
-				$this->user->logout(true);
+				$this->user->logout();
 			} else {
 				trigger_error('Can not check permissions: ' . htmlspecialchars($e->getMessage()));
 			}
@@ -335,11 +324,5 @@ final class Context implements ContainerInterface
 			throw new \RuntimeException(sprintf('Custom asset "%s" already exist.', $type));
 		}
 		$this->customAssets[$type] = $path;
-	}
-
-
-	public function getUserManager(): UserManagerAccessor
-	{
-		return $this->userManager;
 	}
 }

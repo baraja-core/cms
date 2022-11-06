@@ -6,8 +6,9 @@ namespace Baraja\Cms;
 
 
 use Baraja\BarajaCloud\CloudManager;
+use Baraja\CAS\Service\UserMetaManager;
+use Baraja\CAS\User;
 use Baraja\Cms\Settings\SystemInfo;
-use Baraja\Cms\User\UserManagerAccessor;
 use Baraja\DoctrineConfiguration\Option;
 use Baraja\DoctrineConfiguration\OptionRepository;
 use Baraja\DynamicConfiguration\Configuration;
@@ -28,7 +29,8 @@ final class Settings
 		private EntityManagerInterface $entityManager,
 		private Localization $localization,
 		private CloudManager $cloudManager,
-		private UserManagerAccessor $userManager,
+		private User $user,
+		private UserMetaManager $userMetaManager,
 		private string $currentVersion,
 		Storage $storage,
 		Configuration $configuration,
@@ -40,7 +42,7 @@ final class Settings
 
 	public function getSystemInfo(): SystemInfo
 	{
-		return new SystemInfo($this->userManager);
+		return new SystemInfo($this->user, $this->userMetaManager);
 	}
 
 
@@ -136,15 +138,6 @@ final class Settings
 		}
 
 		return false;
-	}
-
-
-	/**
-	 * @deprecated since 2021-11-15, in future it will be implemented without cache.
-	 */
-	public function cleanCache(): void
-	{
-		$this->cache->clean([Cache::ALL => true]);
 	}
 
 

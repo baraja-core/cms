@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Baraja\Cms\Announcement\Entity;
 
 
-use Baraja\Cms\User\Entity\User;
+use Baraja\CAS\Entity\User;
 use Baraja\Localization\Localization;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -26,9 +26,9 @@ class Announcement
 	#[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
 	private ?self $parent;
 
-	/** @var self[]|Collection */
+	/** @var Collection<self> */
 	#[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
-	private $children;
+	private Collection $children;
 
 	#[ORM\Column(type: 'string', length: 2, nullable: true)]
 	private ?string $locale;
@@ -79,9 +79,9 @@ class Announcement
 
 
 	/**
-	 * @return self[]|Collection
+	 * @return Collection<self>
 	 */
-	public function getChildren()
+	public function getChildren(): Collection
 	{
 		return $this->children;
 	}

@@ -7,6 +7,11 @@ namespace Baraja\Cms\Api;
 
 use Baraja\AdminBar\AdminBar;
 use Baraja\BarajaCloud\CloudManager;
+use Baraja\CAS\AuthenticationException;
+use Baraja\CAS\Authenticator;
+use Baraja\CAS\Entity\User;
+use Baraja\CAS\Entity\UserResetPasswordRequest;
+use Baraja\CAS\Repository\UserResetPasswordRequestRepository;
 use Baraja\Cms\Api\DTO\CmsGlobalSettingsResponse;
 use Baraja\Cms\Api\DTO\CmsPluginResponse;
 use Baraja\Cms\Api\DTO\CmsSettingsResponse;
@@ -18,11 +23,6 @@ use Baraja\Cms\Plugin\ErrorPlugin;
 use Baraja\Cms\Proxy\GlobalAsset\CmsSimpleStaticAsset;
 use Baraja\Cms\Session;
 use Baraja\Cms\Settings;
-use Baraja\Cms\User\Entity\CmsUser;
-use Baraja\Cms\User\Entity\User;
-use Baraja\Cms\User\Entity\UserResetPasswordRequest;
-use Baraja\Cms\User\Entity\UserResetPasswordRequestRepository;
-use Baraja\Cms\User\UserManager;
 use Baraja\Markdown\CommonMarkRenderer;
 use Baraja\Plugin\BasePlugin;
 use Baraja\StructuredApi\Attributes\PublicEndpoint;
@@ -31,14 +31,11 @@ use Baraja\Url\Url;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
-use Nette\Security\AuthenticationException;
-use Nette\Security\Authenticator;
 
 #[PublicEndpoint]
 final class CmsEndpoint extends BaseEndpoint
 {
 	public function __construct(
-		private UserManager $userManager,
 		private CloudManager $cloudManager,
 		private Settings $settings,
 		private MenuManager $menuManager,
@@ -123,12 +120,12 @@ final class CmsEndpoint extends BaseEndpoint
 			$this->sendError('Empty username or password.');
 		}
 		try {
-			$this->userManager->authenticate($username, $password, $remember);
+			$this->getUser()->getAuthenticator()->authentication($username, $password, $remember);
 		} catch (AuthenticationException $e) {
 			$code = $e->getCode();
-			if (in_array($code, [Authenticator::IDENTITY_NOT_FOUND, Authenticator::INVALID_CREDENTIAL, Authenticator::FAILURE], true)) {
+			if (in_array($code, [Authenticator::IdentityNotFound, Authenticator::InvalidCredential, Authenticator::Failure], true)) {
 				$this->sendError($e->getMessage());
-			} elseif ($code === Authenticator::NOT_APPROVED) {
+			} elseif ($code === Authenticator::NotApproved) {
 				$reason = $e->getMessage();
 				$this->sendError(
 					'The user has been assigned a permanent block. Please contact your administrator.'
@@ -155,10 +152,8 @@ final class CmsEndpoint extends BaseEndpoint
 			$this->sendError('User is not logged in.');
 		}
 		$id = $userEntity->getId();
-		assert(is_numeric($id));
-		$id = (int) $id;
 		try {
-			$user = $this->userManager->getUserById($id);
+			$user = $this->getUser()->getUserStorage()->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError(sprintf('User "%d" does not exist.', $id));
 		}
@@ -177,20 +172,17 @@ final class CmsEndpoint extends BaseEndpoint
 	public function postForgotPassword(string $locale, string $username): void
 	{
 		try {
-			/** @var CmsUser $user */
-			$user = $this->userManager->getDefaultUserRepository()
+			$user = $this->getUser()->getUserStorage()->getUserRepository()
 				->createQueryBuilder('user')
+				->leftJoin('user.email', 'email')
 				->where('user.username = :username')
-				->orWhere('user.email = :email')
+				->orWhere('email.email = :email')
 				->setParameter('username', $username)
 				->setParameter('email', $username)
 				->setMaxResults(1)
 				->getQuery()
 				->getSingleResult();
-
-			if (!$user instanceof User) {
-				$this->sendError('Reset password is available only for system CMS Users. Please contact your administrator');
-			}
+			assert($user instanceof User);
 
 			$request = new UserResetPasswordRequest($user, '3 hours');
 			$this->entityManager->persist($request);
@@ -205,7 +197,7 @@ final class CmsEndpoint extends BaseEndpoint
 				'expireDate' => $request->getExpireDate()->format('d. m. Y, H:i:s'),
 			]);
 		} catch (NoResultException | NonUniqueResultException) {
-			// Silence is golden.
+			$this->sendError('Reset password is available only for system CMS Users. Please contact your administrator');
 		}
 
 		$this->sendOk();
@@ -216,8 +208,7 @@ final class CmsEndpoint extends BaseEndpoint
 	{
 		if (preg_match('/^(\S+)\s+(\S+)$/', trim($realName), $parser) === 1) {
 			try {
-				/** @var CmsUser $user */
-				$user = $this->userManager->getDefaultUserRepository()
+				$user = $this->getUser()->getUserStorage()->getUserRepository()
 					->createQueryBuilder('user')
 					->where('user.firstName = :firstName')
 					->andWhere('user.lastName = :lastName')
@@ -226,6 +217,7 @@ final class CmsEndpoint extends BaseEndpoint
 					->setMaxResults(1)
 					->getQuery()
 					->getSingleResult();
+				assert($user instanceof User);
 
 				$this->cloudManager->callRequest('cloud/forgot-username', [
 					'domain' => Url::get()->getNetteUrl()->getDomain(3),
@@ -266,8 +258,8 @@ final class CmsEndpoint extends BaseEndpoint
 
 	public function postForgotPasswordSetNew(string $token, string $locale, string $password): void
 	{
-		/** @var UserResetPasswordRequestRepository $repository */
 		$repository = $this->entityManager->getRepository(UserResetPasswordRequest::class);
+		assert($repository instanceof UserResetPasswordRequestRepository);
 
 		try {
 			$request = $repository->getByToken($token);
@@ -299,14 +291,7 @@ final class CmsEndpoint extends BaseEndpoint
 	public function postSetUserPassword(string $locale, int $userId, string $password): void
 	{
 		try {
-			/** @var CmsUser $user */
-			$user = $this->userManager->getDefaultUserRepository()
-				->createQueryBuilder('user')
-				->where('user.id = :userId')
-				->setParameter('userId', $userId)
-				->setMaxResults(1)
-				->getQuery()
-				->getSingleResult();
+			$user = $this->getUser()->getUserStorage()->getUserById($userId);
 		} catch (NoResultException | NonUniqueResultException | \InvalidArgumentException) {
 			$this->sendError('User "' . $userId . '" does not exist.');
 		}
@@ -322,10 +307,8 @@ final class CmsEndpoint extends BaseEndpoint
 
 	public function postRenderEditorPreview(string $haystack): void
 	{
-		$this->sendJson(
-			[
-				'html' => $this->commonMarkRenderer->render($haystack),
-			],
-		);
+		$this->sendJson([
+			'html' => $this->commonMarkRenderer->render($haystack),
+		]);
 	}
 }
