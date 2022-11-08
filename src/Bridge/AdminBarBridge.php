@@ -26,6 +26,9 @@ final class AdminBarBridge
 
 	public function setup(): void
 	{
+		if ($this->user->isLoggedIn() === false) {
+			return;
+		}
 		$menu = AdminBar::getBar()->getMenu();
 
 		// Show link only in case of user can edit profile
