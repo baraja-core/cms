@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Baraja\Cms\Search;
+namespace Baraja\Cms\Api\CmsGlobalSearch;
 
 
 use Baraja\Cms\LinkGenerator;
+use Baraja\Cms\Search\SearchablePlugin;
 use Baraja\Plugin\PluginManager;
 use Baraja\Search\SearchAccessor;
 use Baraja\StructuredApi\BaseEndpoint;
@@ -21,14 +22,14 @@ final class CmsGlobalSearchEndpoint extends BaseEndpoint
 	}
 
 
-	public function actionDefault(string $query): void
+	public function actionDefault(string $query): CmsGlobalSearchResponse
 	{
 		if ($this->searchAccessor === null) {
-			$this->sendJson([
-				'active' => false,
-				'query' => $query,
-				'results' => [],
-			]);
+			return new CmsGlobalSearchResponse(
+				active: false,
+				query: $query,
+				results: [],
+			);
 		}
 
 		$entityToPlugin = $this->pluginManager->getBaseEntityToPlugin();
@@ -56,19 +57,19 @@ final class CmsGlobalSearchEndpoint extends BaseEndpoint
 			$entityClass = $this->entityManager->getClassMetadata($searchItem->getEntity()::class)->rootEntityName;
 			$pluginClass = $entityToPlugin[$entityClass] ?? null;
 			$pluginName = $pluginClassToPluginName[$pluginClass] ?? null;
-			$results[] = [
-				'title' => $searchItem->getTitleHighlighted(),
-				'snippet' => $searchItem->getSnippetHighlighted(),
-				'link' => LinkGenerator::generateInternalLink($pluginName . ':detail', [
+			$results[] = new CmsGlobalSearchItem(
+				title: (string) $searchItem->getTitleHighlighted(),
+				snippet: $searchItem->getSnippetHighlighted(),
+				link: LinkGenerator::generateInternalLink($pluginName . ':detail', [
 					'id' => $searchItem->getId(),
 				]),
-			];
+			);
 		}
 
-		$this->sendJson([
-			'active' => true,
-			'query' => $query,
-			'results' => $results,
-		]);
+		return new CmsGlobalSearchResponse(
+			active: true,
+			query: $query,
+			results: $results,
+		);
 	}
 }

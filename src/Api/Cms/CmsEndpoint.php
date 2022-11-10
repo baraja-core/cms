@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Baraja\Cms\Api;
+namespace Baraja\Cms\Api\Cms;
 
 
 use Baraja\AdminBar\AdminBar;
@@ -12,9 +12,6 @@ use Baraja\CAS\Authenticator;
 use Baraja\CAS\Entity\User;
 use Baraja\CAS\Entity\UserResetPasswordRequest;
 use Baraja\CAS\Repository\UserResetPasswordRequestRepository;
-use Baraja\Cms\Api\DTO\CmsGlobalSettingsResponse;
-use Baraja\Cms\Api\DTO\CmsPluginResponse;
-use Baraja\Cms\Api\DTO\CmsSettingsResponse;
 use Baraja\Cms\Configuration;
 use Baraja\Cms\ContextAccessor;
 use Baraja\Cms\Helpers;
@@ -27,6 +24,8 @@ use Baraja\Markdown\CommonMarkRenderer;
 use Baraja\Plugin\BasePlugin;
 use Baraja\StructuredApi\Attributes\PublicEndpoint;
 use Baraja\StructuredApi\BaseEndpoint;
+use Baraja\StructuredApi\Response\Status\ErrorResponse;
+use Baraja\StructuredApi\Response\Status\OkResponse;
 use Baraja\Url\Url;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
@@ -51,14 +50,14 @@ final class CmsEndpoint extends BaseEndpoint
 	 * It maintains a connection with the user session and passes basic system states
 	 * from the backend to the thin javascript client on the user's side.
 	 */
-	public function actionKeepConnection(): void
+	public function actionKeepConnection(): CmsKeepConnectionResponse
 	{
-		$this->sendJson([
-			'login' => $this->contextAccessor
+		return new CmsKeepConnectionResponse(
+			login: $this->contextAccessor
 				->get()
 				->getIntegrityWorkflow()
 				->run(true),
-		]);
+		);
 	}
 
 
@@ -90,7 +89,7 @@ final class CmsEndpoint extends BaseEndpoint
 		try {
 			$plugin = $context->getPluginByName($name);
 			if ($context->checkPermission($name) === false) {
-				$this->sendError('Permission denied.');
+				ErrorResponse::invoke('Permission denied.');
 			}
 		} catch (\RuntimeException | \InvalidArgumentException $e) {
 			if ($e->getCode() !== 404) {
@@ -114,62 +113,64 @@ final class CmsEndpoint extends BaseEndpoint
 	}
 
 
-	public function postSign(string $locale, string $username, string $password, bool $remember = false): void
+	public function postSign(string $locale, string $username, string $password, bool $remember = false): CmsSignResponse
 	{
 		if ($username === '' || $password === '') {
-			$this->sendError('Empty username or password.');
+			ErrorResponse::invoke('Empty username or password.');
 		}
 		try {
-			$this->getUser()->getAuthenticator()->authentication($username, $password, $remember);
+			$login = $this->getUser()->getAuthenticator()->authentication($username, $password, $remember);
+
+			return new CmsSignResponse(
+				loginStatus: true,
+				identityId: $login->getIdentityId(),
+			);
 		} catch (AuthenticationException $e) {
 			$code = $e->getCode();
 			if (in_array($code, [Authenticator::IdentityNotFound, Authenticator::InvalidCredential, Authenticator::Failure], true)) {
-				$this->sendError($e->getMessage());
+				ErrorResponse::invoke($e->getMessage());
 			} elseif ($code === Authenticator::NotApproved) {
 				$reason = $e->getMessage();
-				$this->sendError(
+				ErrorResponse::invoke(
 					'The user has been assigned a permanent block. Please contact your administrator.'
 					. ($reason !== '' ? ' Block reason: ' . $reason : ''),
 				);
-			} else {
-				$this->sendError('Wrong username or password.');
 			}
 		} catch (\Throwable $e) {
 			$this->contextAccessor->get()->getContainer()->getLogger()->critical($e->getMessage(), ['exception' => $e]);
-			$this->sendError('Internal authentication error. Your account has been broken. Please contact your administrator or Baraja support team.');
+			ErrorResponse::invoke('Internal authentication error. Your account has been broken. Please contact your administrator or Baraja support team.');
 		}
 
-		$this->sendOk([
-			'loginStatus' => true,
-		]);
+		ErrorResponse::invoke('Wrong username or password.');
 	}
 
 
-	public function postCheckOtpCode(string $locale, string $code): void
+	public function postCheckOtpCode(string $locale, string $code): OkResponse
 	{
 		$userEntity = $this->getUserEntity();
 		if ($userEntity === null) {
-			$this->sendError('User is not logged in.');
+			ErrorResponse::invoke('User is not logged in.');
 		}
 		$id = $userEntity->getId();
 		try {
 			$user = $this->getUser()->getUserStorage()->getUserById($id);
 		} catch (NoResultException | NonUniqueResultException) {
-			$this->sendError(sprintf('User "%d" does not exist.', $id));
+			ErrorResponse::invoke(sprintf('User "%d" does not exist.', $id));
 		}
 		$otpCode = $user->getOtpCode();
 		if ($otpCode === null) {
-			$this->sendError(sprintf('OTP code for user "%d" does not exist.', $user->getId()));
+			ErrorResponse::invoke(sprintf('OTP code for user "%d" does not exist.', $user->getId()));
 		}
 		if (Helpers::checkAuthenticatorOtpCodeManually($otpCode, (int) $code) === true) {
 			Session::remove(Session::WORKFLOW_NEED_OTP_AUTH);
-			$this->sendOk();
+
+			return new OkResponse;
 		}
-		$this->sendError('OTP code is invalid. Please try again.');
+		ErrorResponse::invoke('OTP code is invalid. Please try again.');
 	}
 
 
-	public function postForgotPassword(string $locale, string $username): void
+	public function postForgotPassword(string $locale, string $username): OkResponse
 	{
 		try {
 			$user = $this->getUser()->getUserStorage()->getUserRepository()
@@ -197,14 +198,14 @@ final class CmsEndpoint extends BaseEndpoint
 				'expireDate' => $request->getExpireDate()->format('d. m. Y, H:i:s'),
 			]);
 		} catch (NoResultException | NonUniqueResultException) {
-			$this->sendError('Reset password is available only for system CMS Users. Please contact your administrator');
+			ErrorResponse::invoke('Reset password is available only for system CMS Users. Please contact your administrator');
 		}
 
-		$this->sendOk();
+		return new OkResponse;
 	}
 
 
-	public function postForgotUsername(string $locale, string $realName): void
+	public function postForgotUsername(string $locale, string $realName): OkResponse
 	{
 		if (preg_match('/^(\S+)\s+(\S+)$/', trim($realName), $parser) === 1) {
 			try {
@@ -230,18 +231,18 @@ final class CmsEndpoint extends BaseEndpoint
 				// Silence is golden.
 			}
 		} else {
-			$this->sendError('Invalid name "' . $realName . '".');
+			ErrorResponse::invoke('Invalid name "' . $realName . '".');
 		}
 
-		$this->sendOk();
+		return new OkResponse;
 	}
 
 
-	public function postReportProblem(string $locale, string $description, string $username): void
+	public function postReportProblem(string $locale, string $description, string $username): OkResponse
 	{
 		$adminEmail = $this->settings->getAdminEmail();
 		if ($adminEmail === null) {
-			$this->sendError('Admin e-mail does not exist. Can not report your problem right now.');
+			ErrorResponse::invoke('Admin e-mail does not exist. Can not report your problem right now.');
 		}
 
 		$this->cloudManager->callRequest('cloud/report-problem', [
@@ -252,11 +253,11 @@ final class CmsEndpoint extends BaseEndpoint
 			'username' => $username,
 		]);
 
-		$this->sendOk();
+		return new OkResponse;
 	}
 
 
-	public function postForgotPasswordSetNew(string $token, string $locale, string $password): void
+	public function postForgotPasswordSetNew(string $token, string $locale, string $password): OkResponse
 	{
 		$repository = $this->entityManager->getRepository(UserResetPasswordRequest::class);
 		assert($repository instanceof UserResetPasswordRequestRepository);
@@ -264,12 +265,12 @@ final class CmsEndpoint extends BaseEndpoint
 		try {
 			$request = $repository->getByToken($token);
 			if ($request->isExpired() === true) {
-				$this->sendError('Token has been expired.');
+				ErrorResponse::invoke('Token has been expired.');
 			}
 			try {
 				$request->getUser()->setPassword($password);
 			} catch (\InvalidArgumentException $e) {
-				$this->sendError('Password can not be changed. Reason: ' . $e->getMessage());
+				ErrorResponse::invoke('Password can not be changed. Reason: ' . $e->getMessage());
 			}
 			$request->setExpired();
 			$this->entityManager->flush();
@@ -281,34 +282,35 @@ final class CmsEndpoint extends BaseEndpoint
 				'email' => $request->getUser()->getEmail(),
 			]);
 		} catch (NoResultException | NonUniqueResultException) {
-			$this->sendError('The password change token does not exist. Please request a new token again.');
+			ErrorResponse::invoke('The password change token does not exist. Please request a new token again.');
 		}
 
-		$this->sendOk();
+		return new OkResponse;
 	}
 
 
-	public function postSetUserPassword(string $locale, int $userId, string $password): void
+	public function postSetUserPassword(string $locale, int $userId, string $password): OkResponse
 	{
 		try {
 			$user = $this->getUser()->getUserStorage()->getUserById($userId);
 		} catch (NoResultException | NonUniqueResultException | \InvalidArgumentException) {
-			$this->sendError('User "' . $userId . '" does not exist.');
+			ErrorResponse::invoke('User "' . $userId . '" does not exist.');
 		}
 		try {
 			$user->setPassword($password);
 		} catch (\InvalidArgumentException $e) {
-			$this->sendError('Password can not be changed. Reason: ' . $e->getMessage());
+			ErrorResponse::invoke('Password can not be changed. Reason: ' . $e->getMessage());
 		}
 		$this->entityManager->flush();
-		$this->sendOk();
+
+		return new OkResponse;
 	}
 
 
-	public function postRenderEditorPreview(string $haystack): void
+	public function postRenderEditorPreview(string $haystack): CmsRenderEditorPreview
 	{
-		$this->sendJson([
-			'html' => $this->commonMarkRenderer->render($haystack),
-		]);
+		return new CmsRenderEditorPreview(
+			html: $this->commonMarkRenderer->render($haystack),
+		);
 	}
 }

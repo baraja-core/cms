@@ -12,14 +12,14 @@ use Nette\Http\UrlScript;
 final class Support
 {
 	public const
-		PRIORITY_LOW = 'low',
-		PRIORITY_NORMAL = 'normal',
-		PRIORITY_URGENT = 'urgent';
+		PriorityLow = 'low',
+		PriorityNormal = 'normal',
+		PriorityUrgent = 'urgent';
 
-	public const PRIORITY_LIST = [
-		self::PRIORITY_LOW => 'Low (3 weeks)',
-		self::PRIORITY_NORMAL => 'Normal (7 days)',
-		self::PRIORITY_URGENT => 'Urgent (24 hours)',
+	public const PriorityList = [
+		self::PriorityLow => 'Low (3 weeks)',
+		self::PriorityNormal => 'Normal (7 days)',
+		self::PriorityUrgent => 'Urgent (24 hours)',
 	];
 
 	private UrlScript $url;
@@ -57,7 +57,7 @@ final class Support
 			'subject' => $subject,
 			'message' => $message,
 			'priority' => $priority,
-			'dueDate' => $dueDate === null ? null : $dueDate->format(\DateTime::ATOM),
+			'dueDate' => $dueDate?->format(\DateTime::ATOM),
 			'url' => $url,
 		], 'POST');
 	}

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Baraja\Cms\Api\DTO;
+namespace Baraja\Cms\Api\Cms;
 
 
 use Baraja\Cms\MenuItem;

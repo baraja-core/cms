@@ -10,6 +10,8 @@ use Baraja\Cms\Announcement\Entity\Announcement;
 use Baraja\Cms\Announcement\Entity\AnnouncementRepository;
 use Baraja\Localization\Localization;
 use Baraja\StructuredApi\BaseEndpoint;
+use Baraja\StructuredApi\Response\Status\ErrorResponse;
+use Baraja\StructuredApi\Response\Status\OkResponse;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class CmsDashboardEndpoint extends BaseEndpoint
@@ -36,27 +38,26 @@ final class CmsDashboardEndpoint extends BaseEndpoint
 	}
 
 
-	public function postPostTopic(string $message, ?int $parentId = null): void
+	public function postPostTopic(string $message, ?int $parentId = null): OkResponse
 	{
 		$identity = $this->userService->getIdentityEntity();
-		assert($identity !== null);
-
-		$parent = null;
-		if ($parentId !== null) {
-			$parent = $this->repository->find($parentId);
-			assert($parent instanceof Announcement);
+		if ($identity === null) {
+			ErrorResponse::invoke('User must be logged in.');
 		}
 
 		$topic = new Announcement(
 			user: $identity,
 			locale: $this->localization->getLocale(),
 			message: $message,
-			parent: $parent,
+			parent: $parentId !== null
+				? $this->repository->getById($parentId)
+				: null,
 		);
 
 		$topic->setActive();
 		$this->entityManager->persist($topic);
 		$this->entityManager->flush();
-		$this->sendOk();
+
+		return new OkResponse;
 	}
 }
