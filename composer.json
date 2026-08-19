@@ -30,7 +30,7 @@
 		"guzzlehttp/psr7": "^2.0",
 		"nette/di": "^3.0",
 		"latte/latte": "^2.5 | ^3.0",
-		"nette/utils": "^3.0",
+		"nette/utils": "^3.0 || ^4.0",
 		"nette/http": "^3.1",
 		"nette/caching": "^3.0",
 		"piwik/device-detector": "^4.2"
@@ -66,7 +66,8 @@
 	"minimum-stability": "stable",
 	"config": {
 		"allow-plugins": {
-			"phpstan/extension-installer": true
+			"phpstan/extension-installer": true,
+			"php-http/discovery": true
 		}
 	}
 }
