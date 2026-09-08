@@ -1,6 +1,7 @@
 includes:
 	- vendor/spaze/phpstan-disallowed-calls/disallowed-dangerous-calls.neon
 	- vendor/spaze/phpstan-disallowed-calls/disallowed-execution-calls.neon
+	- phpstan-baseline.neon
 
 parameters:
 	checkGenericClassInNonGenericObjectType: false

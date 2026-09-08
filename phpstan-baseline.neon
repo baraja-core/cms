@@ -1,0 +1,83 @@
+parameters:
+	ignoreErrors:
+		-
+			message: """
+				#^Fetching deprecated class constant S302_FOUND of interface Nette\\\\Http\\\\IResponse\\:
+				use IResponse\\:\\:S302_Found$#
+			"""
+			count: 1
+			path: src/Admin.php
+
+		-
+			message: "#^Right side of && is always true\\.$#"
+			count: 2
+			path: src/Admin.php
+
+		-
+			message: """
+				#^Fetching deprecated class constant EXPIRE of class Nette\\\\Caching\\\\Cache\\:
+				use Cache\\:\\:Expire$#
+			"""
+			count: 1
+			path: src/Api/UserEndpoint.php
+
+		-
+			message: "#^Cannot access property \\$homepage on array\\|object\\.$#"
+			count: 2
+			path: src/CmsExtension.php
+
+		-
+			message: "#^Offset 'format' on array\\{0\\: string, name\\: non\\-empty\\-string, 1\\: non\\-empty\\-string, format\\: non\\-empty\\-string, 2\\: non\\-empty\\-string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/CmsExtension.php
+
+		-
+			message: "#^Static property Baraja\\\\Cms\\\\LinkGenerator\\:\\:\\$lastNonce \\(array\\<string, int\\>\\) does not accept array\\.$#"
+			count: 1
+			path: src/LinkGenerator.php
+
+		-
+			message: """
+				#^Fetching deprecated class constant S302_FOUND of interface Nette\\\\Http\\\\IResponse\\:
+				use IResponse\\:\\:S302_Found$#
+			"""
+			count: 1
+			path: src/MiddleWare/Application.php
+
+		-
+			message: """
+				#^Fetching deprecated class constant PRODUCTION of class Tracy\\\\Debugger\\:
+				use Debugger\\:\\:Production$#
+			"""
+			count: 1
+			path: src/MiddleWare/IntegrityWorkflow.php
+
+		-
+			message: "#^Offset 'extension' on array\\{0\\: string, filename\\: non\\-falsy\\-string, 1\\: non\\-falsy\\-string, 2\\: non\\-empty\\-string, extension\\: non\\-empty\\-string, 3\\: non\\-empty\\-string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/Proxy/Proxy.php
+
+		-
+			message: "#^Offset 'extension' on array\\{0\\: string, hash\\: non\\-falsy\\-string, 1\\: non\\-falsy\\-string, extension\\: non\\-empty\\-string, 2\\: non\\-empty\\-string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/Proxy/Proxy.php
+
+		-
+			message: "#^Offset 'filename' on array\\{0\\: string, filename\\: non\\-falsy\\-string, 1\\: non\\-falsy\\-string, 2\\: non\\-empty\\-string, extension\\: non\\-empty\\-string, 3\\: non\\-empty\\-string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/Proxy/Proxy.php
+
+		-
+			message: "#^Offset 'hash' on array\\{0\\: string, hash\\: non\\-falsy\\-string, 1\\: non\\-falsy\\-string, extension\\: non\\-empty\\-string, 2\\: non\\-empty\\-string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/Proxy/Proxy.php
+
+		-
+			message: "#^Static property Baraja\\\\Cms\\\\Security\\\\Nonce\\:\\:\\$lastNonce \\(array\\<string, int\\>\\) does not accept array\\.$#"
+			count: 1
+			path: src/Security/Nonce.php
+
+		-
+			message: "#^Casting to string something that's already string\\.$#"
+			count: 1
+			path: src/Settings/InstallProcess.php
