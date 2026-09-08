@@ -47,7 +47,8 @@ final class MenuItem
 			priority: $plugin['priority'],
 			link: sprintf(
 				'%s/%s',
-				Configuration::get()->getBaseUri(), Helpers::formatPresenterNameToUri($plugin['name']),
+				Configuration::get()->getBaseUri(),
+				Helpers::formatPresenterNameToUri($plugin['name']),
 			),
 			icon: $plugin['icon'] ?? null,
 			child: [],

@@ -45,7 +45,8 @@ final class CmsInstallEndpoint extends BaseEndpoint
 		string $password,
 		string $passwordVerify,
 		bool $vop = false,
-	): void {
+	): void
+	{
 		if ($this->settings->isBasicConfigurationOk() === true) {
 			$this->sendError('Unauthorized request.');
 		}
@@ -136,7 +137,8 @@ final class CmsInstallEndpoint extends BaseEndpoint
 		string $firstName,
 		string $lastName,
 		?string $phone = null,
-	): void {
+	): void
+	{
 		if ($this->settings->isCloudConnectionOk() === true) {
 			$this->sendError('Unauthorized request.');
 		}

@@ -51,7 +51,8 @@ final class Support
 		string $priority,
 		?\DateTime $dueDate = null,
 		?string $url = null,
-	): void {
+	): void
+	{
 		$this->cloudManager->callRequest('cms-issue', [
 			'domain' => $this->getDomain(),
 			'subject' => $subject,

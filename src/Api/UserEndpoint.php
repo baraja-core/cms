@@ -66,7 +66,8 @@ final class UserEndpoint extends BaseEndpoint
 		?string $role = null,
 		?string $query = null,
 		?string $active = null,
-	): void {
+	): void
+	{
 		$currentUserId = $this->getUser()->getId();
 		$currentUser = $this->getUser()->getIdentityEntity();
 		assert($currentUser !== null);
@@ -213,7 +214,8 @@ final class UserEndpoint extends BaseEndpoint
 		string $email,
 		?string $phone = null,
 		?string $password = null,
-	): void {
+	): void
+	{
 		if ($this->getUser()->getUserStorage()->userExist($email)) {
 			$this->sendError(sprintf('User "%s" already exist.', $email));
 		}

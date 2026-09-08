@@ -42,7 +42,8 @@ final class InternalSupportEndpoint extends BaseEndpoint
 		string $priority,
 		?string $dueDate = null,
 		?string $url = null,
-	): void {
+	): void
+	{
 		if (isset(Support::PriorityList[$priority]) === false) {
 			$this->sendError('Priority "' . $priority . '" does not exist. Did you mean "' . implode('", "', array_keys(Support::PriorityList)) . '"?');
 		}

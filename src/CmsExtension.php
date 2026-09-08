@@ -366,7 +366,8 @@ final class CmsExtension extends CompilerExtension
 		ServiceDefinition $globalAssetManager,
 		string $path,
 		string $format,
-	): string {
+	): string
+	{
 		$hash = md5($path . '.' . $format);
 		$globalAssetManager->addSetup('?->addDiskPath(?, ?)', [
 			'@self',
