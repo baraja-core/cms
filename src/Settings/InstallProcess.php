@@ -28,8 +28,7 @@ final class InstallProcess
 		try {
 			$this->settings->isDatabaseConnectionOk();
 		} catch (\Throwable $databaseException) {
-			/** @var string $host */
-			$host = $this->entityManager->getConnection()->getParams()['host'] ?? '';
+			$host = (string) ($this->entityManager->getConnection()->getParams()['host'] ?? '');
 
 			return (new Engine)
 				->renderToString(__DIR__ . '/../../template/install-database.latte', [

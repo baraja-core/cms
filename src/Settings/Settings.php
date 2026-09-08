@@ -95,8 +95,8 @@ final class Settings
 			return true;
 		}
 
-		/** @var OptionRepository $optionRepository */
 		$optionRepository = $this->entityManager->getRepository(Option::class);
+		assert($optionRepository instanceof OptionRepository);
 
 		$status = $optionRepository->isOptionExist();
 		if ($status === true) {

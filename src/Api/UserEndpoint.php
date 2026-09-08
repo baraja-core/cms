@@ -508,8 +508,8 @@ final class UserEndpoint extends BaseEndpoint
 
 	public function postSetAuth(int $id, string $hash, string $code): void
 	{
-		/** @var string|null $otpCode */
 		$otpCode = $this->cache->load($hash);
+		assert($otpCode === null || is_string($otpCode));
 
 		if ($otpCode === null) {
 			$this->sendError('Hash is invalid or already expired.');

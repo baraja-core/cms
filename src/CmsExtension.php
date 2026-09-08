@@ -156,18 +156,17 @@ final class CmsExtension extends CompilerExtension
 		$builder->addAccessorDefinition($this->prefix('customGlobalAssetManagerAccessor'))
 			->setImplement(CustomGlobalAssetManagerAccessor::class);
 
-		/** @var ServiceDefinition $pluginManager */
 		$pluginManager = $this->getContainerBuilder()->getDefinitionByType(PluginManager::class);
+		assert($pluginManager instanceof ServiceDefinition);
 
 		// Homepage
-		$homepageSource = $this->config->homepage !== null
-			? $this->config->homepage : __DIR__ . '/../template/vue/homepage-default.js';
+		$homepageSource = $this->config->homepage ?? __DIR__ . '/../template/vue/homepage-default.js';
 
 		if (is_file($homepageSource) === false) {
 			if ($this->config->homepage !== null) {
 				throw new \RuntimeException(
 					'Custom homepage file "' . $this->config->homepage . '" does not exist. ' .
-					'Please check the path in your configuration or remove the homepage setting to use the default.'
+					'Please check the path in your configuration or remove the homepage setting to use the default.',
 				);
 			}
 			throw new \RuntimeException('Default homepage file "' . $homepageSource . '" does not exist.');

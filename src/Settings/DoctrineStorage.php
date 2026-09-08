@@ -21,8 +21,8 @@ final class DoctrineStorage implements Storage
 	public function __construct(
 		private EntityManagerInterface $entityManager,
 	) {
-		/** @var OptionRepository $optionRepository */
 		$optionRepository = $entityManager->getRepository(Option::class);
+		assert($optionRepository instanceof OptionRepository);
 		$this->optionRepository = $optionRepository;
 	}
 

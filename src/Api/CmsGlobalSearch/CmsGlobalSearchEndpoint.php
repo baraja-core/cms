@@ -37,8 +37,8 @@ final class CmsGlobalSearchEndpoint extends BaseEndpoint
 		$entityMap = [];
 		foreach ($entityToPlugin as $baseEntity => $pluginClass) {
 			if (is_subclass_of($pluginClass, SearchablePlugin::class)) {
-				/** @var SearchablePlugin $plugin */
 				$plugin = $this->pluginManager->getPluginByType($pluginClass);
+				assert($plugin instanceof SearchablePlugin);
 				$entityMap[$baseEntity] = $plugin->getSearchColumns();
 				if (isset($pluginClassToPluginName[$pluginClass]) === false) {
 					$pluginClassToPluginName[$pluginClass] = $this->pluginManager->getPluginNameByType($plugin);

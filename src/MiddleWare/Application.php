@@ -107,8 +107,8 @@ final class Application
 		} catch (PluginTerminateException) {
 			$this->terminate();
 		} catch (PluginUserErrorException $e) {
-			/** @var ErrorPlugin $pluginService */
 			$pluginService = $this->context->getPluginByType(ErrorPlugin::class);
+			assert($pluginService instanceof ErrorPlugin);
 			$pluginService->setTitle($e->getMessage());
 			$pluginService->setSubtitle(null);
 		}
