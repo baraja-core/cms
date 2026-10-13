@@ -2,21 +2,42 @@ console.log('%c Welcome to Baraja CMS. All components has been loaded successful
 
 Vue.component('cms-menu', {
 	props: ['structure', 'activeKey', 'dashboardLink', 'isDashboard', 'debugMode'],
-	template: `<div class="cms-menu-container">
-		<a :class="{'cms-menu-item': true, 'cms-menu-item-selected': isDashboard}" :href="dashboardLink">
-			<b-icon icon="compass" class="mr-2"></b-icon>Dashboard
-		</a>
-		<template v-for="item in structure">
-			<cms-menu-item :item-key="item.key" :title="item.title" :link="item.link" :icon="item.icon" :child="item.child" :priority="item.priority" :active-key="activeKey" :debug-mode="debugMode"></cms-menu-item>
-		</template>
-	</div>`
+	template: `<div :class="{'cms-menu-collapsed': collapsed}">
+		<div class="cms-menu-container">
+			<a :class="{'cms-menu-item': true, 'cms-menu-item-selected': isDashboard}" :href="dashboardLink" title="Dashboard">
+				<b-icon icon="compass" class="mr-2"></b-icon><span class="cms-menu-label">Dashboard</span>
+			</a>
+			<template v-for="item in structure">
+				<cms-menu-item :item-key="item.key" :title="item.title" :link="item.link" :icon="item.icon" :child="item.child" :priority="item.priority" :active-key="activeKey" :debug-mode="debugMode"></cms-menu-item>
+			</template>
+		</div>
+		<div class="cms-menu-container">
+			<button type="button" class="cms-menu-item cms-menu-toggle" @click="toggle" :aria-expanded="collapsed ? 'false' : 'true'" :title="collapsed ? 'Expand menu' : 'Collapse menu'">
+				<b-icon :icon="collapsed ? 'chevron-double-right' : 'chevron-double-left'" class="mr-2"></b-icon><span class="cms-menu-label">Hide menu</span>
+			</button>
+		</div>
+	</div>`,
+	data() {
+		return {
+			collapsed: localStorage.getItem('cms-menu-collapsed') === '1' ?? false,
+		}
+	},
+	methods: {
+		toggle() {
+			this.collapsed = !this.collapsed;
+			try {
+				localStorage.setItem('cms-menu-collapsed', this.collapsed ? '1' : '0');
+			} catch (e) {
+			}
+		}
+	}
 });
 
 Vue.component('cms-menu-item', {
 	props: ['itemKey', 'title', 'link', 'icon', 'child', 'priority', 'activeKey', 'debugMode'],
-	template: `<a :class="{'cms-menu-item': true, 'cms-menu-item-selected': itemKey === activeKey}" :href="basePath + '/' + link">
-	<span v-if="debugMode" class="text-secondary" style="font-size:10pt">[{{ priority }}]</span>
-	<b-icon :icon="icon ? icon : 'hash'" class="mr-2"></b-icon>{{ title }}
+	template: `<a :class="{'cms-menu-item': true, 'cms-menu-item-selected': itemKey === activeKey}" :href="basePath + '/' + link" :title="title">
+	<span v-if="debugMode" class="text-secondary cms-menu-label" style="font-size:10pt">[{{ priority }}]</span>
+	<b-icon :icon="icon ? icon : 'hash'" class="mr-2"></b-icon><span class="cms-menu-label">{{ title }}</span>
 	<div class="cms-menu-item" v-if="child.length > 0">
 		<template v-for="item in child">
 			<cms-menu-item :item-key="item.key" :title="item.title" :link="item.link" :icon="item.icon" :child="item.child" :priority="item.priority" :debug-mode="debugMode"></cms-menu-item>
