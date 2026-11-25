@@ -18,8 +18,14 @@ Vue.component('cms-menu', {
 		</div>
 	</div>`,
 	data() {
+		let collapsed = false;
+		try {
+			collapsed = localStorage.getItem('cms-menu-collapsed') === '1';
+		} catch (e) {
+			// localStorage may be unavailable (privacy mode, disabled storage)
+		}
 		return {
-			collapsed: localStorage.getItem('cms-menu-collapsed') === '1' ?? false,
+			collapsed: collapsed,
 		}
 	},
 	methods: {
@@ -28,6 +34,7 @@ Vue.component('cms-menu', {
 			try {
 				localStorage.setItem('cms-menu-collapsed', this.collapsed ? '1' : '0');
 			} catch (e) {
+				// localStorage may be unavailable, the state just won't persist
 			}
 		}
 	}
