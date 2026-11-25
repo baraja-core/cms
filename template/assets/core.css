@@ -48,6 +48,29 @@
 	box-shadow: 0 5px 16px 0 rgba(214, 206, 194, 0.5);
 }
 
+#cms-menu:has(.cms-menu-collapsed) {
+	flex: 0 0 auto;
+}
+
+.cms-menu-collapsed .cms-menu-label {
+	display: none;
+}
+
+#cms-menu .cms-menu-collapsed .cms-menu-item {
+	text-align: center;
+}
+
+.cms-menu-collapsed .b-icon {
+	margin-right: 0 !important;
+}
+
+#cms-menu .cms-menu-toggle {
+	width: 100%;
+	border: 0;
+	background: none;
+	text-align: left;
+}
+
 .cms-main {
 	flex: 80%;
 }
